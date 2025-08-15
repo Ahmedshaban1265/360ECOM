@@ -137,10 +137,12 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                             }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <Button className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 relative overflow-hidden group">
-                                <motion.div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                <span className="relative z-10">{t.nav.getStarted}</span>
-                            </Button>
+                            <Link to="/booking">
+                                <Button className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 relative overflow-hidden group">
+                                    <motion.div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <span className="relative z-10">{t.nav.getStarted}</span>
+                                </Button>
+                            </Link>
                         </motion.div>
                     </div>
 
