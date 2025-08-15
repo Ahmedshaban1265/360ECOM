@@ -20,6 +20,7 @@ import TestimonialsPage from '@/pages/TestimonialsPage';
 import ContactPage from '@/pages/ContactPage';
 import CaseStudiesPage from '@/pages/CaseStudiesPage';
 import ProjectsPage from '@/pages/ProjectsPage';
+import BookingPage from '@/pages/BookingPage';
 
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
