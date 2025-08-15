@@ -13,7 +13,7 @@ const content = {
             results: "Our Results",
             testimonials: "Testimonials",
             contact: "Contact",
-            getStarted: "Get Started"
+            getStarted: "Book a Consultation"
         },
         hero: {
             badge: "#1 E-commerce Growth Agency",
@@ -123,7 +123,7 @@ const content = {
             services: "الخدمات",
             about: "من نحن",
             clients: "عملاؤنا",
-            "case-studies": "دراسات الحالة",
+            "case-studies": "دراسات ا��حالة",
             ProjectsPage: "مشاريعنا",
             team: "فريقنا",
             results: "نتائجنا",
@@ -213,7 +213,7 @@ const content = {
             badge: "تواصل معنا",
             title: "مستعد لبدء",
             titleHighlight: "رحلة النمو؟",
-            description: "دعنا نناقش كيف يمكننا مساعدتك في تحقيق أهداف عملك والارتقاء بتجارتك الإلكترونية إلى المستوى التالي.",
+            description: "دعنا ��ناقش كيف يمكننا مساعدتك في تحقيق أهداف عملك والارتقاء بتجارتك الإلكترونية إلى المستوى التالي.",
             getInTouch: "تواصل معنا",
             sendMessage: "أرسل لنا رسالة",
             email: "البريد الإلكتروني",
