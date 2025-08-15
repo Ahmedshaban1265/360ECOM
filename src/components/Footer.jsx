@@ -1,0 +1,86 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { MessageCircle, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
+import content from "../utils/content";
+import ScrollAnimationWrapper from "./ScrollAnimationWrapper";
+
+export default function Footer({ language }) {
+    const t = content[language];
+    const isRTL = language === "ar";
+
+    const socialLinks = [
+        { icon: <MessageCircle className="w-5 h-5" />, href: "https://wa.me/1234567890", label: "WhatsApp" },
+        { icon: <Instagram className="w-5 h-5" />, href: "https://instagram.com/360ecom", label: "Instagram" },
+        { icon: <Facebook className="w-5 h-5" />, href: "https://facebook.com/360ecom", label: "Facebook" },
+        { icon: <Linkedin className="w-5 h-5" />, href: "https://linkedin.com/company/360ecom", label: "LinkedIn" },
+        { icon: <Twitter className="w-5 h-5" />, href: "https://twitter.com/360ecom", label: "Twitter" }
+    ];
+
+    return (
+        <footer className="py-12 border-t bg-muted/30">
+            <div className="container mx-auto px-4">
+                <ScrollAnimationWrapper>
+                    <div className="grid lg:grid-cols-4 gap-8">
+                        <div>
+                            <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                                360ECOM
+                            </div>
+                            <p className="text-muted-foreground mb-6">
+                                {t.footer.description}
+                            </p>
+                            <div className="flex space-x-4">
+                                {socialLinks.map((social, index) => (
+                                    <motion.a
+                                        key={index}
+                                        href={social.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-10 h-10 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
+                                        whileHover={{ scale: 1.1, rotate: 5 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        title={social.label}
+                                    >
+                                        {social.icon}
+                                    </motion.a>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 className="font-semibold mb-4">{t.footer.services}</h4>
+                            <ul className="space-y-2 text-muted-foreground">
+                                <li><Link to="/services" className="hover:text-emerald-600 transition-colors">E-commerce Development</Link></li>
+                                <li><Link to="/services" className="hover:text-emerald-600 transition-colors">Digital Marketing</Link></li>
+                                <li><Link to="/services" className="hover:text-emerald-600 transition-colors">Web Development</Link></li>
+                                <li><Link to="/services" className="hover:text-emerald-600 transition-colors">SEO Optimization</Link></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-semibold mb-4">{t.footer.company}</h4>
+                            <ul className="space-y-2 text-muted-foreground">
+                                <li><Link to="/about" className="hover:text-emerald-600 transition-colors">About Us</Link></li>
+                                <li><Link to="/about" className="hover:text-emerald-600 transition-colors">Our Team</Link></li>
+                                <li><Link to="/contact" className="hover:text-emerald-600 transition-colors">Careers</Link></li>
+                                <li><Link to="/contact" className="hover:text-emerald-600 transition-colors">Contact</Link></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-semibold mb-4">{t.footer.connect}</h4>
+                            <ul className="space-y-2 text-muted-foreground">
+                                <li><a href="mailto:hello@360ecom.com" className="hover:text-emerald-600 transition-colors">hello@360ecom.com</a></li>
+                                <li><a href="tel:+1234567890" className="hover:text-emerald-600 transition-colors">+1 (234) 567-890</a></li>
+                                <li><span>123 Business St, City, Country</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </ScrollAnimationWrapper>
+
+                <div className="border-t mt-8 pt-8 text-center text-muted-foreground">
+                    <p>{t.footer.copyright}</p>
+                </div>
+            </div>
+        </footer>
+    );
+}
