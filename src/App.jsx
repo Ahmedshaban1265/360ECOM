@@ -20,6 +20,7 @@ import TestimonialsPage from '@/pages/TestimonialsPage';
 import ContactPage from '@/pages/ContactPage';
 import CaseStudiesPage from '@/pages/CaseStudiesPage';
 import ProjectsPage from '@/pages/ProjectsPage';
+import BookingPage from '@/pages/BookingPage';
 
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
@@ -71,6 +72,7 @@ function AppContent() {
         <Route path="/contact" element={<ContactPage language={language} />} />
         <Route path="/case-studies" element={<CaseStudiesPage language={language} />} />
         <Route path="/our-projects" element={<ProjectsPage language={language} />} />
+        <Route path="/booking" element={<BookingPage language={language} />} />
 
         {/* Admin login */}
         <Route path="/admin-login" element={<AdminLogin />} />

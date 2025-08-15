@@ -13,7 +13,7 @@ const content = {
             results: "Our Results",
             testimonials: "Testimonials",
             contact: "Contact",
-            getStarted: "Get Started"
+            getStarted: "Book a Consultation"
         },
         hero: {
             badge: "#1 E-commerce Growth Agency",
@@ -129,7 +129,7 @@ const content = {
             results: "نتائجنا",
             testimonials: "آراء العملاء",
             contact: "تواصل معنا",
-            getStarted: "ابدأ الآن"
+            getStarted: "احجز استشارة"
         },
         hero: {
             badge: "وكالة النمو الرقمي رقم 1",
