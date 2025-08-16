@@ -324,12 +324,12 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
         <div className="absolute inset-0 " />
         <div className="container mx-auto px-6 relative">
           <ScrollAnimationWrapper className="text-center max-w-4xl mx-auto">
-            <Badge className="mb-6 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white border-0 px-6 py-2 text-sm font-medium">
+            <Badge className="mb-6 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black border-0 px-6 py-2 text-sm font-medium">
               {t.hero.badge}
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 bg-clip-text text-transparent">
               {t.hero.title}
-              <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 bg-clip-text text-transparent">
                 {t.hero.titleHighlight}
               </span>
             </h1>
@@ -350,11 +350,11 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
                   {/* Content */}
                   <div className={`${index % 2 === 1 ? 'lg:col-start-2' : ''}`}>
                     <div className="flex items-center gap-4 mb-6">
-                      <Badge className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                      <Badge className="bg-gradient-to-r from-blue-600 via-blue-400 to-purple-300 text-black">
                         {caseStudy.industry}
                       </Badge>
                       {caseStudy.featured && (
-                        <Badge variant="outline" className="border-emerald-500 text-emerald-600">
+                        <Badge variant="outline" className="border-blue-500 text-blue-600">
                           Featured
                         </Badge>
                       )}
@@ -371,7 +371,7 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                       {Object.entries(caseStudy.results).map(([key, value], resultIndex) => (
                         <div key={resultIndex} className="text-center">
-                          <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                          <div className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 bg-clip-text text-transparent">
                             {value}
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400 capitalize">
@@ -402,7 +402,7 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
 
                       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
                         <div className="flex items-start gap-4">
-                          <Quote className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-1" />
+                          <Quote className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
                           <div>
                             <p className="text-gray-700 dark:text-gray-300 italic mb-4">
                               "{caseStudy.testimonial.text}"
@@ -428,7 +428,7 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
                       </div>
 
                       <div className="flex gap-4">
-                        <Button className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                        <Button className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                           <ExternalLink className="w-4 h-4 mr-2" />
                           View Live Project
                         </Button>
@@ -444,7 +444,7 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
                   <div className={`${index % 2 === 1 ? 'lg:col-start-1' : ''}`}>
                     <div className="space-y-6">
                       {/* Project Image */}
-                      <div className="aspect-video bg-gradient-to-br from-emerald-100 via-blue-100 to-purple-100 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 rounded-lg flex items-center justify-center">
+                      <div className="aspect-video bg-gradient-to-br from-emerald-100 via-blue-100 to-purple-100 dark:from-blue-900/20 dark:via-blue-600/20 dark:to-blue-400/20 rounded-lg flex items-center justify-center">
                         <div className="text-6xl text-gray-400 dark:text-gray-600">
                           <Globe />
                         </div>
@@ -468,8 +468,8 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
                                   <span className="text-sm text-gray-500 dark:text-gray-400">
                                     {metric.before}
                                   </span>
-                                  <ArrowRight className="w-4 h-4 text-emerald-600" />
-                                  <span className="text-sm font-semibold text-emerald-600">
+                                  <ArrowRight className="w-4 h-4 text-blue-600" />
+                                  <span className="text-sm font-semibold text-blue-600">
                                     {metric.after}
                                   </span>
                                 </div>
@@ -503,7 +503,7 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
             {t.process.steps.map((step, index) => (
               <ScrollAnimationWrapper key={index} delay={index * 0.1}>
                 <div className="text-center">
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                     {step.number}
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
@@ -520,7 +520,7 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600">
+      <section className="py-20 bg-gradient-to-r from-black to-gray-900">
         <div className="container mx-auto px-6 text-center">
           <ScrollAnimationWrapper>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

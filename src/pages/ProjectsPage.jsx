@@ -266,12 +266,12 @@ function ProjectCard({ project, language, index }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
             {/* Project Category Badge */}
-            <Badge className="absolute top-4 left-4 bg-gradient-to-r from-emerald-600 to-blue-600 text-white">
+            <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
               {project.category}
             </Badge>
             
             {/* Project Status */}
-            <Badge className="absolute top-4 right-4 bg-green-600 text-white">
+            <Badge className="absolute top-4 right-4 bg-blue-800 text-white">
               {project.status}
             </Badge>
             
@@ -334,7 +334,7 @@ function ProjectCard({ project, language, index }) {
               <ul className="space-y-1">
                 {project.results.slice(0, 2).map((result, resultIndex) => (
                   <li key={resultIndex} className="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                    <TrendingUp className="w-3 h-3 mr-2 text-green-600" />
+                    <TrendingUp className="w-3 h-3 mr-2 text-blue-600" />
                     {result}
                   </li>
                 ))}
@@ -342,7 +342,7 @@ function ProjectCard({ project, language, index }) {
             </div>
             
             {/* View Project Button */}
-            <Button className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700">
+            <Button className="w-full bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-emerald-700 hover:to-blue-700">
               {t.viewProject}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -390,13 +390,13 @@ function ProjectsPage({ language = 'en' }) {
         <div className="container mx-auto px-6">
           <ScrollAnimationWrapper>
             <div className="text-center max-w-4xl mx-auto">
-              <Badge className="bg-gradient-to-r from-emerald-600 to-blue-600 text-white mb-6">
+              <Badge className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black mb-6">
                 {t.title}
               </Badge>
               
               <h1 className="text-5xl lg:text-6xl font-bold mb-6">
                 {t.subtitle.split(' ').map((word, index) => (
-                  <span key={index} className={index === t.subtitle.split(' ').length - 1 ? 'bg-gradient-to-r from-emerald-400 to-blue-600 bg-clip-text text-transparent' : ''}>
+                  <span key={index} className={index === t.subtitle.split(' ').length - 1 ? 'bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent' : ''}>
                     {word}{' '}
                   </span>
                 ))}
@@ -426,7 +426,7 @@ function ProjectsPage({ language = 'en' }) {
                       size="sm"
                       onClick={() => setSelectedCategory(category.id)}
                       className={selectedCategory === category.id ? 
-                        "bg-gradient-to-r from-emerald-600 to-blue-600 text-white" : 
+                        "bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black" : 
                         "hover:bg-accent"
                       }
                     >
@@ -482,7 +482,7 @@ function ProjectsPage({ language = 'en' }) {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600">
+      <section className="py-20 bg-gradient-to-r from-black  to-gray-900">
         <div className="container mx-auto px-6">
           <ScrollAnimationWrapper>
             <div className="text-center text-white">

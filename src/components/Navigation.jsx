@@ -141,7 +141,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                             whileTap={{ scale: 0.95 }}
                         >
                             <Link to="/booking">
-                                <Button className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 relative overflow-hidden group">
+                                <Button className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400 relative overflow-hidden group">
                                     <motion.div className="absolute inset-0 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     <span className="relative z-10">{t.nav.getStarted}</span>
                                 </Button>
@@ -230,7 +230,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                 >
                                     <Link to="/booking">
                                         <Button
-                                            className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg px-8 py-3"
+                                            className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400 text-lg px-8 py-3"
                                             onClick={() => setIsMenuOpen(false)}
                                         >
                                             {t.nav.getStarted}

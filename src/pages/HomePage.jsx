@@ -67,9 +67,8 @@ export default function HomePage({ language = "en" }) {
 
     return (
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-            {/* Hero Section - Keep exactly as is */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-blue-800/20 to-blue-700/20 dark:from-blue-900/40 dark:via-blue-800/40 dark:to-blue-700/40"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-blue-800/20 to-blue-700/20 dark:from-blue-700/20 dark:via-blue-500/20 dark:to-blue-300/20"></div>
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5QzkyQUMiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
 
                 <motion.div
@@ -83,7 +82,7 @@ export default function HomePage({ language = "en" }) {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 }}
                             >
-                                <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden group">
+                                <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black relative overflow-hidden group">
                                     <motion.div
                                         className="absolute inset-0 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     />
@@ -100,7 +99,7 @@ export default function HomePage({ language = "en" }) {
                             >
                                 {t.hero.title}
                                 <motion.span
-                                    className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent block"
+                                    className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block"
                                     animate={{
                                         backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                                     }}
@@ -134,7 +133,7 @@ export default function HomePage({ language = "en" }) {
                                     whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    <Button size="lg" className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg px-8 relative overflow-hidden group">
+                                    <Button size="lg" className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400 text-lg px-8 relative overflow-hidden group">
                                         <motion.div
                                             className="absolute inset-0 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                         />
@@ -250,12 +249,12 @@ export default function HomePage({ language = "en" }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {t.services.badge}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.services.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block">
                                     {t.services.titleHighlight}
                                 </span>
                             </h2>
@@ -287,7 +286,7 @@ export default function HomePage({ language = "en" }) {
                                             </div>
                                         </div>
                                         <CardHeader>
-                                            <CardTitle className="text-xl group-hover:text-emerald-600 transition-colors">
+                                            <CardTitle className="text-xl group-hover:text-[#155DFC] transition-colors">
                                                 {service.title}
                                             </CardTitle>
                                         </CardHeader>
@@ -298,7 +297,7 @@ export default function HomePage({ language = "en" }) {
                                             <div className="space-y-2 mb-4">
                                                 {service.features.slice(0, 2).map((feature, idx) => (
                                                     <div key={idx} className="flex items-center space-x-2">
-                                                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                                                        <CheckCircle className="w-4 h-4 text-[#155DFC]" />
                                                         <span className="text-sm">{feature}</span>
                                                     </div>
                                                 ))}
@@ -313,7 +312,7 @@ export default function HomePage({ language = "en" }) {
                     <ScrollAnimationWrapper>
                         <div className="text-center">
                             <Link to="/services">
-                                <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
+                                <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     Explore All Services
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
@@ -328,12 +327,12 @@ export default function HomePage({ language = "en" }) {
                 <div className="container mx-auto px-4">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <ScrollAnimationWrapper>
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {t.about.badge}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.about.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block">
                                     {t.about.titleHighlight}
                                 </span>
                             </h2>
@@ -344,14 +343,14 @@ export default function HomePage({ language = "en" }) {
                                 {t.about.features.slice(0, 3).map((feature, index) => (
                                     <ScrollAnimationWrapper key={index} delay={index * 0.1}>
                                         <div className="flex items-center space-x-3">
-                                            <CheckCircle className="w-5 h-5 text-emerald-600" />
+                                            <CheckCircle className="w-5 h-5 text-blue-600" />
                                             <span>{feature}</span>
                                         </div>
                                     </ScrollAnimationWrapper>
                                 ))}
                             </div>
                             <Link to="/about">
-                                <Button className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
+                                <Button className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     Learn More About Us
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
@@ -391,12 +390,12 @@ export default function HomePage({ language = "en" }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {language === 'ar' ? 'عملاؤنا' : 'Our Clients'}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {language === 'ar' ? 'شراكات' : 'Trusted'}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-bluee-600 via-blue-400 to-blue-300 bg-clip-text text-transparent block">
                                     {language === 'ar' ? 'استراتيجية' : 'Partnerships'}
                                 </span>
                             </h2>
@@ -534,7 +533,7 @@ export default function HomePage({ language = "en" }) {
                     <ScrollAnimationWrapper delay={0.4}>
                         <div className="text-center mt-16">
                             <Link to="/clients">
-                                <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
+                                <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     View All Clients
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
@@ -549,12 +548,12 @@ export default function HomePage({ language = "en" }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {language === 'ar' ? 'دراسات الحالة' : 'Case Studies'}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {language === 'ar' ? 'نتائج' : 'Real Results for'}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 bg-clip-text text-transparent block">
                                     {language === 'ar' ? 'حقيقية' : 'Real Businesses'}
                                 </span>
                             </h2>
@@ -572,10 +571,10 @@ export default function HomePage({ language = "en" }) {
                         <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
                             <div>
                                 <div className="flex items-center gap-4 mb-6">
-                                    <Badge className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                                    <Badge className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 text-black">
                                         {language === 'ar' ? 'الأزياء والتجزئة' : 'Fashion & Retail'}
                                     </Badge>
-                                    <Badge variant="outline" className="border-emerald-500 text-emerald-600">
+                                    <Badge variant="outline" className="border-blue-500 text-blue-600">
                                         Featured
                                     </Badge>
                                     <div className="flex items-center text-sm text-muted-foreground">
@@ -599,7 +598,7 @@ export default function HomePage({ language = "en" }) {
                                         { label: language === 'ar' ? 'الإيرادات' : 'Revenue', value: '$2.5M+' }
                                     ].map((result, index) => (
                                         <div key={index} className="text-center">
-                                            <div className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                                            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-blue-400 to-purple-300 bg-clip-text text-transparent">
                                                 {result.value}
                                             </div>
                                             <div className="text-sm text-muted-foreground">
@@ -611,7 +610,7 @@ export default function HomePage({ language = "en" }) {
 
                                 <div className="bg-muted/50 p-6 rounded-lg mb-6">
                                     <div className="flex items-start gap-4">
-                                        <Quote className="w-8 h-8 text-emerald-600 flex-shrink-0 mt-1" />
+                                        <Quote className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
                                         <div>
                                             <p className="text-muted-foreground italic mb-4">
                                                 "{language === 'ar' 
@@ -629,7 +628,7 @@ export default function HomePage({ language = "en" }) {
                             </div>
 
                             <div>
-                                <div className="aspect-video bg-gradient-to-br from-emerald-100 via-blue-100 to-purple-100 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 rounded-lg flex items-center justify-center mb-6">
+                                <div className="aspect-video bg-gradient-to-br from-emerald-100 via-blue-100 to-purple-100 dark:from-blue-900/20 dark:via-blue-600/20 dark:to-blue-400/20 rounded-lg flex items-center justify-center mb-6">
                                     <div className="text-6xl text-muted-foreground">
                                         <Globe />
                                     </div>
@@ -666,7 +665,7 @@ export default function HomePage({ language = "en" }) {
                     <ScrollAnimationWrapper>
                         <div className="text-center">
                             <Link to="/case-studies">
-                                <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
+                                <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     Explore All Case Studies
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
@@ -681,12 +680,12 @@ export default function HomePage({ language = "en" }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {language === 'ar' ? 'مشاريعنا' : 'Our Projects'}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {language === 'ar' ? 'محفظة' : 'Portfolio of'}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block">
                                     {language === 'ar' ? 'النجاح' : 'Success'}
                                 </span>
                             </h2>
@@ -733,16 +732,16 @@ export default function HomePage({ language = "en" }) {
                             <ScrollAnimationWrapper key={index} delay={index * 0.1}>
                                 <motion.div whileHover={{ y: -10 }}>
                                     <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
-                                        <div className="relative h-48 bg-gradient-to-br from-emerald-100 via-blue-100 to-purple-100 dark:from-emerald-900/20 dark:via-blue-900/20 dark:to-purple-900/20 flex items-center justify-center">
-                                            <div className="text-emerald-600">
+                                        <div className="relative h-48 bg-gradient-to-br from-emerald-100 via-blue-100 to-purple-100 dark:from-blue-900/20 dark:via-blue-600/20 dark:to-blue-400/20 flex items-center justify-center">
+                                            <div className="text-blue-600">
                                                 {project.icon}
                                             </div>
-                                            <Badge className="absolute top-4 left-4 bg-gradient-to-r from-emerald-600 to-blue-600 text-white">
+                                            <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                                 {project.category}
                                             </Badge>
                                         </div>
                                         <CardHeader>
-                                            <CardTitle className="text-xl group-hover:text-emerald-600 transition-colors">
+                                            <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
                                                 {project.title}
                                             </CardTitle>
                                         </CardHeader>
@@ -750,7 +749,7 @@ export default function HomePage({ language = "en" }) {
                                             <div className="space-y-2">
                                                 {project.results.map((result, idx) => (
                                                     <div key={idx} className="flex items-center space-x-2">
-                                                        <TrendingUp className="w-4 h-4 text-emerald-600" />
+                                                        <TrendingUp className="w-4 h-4 text-blue-600" />
                                                         <span className="text-sm">{result}</span>
                                                     </div>
                                                 ))}
@@ -765,7 +764,7 @@ export default function HomePage({ language = "en" }) {
                     <ScrollAnimationWrapper>
                         <div className="text-center">
                             <Link to="/our-projects">
-                                <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
+                                <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     View All Projects
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
@@ -780,12 +779,12 @@ export default function HomePage({ language = "en" }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {t.testimonials.badge}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.testimonials.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block">
                                     {t.testimonials.titleHighlight}
                                 </span>
                             </h2>
@@ -796,7 +795,7 @@ export default function HomePage({ language = "en" }) {
                         <ProfessionalCarousel
                             items={testimonialItems.slice(0, 6)}
                             renderItem={(testimonial, isCenter) => (
-                                <Card className={`p-6 border-0 shadow-lg transition-all duration-300 w-80 ${isCenter ? 'bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20' : 'bg-background'
+                                <Card className={`p-6 border-0 shadow-lg transition-all duration-300 w-80 ${isCenter ? 'bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-blue-900/20 dark:via-blue-600/20 dark:to-blue-400/20' : 'bg-background'
                                     }`}>
                                     <div className="flex mb-4">
                                         {[...Array(testimonial.rating)].map((_, i) => (
@@ -807,7 +806,7 @@ export default function HomePage({ language = "en" }) {
                                         "{testimonial.text}"
                                     </p>
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                                        <div className="w-12 h-12 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 rounded-full flex items-center justify-center text-white font-bold">
                                             {testimonial.avatar}
                                         </div>
                                         <div>
@@ -823,7 +822,7 @@ export default function HomePage({ language = "en" }) {
                     <ScrollAnimationWrapper delay={0.4}>
                         <div className="text-center mt-12">
                             <Link to="/testimonials">
-                                <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
+                                <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     Read More Testimonials
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
@@ -838,12 +837,12 @@ export default function HomePage({ language = "en" }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {t.contact.badge}
                             </Badge>
                             <h2 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.contact.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 bg-clip-text text-transparent block">
                                     {t.contact.titleHighlight}
                                 </span>
                             </h2>
@@ -891,7 +890,7 @@ export default function HomePage({ language = "en" }) {
                     <ScrollAnimationWrapper>
                         <div className="text-center">
                             <Link to="/contact">
-                                <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
+                                <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     Get In Touch
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>

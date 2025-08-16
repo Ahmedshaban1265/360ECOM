@@ -58,7 +58,7 @@ function ClientsPage({ language = 'en' }) {
     <div className="min-h-screen bg-background text-foreground pt-20">
       <div className="container mx-auto px-6 py-20">
         <ScrollAnimationWrapper>
-          <h1 className="text-4xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent">
             {language === 'ar' ? 'عملاؤنا' : 'Our Clients'}
           </h1>
         </ScrollAnimationWrapper>
@@ -134,7 +134,7 @@ function ClientsPage({ language = 'en' }) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
+              className="bg-gradient-to-r from-blue-400 via-blue-400 to-blue-200 text-black px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300"
             >
               {language === 'ar' ? 'ابدأ مشروعك' : 'Start Your Project'}
             </motion.button>
