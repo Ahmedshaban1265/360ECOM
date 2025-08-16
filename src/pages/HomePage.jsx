@@ -83,9 +83,9 @@ export default function HomePage({ language = "en" }) {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 }}
                             >
-                                <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white relative overflow-hidden group">
+                                <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white relative overflow-hidden group">
                                     <motion.div
-                                        className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        className="absolute inset-0 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     />
                                     <Sparkles className="w-4 h-4 mr-2 relative z-10" />
                                     <span className="relative z-10">{t.hero.badge}</span>
@@ -615,7 +615,7 @@ export default function HomePage({ language = "en" }) {
                                         <div>
                                             <p className="text-muted-foreground italic mb-4">
                                                 "{language === 'ar' 
-                                                    ? 'فريق 360ECOM حول أعمالنا بالكامل. انتقلنا من الكفاح لتحقيق المبيعات إلى أن نصبح رائدين في السوق'
+                                                    ? '��ريق 360ECOM حول أعمالنا بالكامل. انتقلنا من الكفاح لتحقيق المبيعات إلى أن نصبح رائدين في السوق'
                                                     : 'The team at 360ECOM transformed our business completely. We went from struggling to make sales to becoming a market leader'
                                                 }"
                                             </p>
@@ -708,7 +708,7 @@ export default function HomePage({ language = "en" }) {
                                 icon: <ShoppingCart className="w-8 h-8" />,
                                 results: [
                                     language === 'ar' ? 'زيادة 300% في معدل ��لتحويل' : '300% increase in conversion rate',
-                                    language === 'ar' ? '2 مليون+ مستخدم نشط شهرياً' : '2M+ monthly active users'
+                                    language === 'ar' ? '2 مليون+ مستخدم نشط شه��ياً' : '2M+ monthly active users'
                                 ]
                             },
                             {
