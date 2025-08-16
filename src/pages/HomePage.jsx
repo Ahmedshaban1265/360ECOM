@@ -174,7 +174,7 @@ export default function HomePage({ language = "en" }) {
                                 transition={{ duration: 0.3 }}
                             >
                                 <motion.div
-                                    className="absolute -inset-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-2xl opacity-20 blur-xl"
+                                    className="absolute -inset-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-2xl opacity-20 blur-xl"
                                     animate={{
                                         scale: [1, 1.1, 1],
                                         opacity: [0.2, 0.3, 0.2],
@@ -402,7 +402,7 @@ export default function HomePage({ language = "en" }) {
                             </h2>
                             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
                                 {language === 'ar'
-                                    ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركات الرائدة'
+                                    ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركا�� الرائدة'
                                     : 'We are proud to work with the best brands and leading companies'
                                 }
                             </p>
@@ -713,7 +713,7 @@ export default function HomePage({ language = "en" }) {
                             },
                             {
                                 title: language === 'ar' ? 'تطبيق توصيل الطعام' : 'Food Delivery Mobile App',
-                                category: language === 'ar' ? 'تطبيقات الجوال' : 'Mobile Apps',
+                                category: language === 'ar' ? 'تطبيقات الجوا��' : 'Mobile Apps',
                                 icon: <Smartphone className="w-8 h-8" />,
                                 results: [
                                     language === 'ar' ? 'مليون+ تحميل في الشهر الأول' : '1M+ downloads in first month',
