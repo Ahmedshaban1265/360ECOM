@@ -233,7 +233,7 @@ export default function HomePage({ language = "en" }) {
                                         className="text-center group"
                                         whileHover={{ scale: 1.05 }}
                                     >
-                                        <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                                        <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
                                             {count}{stat.suffix}
                                         </div>
                                         <div className="text-muted-foreground">{stat.label}</div>
@@ -717,7 +717,7 @@ export default function HomePage({ language = "en" }) {
                                 icon: <Smartphone className="w-8 h-8" />,
                                 results: [
                                     language === 'ar' ? 'مليون+ تحميل في الشهر الأول' : '1M+ downloads in first month',
-                                    language === 'ar' ? 'تقييم 4.8/5 في م��جر التطبيقات' : '4.8/5 app store rating'
+                                    language === 'ar' ? 'تقييم 4.8/5 في متجر التطبيقات' : '4.8/5 app store rating'
                                 ]
                             },
                             {
