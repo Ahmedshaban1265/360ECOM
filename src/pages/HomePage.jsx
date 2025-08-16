@@ -200,7 +200,7 @@ export default function HomePage({ language = "en" }) {
                                     transition={{ delay: 1.2 }}
                                     whileHover={{ scale: 1.05 }}
                                 >
-                                    <div className="text-2xl font-bold text-emerald-600">+300%</div>
+                                    <div className="text-2xl font-bold text-blue-600">+300%</div>
                                     <div className="text-sm text-muted-foreground">Growth Rate</div>
                                 </motion.div>
 
@@ -402,7 +402,7 @@ export default function HomePage({ language = "en" }) {
                             </h2>
                             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
                                 {language === 'ar'
-                                    ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركا�� الرائدة'
+                                    ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركات الرائدة'
                                     : 'We are proud to work with the best brands and leading companies'
                                 }
                             </p>
@@ -713,11 +713,11 @@ export default function HomePage({ language = "en" }) {
                             },
                             {
                                 title: language === 'ar' ? 'تطبيق توصيل الطعام' : 'Food Delivery Mobile App',
-                                category: language === 'ar' ? 'تطبيقات الجوا��' : 'Mobile Apps',
+                                category: language === 'ar' ? 'تطبيقات الجوال' : 'Mobile Apps',
                                 icon: <Smartphone className="w-8 h-8" />,
                                 results: [
                                     language === 'ar' ? 'مليون+ تحميل في الشهر الأول' : '1M+ downloads in first month',
-                                    language === 'ar' ? 'تقييم 4.8/5 في متجر التطبيقات' : '4.8/5 app store rating'
+                                    language === 'ar' ? 'تقييم 4.8/5 في م��جر التطبيقات' : '4.8/5 app store rating'
                                 ]
                             },
                             {
