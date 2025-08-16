@@ -230,7 +230,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                 >
                                     <Link to="/booking">
                                         <Button
-                                            className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 text-lg px-8 py-3"
+                                            className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg px-8 py-3"
                                             onClick={() => setIsMenuOpen(false)}
                                         >
                                             {t.nav.getStarted}
