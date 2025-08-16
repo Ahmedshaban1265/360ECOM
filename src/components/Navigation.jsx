@@ -212,7 +212,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                     <motion.div key={item.key}>
                                         <Link
                                             to={item.path}
-                                            className="text-2xl hover:text-emerald-600 transition-colors block text-center"
+                                            className="text-2xl hover:text-blue-600 transition-colors block text-center"
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: index * 0.1 }}
