@@ -410,7 +410,7 @@ export default function HomePage({ language = "en" }) {
                     </ScrollAnimationWrapper>
 
                     {/* Animated Logo Rows */}
-                    <div className="grid md:grid-cols-3 gap-8 mb-12">
+                    <ScrollAnimationWrapper delay={0.2}>
                         <div className="relative space-y-8">
                             {/* Top Row - Left to Right */}
                             <div className="relative overflow-hidden">
@@ -528,9 +528,10 @@ export default function HomePage({ language = "en" }) {
                                 </motion.div>
                             </div>
                         </div>
-                    </div>
+                    </ScrollAnimationWrapper>
 
-                    <ScrollAnimationWrapper>
+                    {/* CTA Section */}
+                    <ScrollAnimationWrapper delay={0.4}>
                         <div className="text-center">
                             <Link to="/clients">
                                 <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
