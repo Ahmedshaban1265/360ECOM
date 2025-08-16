@@ -45,12 +45,12 @@ export default function ServicesPage({ language }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white">
                                 {t.services.badge}
                             </Badge>
                             <h1 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.services.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent block">
                                     {t.services.titleHighlight}
                                 </span>
                             </h1>
