@@ -89,7 +89,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                 >
                                     {t.nav[item.key]}
                                     <motion.div
-                                        className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-emerald-600 to-blue-600 transition-all duration-300 ${
+                                        className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-600 to-blue-500 transition-all duration-300 ${
                                             location.pathname === item.path
                                                 ? "w-full"
                                                 : "w-0 group-hover:w-full"
