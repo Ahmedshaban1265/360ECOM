@@ -70,8 +70,8 @@ export default function Footer({ language }) {
                         <div>
                             <h4 className="font-semibold mb-4">{t.footer.connect}</h4>
                             <ul className="space-y-2 text-muted-foreground">
-                                <li><a href="mailto:hello@360ecom.com" className="hover:text-emerald-600 transition-colors">hello@360ecom.com</a></li>
-                                <li><a href="tel:+1234567890" className="hover:text-emerald-600 transition-colors">+1 (234) 567-890</a></li>
+                                <li><a href="mailto:hello@360ecom.com" className="hover:text-blue-600 transition-colors">hello@360ecom.com</a></li>
+                                <li><a href="tel:+1234567890" className="hover:text-blue-600 transition-colors">+1 (234) 567-890</a></li>
                                 <li><span>123 Business St, City, Country</span></li>
                             </ul>
                         </div>
