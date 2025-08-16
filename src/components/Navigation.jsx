@@ -77,9 +77,9 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                             <motion.div key={item.key}>
                                 <Link
                                     to={item.path}
-                                    className={`relative hover:text-emerald-600 transition-colors group ${
+                                    className={`relative hover:text-blue-600 transition-colors group ${
                                         location.pathname === item.path
-                                            ? "text-emerald-600"
+                                            ? "text-blue-600"
                                             : ""
                                     }`}
                                     whileHover={{ y: -2 }}
