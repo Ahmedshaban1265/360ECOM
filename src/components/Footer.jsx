@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { MessageCircle, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
 import content from "../utils/content";
 import ScrollAnimationWrapper from "./ScrollAnimationWrapper";
+import newLogo from "@/assets/new-logo.png";
 
 export default function Footer({ language }) {
     const t = content[language];
