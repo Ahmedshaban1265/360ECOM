@@ -30,7 +30,7 @@ export default function AboutPage({ language }) {
                                 {t.about.features.map((feature, index) => (
                                     <ScrollAnimationWrapper key={index} delay={index * 0.1}>
                                         <div className="flex items-center space-x-3">
-                                            <CheckCircle className="w-5 h-5 text-emerald-600" />
+                                            <CheckCircle className="w-5 h-5 text-blue-600" />
                                             <span>{feature}</span>
                                         </div>
                                     </ScrollAnimationWrapper>
