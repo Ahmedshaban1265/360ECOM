@@ -134,7 +134,7 @@ export default function HomePage({ language = "en" }) {
                                     whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.1)" }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 text-lg px-8 relative overflow-hidden group">
+                                    <Button size="lg" className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg px-8 relative overflow-hidden group">
                                         <motion.div
                                             className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                         />
@@ -638,7 +638,7 @@ export default function HomePage({ language = "en" }) {
                                 <Card className="bg-background border-0 shadow-lg">
                                     <CardHeader>
                                         <CardTitle className="text-lg">
-                                            {language === 'ar' ? 'تحسين المقاييس الر��يسية' : 'Key Metrics Improvement'}
+                                            {language === 'ar' ? 'تحسين المقاييس ا��ر��يسية' : 'Key Metrics Improvement'}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
