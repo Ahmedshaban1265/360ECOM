@@ -100,7 +100,7 @@ export default function HomePage({ language = "en" }) {
                             >
                                 {t.hero.title}
                                 <motion.span
-                                    className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block"
+                                    className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent block"
                                     animate={{
                                         backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
                                     }}
@@ -615,7 +615,7 @@ export default function HomePage({ language = "en" }) {
                                         <div>
                                             <p className="text-muted-foreground italic mb-4">
                                                 "{language === 'ar' 
-                                                    ? '��ريق 360ECOM حول أعمالنا بالكامل. انتقلنا من الكفاح لتحقيق المبيعات إلى أن نصبح رائدين في السوق'
+                                                    ? 'فريق 360ECOM حول أعمالنا بالكامل. انتقلنا من الكفاح لتحقيق المبيعات إلى أن نصبح رائدين في السوق'
                                                     : 'The team at 360ECOM transformed our business completely. We went from struggling to make sales to becoming a market leader'
                                                 }"
                                             </p>
@@ -708,7 +708,7 @@ export default function HomePage({ language = "en" }) {
                                 icon: <ShoppingCart className="w-8 h-8" />,
                                 results: [
                                     language === 'ar' ? 'زيادة 300% في معدل ��لتحويل' : '300% increase in conversion rate',
-                                    language === 'ar' ? '2 مليون+ مستخدم نشط شه��ياً' : '2M+ monthly active users'
+                                    language === 'ar' ? '2 مليون+ مستخدم نشط شهرياً' : '2M+ monthly active users'
                                 ]
                             },
                             {
