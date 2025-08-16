@@ -22,7 +22,8 @@ import {
     Quote,
     Calendar,
     Award,
-    Target
+    Target,
+    Smartphone
 } from "lucide-react";
 import ScrollAnimationWrapper from "@/components/ScrollAnimationWrapper";
 import useCountUp from "@/hooks/useCountUp";
