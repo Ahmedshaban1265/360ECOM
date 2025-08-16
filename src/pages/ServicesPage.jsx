@@ -95,7 +95,7 @@ export default function ServicesPage({ language }) {
                                             </div>
                                             <Button
                                                 variant="ghost"
-                                                className="mt-4 p-0 h-auto font-semibold group-hover:text-emerald-600"
+                                                className="mt-4 p-0 h-auto font-semibold group-hover:text-blue-600"
                                             >
                                                 Learn More
                                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
