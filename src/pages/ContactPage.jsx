@@ -20,7 +20,7 @@ export default function ContactPage({ language }) {
                             </Badge>
                             <h1 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.contact.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent block">
                                     {t.contact.titleHighlight}
                                 </span>
                             </h1>
