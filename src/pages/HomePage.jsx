@@ -409,7 +409,7 @@ export default function HomePage({ language = "en" }) {
                         </div>
                     </ScrollAnimationWrapper>
 
-                    {/* Client Success Stories Grid */}
+                    {/* Animated Logo Rows */}
                     <div className="grid md:grid-cols-3 gap-8 mb-12">
                         <div className="relative space-y-8">
                             {/* Top Row - Left to Right */}
