@@ -154,7 +154,7 @@ export default function HomePage({ language = "en" }) {
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    <Button size="lg" variant="outline" className="text-lg px-8 group border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white">
+                                    <Button size="lg" variant="outline" className="text-lg px-8 group border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
                                         <motion.div
                                             animate={{ scale: [1, 1.2, 1] }}
                                             transition={{ duration: 2, repeat: Infinity }}
