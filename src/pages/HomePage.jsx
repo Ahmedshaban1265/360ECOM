@@ -386,8 +386,8 @@ export default function HomePage({ language = "en" }) {
                 </div>
             </section>
 
-            {/* Our Clients Preview Section */}
-            <section className="py-20">
+            {/* Animated Logo Showcase */}
+            <section className="py-20 overflow-hidden">
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
@@ -508,7 +508,7 @@ export default function HomePage({ language = "en" }) {
 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {[
-                                        { label: language === 'ar' ? 'المبيعات' : 'Sales', value: '+300%' },
+                                        { label: language === 'ar' ? 'ا��مبيعات' : 'Sales', value: '+300%' },
                                         { label: language === 'ar' ? 'التحويل' : 'Conversion', value: '+45%' },
                                         { label: language === 'ar' ? 'المرور' : 'Traffic', value: '+200%' },
                                         { label: language === 'ar' ? 'الإيرادات' : 'Revenue', value: '$2.5M+' }
