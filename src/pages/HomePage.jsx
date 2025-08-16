@@ -532,7 +532,7 @@ export default function HomePage({ language = "en" }) {
 
                     {/* CTA Section */}
                     <ScrollAnimationWrapper delay={0.4}>
-                        <div className="text-center">
+                        <div className="text-center mt-16">
                             <Link to="/clients">
                                 <Button size="lg" className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700">
                                     View All Clients
@@ -638,7 +638,7 @@ export default function HomePage({ language = "en" }) {
                                 <Card className="bg-background border-0 shadow-lg">
                                     <CardHeader>
                                         <CardTitle className="text-lg">
-                                            {language === 'ar' ? 'تحسين المقاييس الرئيسية' : 'Key Metrics Improvement'}
+                                            {language === 'ar' ? 'تحسين المقاييس الر��يسية' : 'Key Metrics Improvement'}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
