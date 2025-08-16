@@ -36,7 +36,7 @@ export default function Footer({ language }) {
                                         href={social.href}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-10 h-10 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
+                                        className="w-10 h-10 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform"
                                         whileHover={{ scale: 1.1, rotate: 5 }}
                                         whileTap={{ scale: 0.9 }}
                                         title={social.label}
