@@ -45,12 +45,12 @@ export default function ServicesPage({ language }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white">
                                 {t.services.badge}
                             </Badge>
                             <h1 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.services.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent block">
                                     {t.services.titleHighlight}
                                 </span>
                             </h1>
@@ -77,7 +77,7 @@ export default function ServicesPage({ language }) {
                                             </div>
                                         </div>
                                         <CardHeader>
-                                            <CardTitle className="text-xl group-hover:text-emerald-600 transition-colors">
+                                            <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
                                                 {service.title}
                                             </CardTitle>
                                         </CardHeader>
@@ -88,14 +88,14 @@ export default function ServicesPage({ language }) {
                                             <div className="space-y-2">
                                                 {service.features.map((feature, idx) => (
                                                     <div key={idx} className="flex items-center space-x-2">
-                                                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                                                        <CheckCircle className="w-4 h-4 text-blue-600" />
                                                         <span className="text-sm">{feature}</span>
                                                     </div>
                                                 ))}
                                             </div>
                                             <Button
                                                 variant="ghost"
-                                                className="mt-4 p-0 h-auto font-semibold group-hover:text-emerald-600"
+                                                className="mt-4 p-0 h-auto font-semibold group-hover:text-blue-600"
                                             >
                                                 Learn More
                                                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />

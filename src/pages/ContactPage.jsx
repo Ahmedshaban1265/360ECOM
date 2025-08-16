@@ -15,12 +15,12 @@ export default function ContactPage({ language }) {
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
                         <div className="text-center mb-16">
-                            <Badge className="mb-4 bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 text-white">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 text-white">
                                 {t.contact.badge}
                             </Badge>
                             <h1 className="text-4xl lg:text-5xl font-bold mb-6">
                                 {t.contact.title}
-                                <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent block">
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent block">
                                     {t.contact.titleHighlight}
                                 </span>
                             </h1>
@@ -36,8 +36,8 @@ export default function ContactPage({ language }) {
                                 <h3 className="text-2xl font-bold mb-6">{t.contact.getInTouch}</h3>
                                 <div className="space-y-6">
                                     <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
-                                            <Mail className="w-6 h-6 text-emerald-600" />
+                                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                            <Mail className="w-6 h-6 text-blue-600" />
                                         </div>
                                         <div>
                                             <div className="font-semibold">{t.contact.email}</div>
@@ -104,7 +104,7 @@ export default function ContactPage({ language }) {
                                             placeholder={t.contact.messagePlaceholder}
                                         ></textarea>
                                     </div>
-                                    <Button className="w-full bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 text-lg py-3">
+                                    <Button className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg py-3">
                                         {t.contact.sendBtn}
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </Button>

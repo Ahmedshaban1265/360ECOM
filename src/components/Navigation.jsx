@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Menu, Sun, Moon, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
 import content from "../utils/content";
+import newLogo from "@/assets/new-logo.png";
 
 export default function Navigation({ language, setLanguage, isDark, setIsDark }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -52,11 +53,13 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
             <div className="container mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     <motion.div
-                        className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent"
+                        className="flex items-center"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <Link to="/">360ECOM</Link>
+                        <Link to="/" className="flex items-center">
+                            <img src={newLogo} alt="360ECOM" className="h-8 w-auto" />
+                        </Link>
                     </motion.div>
 
                     {/* Desktop Menu */}
@@ -74,9 +77,9 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                             <motion.div key={item.key}>
                                 <Link
                                     to={item.path}
-                                    className={`relative hover:text-emerald-600 transition-colors group ${
+                                    className={`relative hover:text-blue-600 transition-colors group ${
                                         location.pathname === item.path
-                                            ? "text-emerald-600"
+                                            ? "text-blue-600"
                                             : ""
                                     }`}
                                     whileHover={{ y: -2 }}
@@ -86,7 +89,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                 >
                                     {t.nav[item.key]}
                                     <motion.div
-                                        className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-emerald-600 to-blue-600 transition-all duration-300 ${
+                                        className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-600 to-blue-500 transition-all duration-300 ${
                                             location.pathname === item.path
                                                 ? "w-full"
                                                 : "w-0 group-hover:w-full"
@@ -138,8 +141,8 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                             whileTap={{ scale: 0.95 }}
                         >
                             <Link to="/booking">
-                                <Button className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 relative overflow-hidden group">
-                                    <motion.div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                <Button className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 relative overflow-hidden group">
+                                    <motion.div className="absolute inset-0 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                                     <span className="relative z-10">{t.nav.getStarted}</span>
                                 </Button>
                             </Link>
@@ -192,8 +195,8 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
 
                             {/* Menu content */}
                             <div className="flex flex-col items-center justify-center h-full space-y-8">
-                                <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-8">
-                                    360ECOM
+                                <div className="mb-8 flex justify-center">
+                                    <img src={newLogo} alt="360ECOM" className="h-12 w-auto" />
                                 </div>
 
                                 {[
@@ -209,7 +212,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                     <motion.div key={item.key}>
                                         <Link
                                             to={item.path}
-                                            className="text-2xl hover:text-emerald-600 transition-colors block text-center"
+                                            className="text-2xl hover:text-blue-600 transition-colors block text-center"
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: index * 0.1 }}
@@ -227,7 +230,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                 >
                                     <Link to="/booking">
                                         <Button
-                                            className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 text-lg px-8 py-3"
+                                            className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg px-8 py-3"
                                             onClick={() => setIsMenuOpen(false)}
                                         >
                                             {t.nav.getStarted}
