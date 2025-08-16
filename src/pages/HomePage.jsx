@@ -420,7 +420,7 @@ export default function HomePage({ language = "en" }) {
                             },
                             {
                                 metric: '150%',
-                                description: language === 'ar' ? 'نمو في ��ركة المرور' : 'Traffic Growth',
+                                description: language === 'ar' ? 'نمو في حركة المرور' : 'Traffic Growth',
                                 client: 'ShopMax',
                                 icon: <BarChart3 className="w-8 h-8 text-blue-600" />
                             },
