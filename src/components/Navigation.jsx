@@ -195,8 +195,8 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
 
                             {/* Menu content */}
                             <div className="flex flex-col items-center justify-center h-full space-y-8">
-                                <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-8">
-                                    360ECOM
+                                <div className="mb-8 flex justify-center">
+                                    <img src={newLogo} alt="360ECOM" className="h-12 w-auto" />
                                 </div>
 
                                 {[
