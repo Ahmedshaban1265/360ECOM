@@ -128,15 +128,15 @@ export default function BookingPage({ language = 'en' }) {
                         transition={{ duration: 0.8 }}
                         className="mb-12"
                     >
-                        <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-emerald-600/20 via-blue-600/20 to-purple-600/20 border border-emerald-600/30 mb-6">
-                            <span className="text-sm font-medium bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <div className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300  mb-6">
+                            <span className="text-sm font-medium bg-black bg-clip-text text-transparent">
                                 {language === 'en' ? 'Book Your Consultation' : 'احجز استشارتك'}
                             </span>
                         </div>
                         
                         <h1 className="text-4xl md:text-6xl font-bold mb-6">
                             {language === 'en' ? 'Choose Your' : 'اختر'}{' '}
-                            <span className="bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 bg-clip-text text-transparent">
                                 {language === 'en' ? 'Growth Path' : 'مسار نموك'}
                             </span>
                         </h1>
@@ -168,7 +168,7 @@ export default function BookingPage({ language = 'en' }) {
                             >
                                 {pkg.popular && (
                                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                                        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-medium">
+                                        <div className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black px-4 py-1 rounded-full text-sm font-medium">
                                             {language === 'en' ? 'Most Popular' : 'الأكثر شعبية'}
                                         </div>
                                     </div>
@@ -196,7 +196,7 @@ export default function BookingPage({ language = 'en' }) {
                                     <div className="space-y-3 mb-8">
                                         {pkg.features.map((feature, featureIndex) => (
                                             <div key={featureIndex} className="flex items-start gap-3">
-                                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-r from-emerald-600 to-blue-600 flex items-center justify-center mt-0.5">
+                                                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-r from-blue-600 to-blue-300 flex items-center justify-center mt-0.5">
                                                     <Check className="w-3 h-3 text-white" />
                                                 </div>
                                                 <span className="text-sm">{feature}</span>
@@ -211,8 +211,8 @@ export default function BookingPage({ language = 'en' }) {
                                         <Button 
                                             className={`w-full ${
                                                 pkg.popular
-                                                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-700 hover:via-purple-700 hover:to-pink-700'
-                                                    : 'bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700'
+                                                    ? 'bg-gradient-to-r from-blue-500 via-blue-700 to-blue-900 hover:from-blue-800 hover:via-blue-700 hover:to-blue-600 cursor-pointer'
+                                                    : 'bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400 cursor-pointer'
                                             } text-white border-0`}
                                             size="lg"
                                         >
@@ -252,7 +252,7 @@ export default function BookingPage({ language = 'en' }) {
                             <Button 
                                 variant="outline" 
                                 size="lg"
-                                className="border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                                className="border-2 cursor-pointer text-blue-600 hover:bg-emerald-600 hover:text-white transition-all duration-300"
                             >
                                 {language === 'en' ? 'Schedule Free Call' : 'جدولة مكالمة مجانية'}
                             </Button>
