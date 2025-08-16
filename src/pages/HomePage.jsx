@@ -400,8 +400,8 @@ export default function HomePage({ language = "en" }) {
                                     {language === 'ar' ? 'استراتيجية' : 'Partnerships'}
                                 </span>
                             </h2>
-                            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                                {language === 'ar' 
+                            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
+                                {language === 'ar'
                                     ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركات الرائدة'
                                     : 'We are proud to work with the best brands and leading companies'
                                 }
@@ -707,7 +707,7 @@ export default function HomePage({ language = "en" }) {
                                 category: language === 'ar' ? 'التجارة الإلكترونية' : 'E-commerce',
                                 icon: <ShoppingCart className="w-8 h-8" />,
                                 results: [
-                                    language === 'ar' ? 'زيادة 300% في معدل التحويل' : '300% increase in conversion rate',
+                                    language === 'ar' ? 'زيادة 300% في معدل ��لتحويل' : '300% increase in conversion rate',
                                     language === 'ar' ? '2 مليون+ مستخدم نشط شهرياً' : '2M+ monthly active users'
                                 ]
                             },
