@@ -69,7 +69,7 @@ export default function HomePage({ language = "en" }) {
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
             {/* Hero Section - Keep exactly as is */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/20 via-blue-900/20 to-purple-900/20 dark:from-emerald-900/40 dark:via-blue-900/40 dark:to-purple-900/40"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-blue-800/20 to-blue-700/20 dark:from-blue-900/40 dark:via-blue-800/40 dark:to-blue-700/40"></div>
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5QzkyQUMiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
 
                 <motion.div
