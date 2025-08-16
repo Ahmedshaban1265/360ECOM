@@ -88,7 +88,7 @@ export default function ServicesPage({ language }) {
                                             <div className="space-y-2">
                                                 {service.features.map((feature, idx) => (
                                                     <div key={idx} className="flex items-center space-x-2">
-                                                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                                                        <CheckCircle className="w-4 h-4 text-blue-600" />
                                                         <span className="text-sm">{feature}</span>
                                                     </div>
                                                 ))}
