@@ -411,39 +411,123 @@ export default function HomePage({ language = "en" }) {
 
                     {/* Client Success Stories Grid */}
                     <div className="grid md:grid-cols-3 gap-8 mb-12">
-                        {[
-                            {
-                                metric: '300%',
-                                description: language === 'ar' ? 'زيادة في المبيعات' : 'Increase in Sales',
-                                client: 'TechFlow',
-                                icon: <TrendingUp className="w-8 h-8 text-emerald-600" />
-                            },
-                            {
-                                metric: '150%',
-                                description: language === 'ar' ? 'نمو في حركة المرور' : 'Traffic Growth',
-                                client: 'ShopMax',
-                                icon: <BarChart3 className="w-8 h-8 text-blue-600" />
-                            },
-                            {
-                                metric: '95%',
-                                description: language === 'ar' ? 'رضا العملاء' : 'Client Satisfaction',
-                                client: 'StyleHub',
-                                icon: <Star className="w-8 h-8 text-purple-600" />
-                            }
-                        ].map((story, index) => (
-                            <ScrollAnimationWrapper key={index} delay={index * 0.1}>
-                                <motion.div whileHover={{ y: -5 }}>
-                                    <Card className="text-center p-6 bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                                        <div className="mb-4">{story.icon}</div>
-                                        <div className="text-4xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                                            {story.metric}
+                        <div className="relative space-y-8">
+                            {/* Top Row - Left to Right */}
+                            <div className="relative overflow-hidden">
+                                <motion.div
+                                    className="flex space-x-16 whitespace-nowrap"
+                                    animate={{
+                                        x: [0, -100 * 5]
+                                    }}
+                                    transition={{
+                                        x: {
+                                            repeat: Infinity,
+                                            repeatType: "loop",
+                                            duration: 15,
+                                            ease: "linear"
+                                        }
+                                    }}
+                                >
+                                    {/* First set of logos */}
+                                    {[clientLogo1, clientLogo2, clientLogo3, clientLogo4, clientLogo5].map((logo, index) => (
+                                        <div
+                                            key={`first-${index}`}
+                                            className="flex-shrink-0 w-32 h-20 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center p-4 hover:shadow-xl transition-all duration-300 group"
+                                        >
+                                            <img
+                                                src={logo}
+                                                alt={`Client ${index + 1}`}
+                                                className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                            />
                                         </div>
-                                        <div className="text-muted-foreground mb-2">{story.description}</div>
-                                        <div className="text-sm text-muted-foreground">{story.client}</div>
-                                    </Card>
+                                    ))}
+                                    {/* Duplicate set for seamless loop */}
+                                    {[clientLogo1, clientLogo2, clientLogo3, clientLogo4, clientLogo5].map((logo, index) => (
+                                        <div
+                                            key={`second-${index}`}
+                                            className="flex-shrink-0 w-32 h-20 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center p-4 hover:shadow-xl transition-all duration-300 group"
+                                        >
+                                            <img
+                                                src={logo}
+                                                alt={`Client ${index + 1}`}
+                                                className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                            />
+                                        </div>
+                                    ))}
+                                    {/* Third set for seamless loop */}
+                                    {[clientLogo1, clientLogo2, clientLogo3, clientLogo4, clientLogo5].map((logo, index) => (
+                                        <div
+                                            key={`third-${index}`}
+                                            className="flex-shrink-0 w-32 h-20 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center p-4 hover:shadow-xl transition-all duration-300 group"
+                                        >
+                                            <img
+                                                src={logo}
+                                                alt={`Client ${index + 1}`}
+                                                className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                            />
+                                        </div>
+                                    ))}
                                 </motion.div>
-                            </ScrollAnimationWrapper>
-                        ))}
+                            </div>
+
+                            {/* Bottom Row - Right to Left */}
+                            <div className="relative overflow-hidden">
+                                <motion.div
+                                    className="flex space-x-16 whitespace-nowrap"
+                                    animate={{
+                                        x: [-100 * 5, 0]
+                                    }}
+                                    transition={{
+                                        x: {
+                                            repeat: Infinity,
+                                            repeatType: "loop",
+                                            duration: 15,
+                                            ease: "linear"
+                                        }
+                                    }}
+                                >
+                                    {/* First set of logos */}
+                                    {[clientLogo5, clientLogo4, clientLogo3, clientLogo2, clientLogo1].map((logo, index) => (
+                                        <div
+                                            key={`first-reverse-${index}`}
+                                            className="flex-shrink-0 w-32 h-20 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center p-4 hover:shadow-xl transition-all duration-300 group"
+                                        >
+                                            <img
+                                                src={logo}
+                                                alt={`Client ${5 - index}`}
+                                                className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                            />
+                                        </div>
+                                    ))}
+                                    {/* Duplicate set for seamless loop */}
+                                    {[clientLogo5, clientLogo4, clientLogo3, clientLogo2, clientLogo1].map((logo, index) => (
+                                        <div
+                                            key={`second-reverse-${index}`}
+                                            className="flex-shrink-0 w-32 h-20 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center p-4 hover:shadow-xl transition-all duration-300 group"
+                                        >
+                                            <img
+                                                src={logo}
+                                                alt={`Client ${5 - index}`}
+                                                className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                            />
+                                        </div>
+                                    ))}
+                                    {/* Third set for seamless loop */}
+                                    {[clientLogo5, clientLogo4, clientLogo3, clientLogo2, clientLogo1].map((logo, index) => (
+                                        <div
+                                            key={`third-reverse-${index}`}
+                                            className="flex-shrink-0 w-32 h-20 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center p-4 hover:shadow-xl transition-all duration-300 group"
+                                        >
+                                            <img
+                                                src={logo}
+                                                alt={`Client ${5 - index}`}
+                                                className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
+                                            />
+                                        </div>
+                                    ))}
+                                </motion.div>
+                            </div>
+                        </div>
                     </div>
 
                     <ScrollAnimationWrapper>
@@ -560,7 +644,7 @@ export default function HomePage({ language = "en" }) {
                                         <div className="space-y-4">
                                             {[
                                                 { label: language === 'ar' ? 'الإيرادات الشهرية' : 'Monthly Revenue', before: '$50K', after: '$200K' },
-                                                { label: language === 'ar' ? 'معدل التحويل' : 'Conversion Rate', before: '0.8%', after: '3.2%' }
+                                                { label: language === 'ar' ? 'معدل ا��تحويل' : 'Conversion Rate', before: '0.8%', after: '3.2%' }
                                             ].map((metric, index) => (
                                                 <div key={index} className="flex items-center justify-between">
                                                     <div className="text-sm font-medium">{metric.label}</div>
