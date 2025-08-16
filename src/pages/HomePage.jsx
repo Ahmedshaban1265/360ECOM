@@ -136,7 +136,7 @@ export default function HomePage({ language = "en" }) {
                                 >
                                     <Button size="lg" className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg px-8 relative overflow-hidden group">
                                         <motion.div
-                                            className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                            className="absolute inset-0 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                         />
                                         <span className="relative z-10 flex items-center">
                                             {t.hero.ctaPrimary}
@@ -638,7 +638,7 @@ export default function HomePage({ language = "en" }) {
                                 <Card className="bg-background border-0 shadow-lg">
                                     <CardHeader>
                                         <CardTitle className="text-lg">
-                                            {language === 'ar' ? 'تحسين المقاييس ا��ر��يسية' : 'Key Metrics Improvement'}
+                                            {language === 'ar' ? 'تحسين المقاييس الر��يسية' : 'Key Metrics Improvement'}
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
