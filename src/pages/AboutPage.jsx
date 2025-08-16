@@ -41,7 +41,7 @@ export default function AboutPage({ language }) {
                         <ScrollAnimationWrapper delay={0.2}>
                             <div className="grid grid-cols-2 gap-4">
                                 <Card className="p-6 text-center">
-                                    <Users className="w-8 h-8 mx-auto mb-4 text-emerald-600" />
+                                    <Users className="w-8 h-8 mx-auto mb-4 text-blue-600" />
                                     <div className="text-2xl font-bold">50+</div>
                                     <div className="text-sm text-muted-foreground">Team Members</div>
                                 </Card>
