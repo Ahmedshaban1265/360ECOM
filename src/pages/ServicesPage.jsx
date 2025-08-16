@@ -77,7 +77,7 @@ export default function ServicesPage({ language }) {
                                             </div>
                                         </div>
                                         <CardHeader>
-                                            <CardTitle className="text-xl group-hover:text-emerald-600 transition-colors">
+                                            <CardTitle className="text-xl group-hover:text-blue-600 transition-colors">
                                                 {service.title}
                                             </CardTitle>
                                         </CardHeader>
