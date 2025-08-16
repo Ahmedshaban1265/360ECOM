@@ -53,11 +53,13 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
             <div className="container mx-auto px-4 py-4">
                 <div className="flex items-center justify-between">
                     <motion.div
-                        className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 bg-clip-text text-transparent"
+                        className="flex items-center"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        <Link to="/">360ECOM</Link>
+                        <Link to="/" className="flex items-center">
+                            <img src={newLogo} alt="360ECOM" className="h-8 w-auto" />
+                        </Link>
                     </motion.div>
 
                     {/* Desktop Menu */}
