@@ -104,7 +104,7 @@ export default function ContactPage({ language }) {
                                             placeholder={t.contact.messagePlaceholder}
                                         ></textarea>
                                     </div>
-                                    <Button className="w-full bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-600 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-700 text-lg py-3">
+                                    <Button className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 hover:from-blue-700 hover:via-blue-800 hover:to-blue-900 text-lg py-3">
                                         {t.contact.sendBtn}
                                         <ArrowRight className="ml-2 w-5 h-5" />
                                     </Button>
