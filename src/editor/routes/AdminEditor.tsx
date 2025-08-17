@@ -102,27 +102,15 @@ export default function AdminEditor() {
 
   return (
     <div className="h-screen bg-background overflow-hidden">
-      {/* Top Toolbar - Temporarily disabled for debugging */}
+      {/* Top Toolbar */}
       <div className="h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="flex items-center justify-between h-full px-4">
-          <h1 className="font-semibold text-sm">Theme Editor</h1>
-          <div className="text-xs text-muted-foreground">Debug Mode</div>
-        </div>
+        <EditorToolbar />
       </div>
 
       {/* Main Editor Layout */}
       <div className="h-[calc(100vh-3.5rem)]">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left Panel - Templates */}
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
-            <div className="h-full border-r border-border bg-background">
-              <LeftNavTemplates />
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle />
-
-          {/* Center Panel - Sections Tree */}
+          {/* Left Panel - Sections Tree */}
           <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
             <div className="h-full border-r border-border bg-background">
               <SectionsTree />
@@ -132,7 +120,7 @@ export default function AdminEditor() {
           <ResizableHandle />
 
           {/* Main Content - Preview Canvas */}
-          <ResizablePanel defaultSize={40} minSize={30}>
+          <ResizablePanel defaultSize={55} minSize={40}>
             <div className="h-full bg-muted/20">
               <PreviewCanvas />
             </div>
@@ -141,7 +129,7 @@ export default function AdminEditor() {
           <ResizableHandle />
 
           {/* Right Panel - Properties */}
-          <ResizablePanel defaultSize={15} minSize={15} maxSize={25}>
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
             <div className="h-full border-l border-border bg-background">
               <PropertiesPanel />
             </div>
