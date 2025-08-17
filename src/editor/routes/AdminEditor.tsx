@@ -22,35 +22,10 @@ export default function AdminEditor() {
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  // Initialize editor
+  // Initialize editor - temporarily disabled for debugging
   useEffect(() => {
-    async function initializeEditor() {
-      if (hasInitialized.current) return;
-
-      try {
-        setIsInitializing(true);
-        setInitError(null);
-        hasInitialized.current = true;
-
-        // Initialize default templates if they don't exist
-        await initializeDefaultTemplates();
-
-        // Load home template by default if no template is selected
-        if (!selectedTemplate) {
-          await loadTemplate('home');
-        }
-
-        setIsInitializing(false);
-      } catch (error) {
-        console.error('Failed to initialize editor:', error);
-        setInitError('Failed to initialize the theme editor. Please try refreshing the page.');
-        setIsInitializing(false);
-        hasInitialized.current = false; // Reset on error to allow retry
-      }
-    }
-
-    if (isAuthenticated && !hasInitialized.current) {
-      initializeEditor();
+    if (isAuthenticated) {
+      setIsInitializing(false); // Skip initialization for now
     }
   }, [isAuthenticated]);
 
