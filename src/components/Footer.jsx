@@ -48,7 +48,7 @@ export default function Footer({ language }) {
                         </div>
 
                         <div>
-                            <h4 className="font-semibold mb-4">{t.footer.services}</h4>
+                            <h4 className="font-semibold mb-4" lang={language}>{t.footer.services}</h4>
                             <ul className="space-y-2 text-muted-foreground">
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">E-commerce Development</Link></li>
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">Digital Marketing</Link></li>
