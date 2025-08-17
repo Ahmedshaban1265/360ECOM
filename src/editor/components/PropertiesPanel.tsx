@@ -115,9 +115,14 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
     setLocalValue(newValue);
 
     if (validateValue(newValue)) {
+      // Clear existing timeout
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+
       // Debounce text inputs, immediate for others
       if (field.type === 'text' || field.type === 'richtext') {
-        setTimeout(() => {
+        debounceRef.current = setTimeout(() => {
           onChange(newValue);
         }, 300);
       } else {
