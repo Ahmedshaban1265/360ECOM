@@ -50,7 +50,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
             animate={{ y: 0 }}
             transition={{ duration: 0.5 }}
         >
-            <div className="container mx-auto px-4 py-4">
+            <div className="container mx-auto  py-4">
                 <div className="flex items-center justify-between">
                     <motion.div
                         className="flex items-center"
@@ -63,7 +63,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                     </motion.div>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden md:flex items-center space-x-7">
                         {[
                             { key: "home", path: "/" },
                             { key: "services", path: "/services" },
@@ -105,9 +105,9 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                 onClick={toggleLanguage}
                                 variant="ghost"
                                 size="icon"
-                                className="relative overflow-hidden"
+                                className="relative overflow-hidden px-5"
                             >
-                                <Languages className="w-5 h-5" />
+                                <Languages className="w-5 h-5 " />
                                 <span className="ml-1 text-xs">
                                     {language.toUpperCase()}
                                 </span>

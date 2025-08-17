@@ -358,7 +358,7 @@ export default function AcademyPage({ language = "en" }) {
         <div className="min-h-screen bg-background text-foreground overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
             {/* Hero Section */}
             <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-blue-800/20 to-blue-700/20 dark:from-blue-700/20 dark:via-blue-500/20 dark:to-blue-300/20"></div>
+                <div className="absolute inset-0 "></div>
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM5QzkyQUMiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
 
                 <motion.div className="container mx-auto px-4 py-20 relative z-10">
@@ -369,12 +369,8 @@ export default function AcademyPage({ language = "en" }) {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.2 }}
                             >
-                                <Badge className="mb-6 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black relative overflow-hidden group text-lg px-6 py-2">
-                                    <motion.div
-                                        className="absolute inset-0 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                    />
-                                    <BookOpen className="w-5 h-5 mr-2 relative z-10" />
-                                    <span className="relative z-10 font-semibold">{t.hero.badge}</span>
+                                <Badge className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black mb-6">
+                                    {t.hero.badge}
                                 </Badge>
                             </motion.div>
 
@@ -516,7 +512,7 @@ export default function AcademyPage({ language = "en" }) {
                                                 </Badge>
                                             )}
                                         </div>
-                                        
+
                                         <CardHeader>
                                             <div className="flex items-center justify-between mb-2">
                                                 <CardTitle className="text-xl group-hover:text-blue-600 transition-colors" lang={language}>
@@ -538,12 +534,12 @@ export default function AcademyPage({ language = "en" }) {
                                                 </div>
                                             </div>
                                         </CardHeader>
-                                        
+
                                         <CardContent>
                                             <CardDescription className="text-base leading-relaxed mb-4" lang={language}>
                                                 {course.description}
                                             </CardDescription>
-                                            
+
                                             <div className="mb-4">
                                                 <h4 className="font-semibold mb-2" lang={language}>
                                                     {language === 'ar' ? 'المميزات الرئيسية:' : 'Key Features:'}

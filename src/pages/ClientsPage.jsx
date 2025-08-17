@@ -16,8 +16,8 @@ function ScrollAnimationWrapper({ children, delay = 0 }) {
       initial={{ opacity: 0, y: 50, scale: 0.9 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: false, amount: 0.3 }}
-      transition={{ 
-        duration: 0.6, 
+      transition={{
+        duration: 0.6,
         delay,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
@@ -58,20 +58,25 @@ function ClientsPage({ language = 'en' }) {
     <div className="min-h-screen bg-background text-foreground pt-20">
       <div className="container mx-auto px-6 py-20">
         <ScrollAnimationWrapper>
+          <div  className='flex justify-center'>
+            <Badge className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black mb-6">
+            {language === 'ar' ? 'عملاؤنا' : 'Our Clients'}
+          </Badge>
+          </div>
           <h1 className="text-4xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent">
             {language === 'ar' ? 'عملاؤنا' : 'Our Clients'}
           </h1>
         </ScrollAnimationWrapper>
-        
+
         <ScrollAnimationWrapper delay={0.2}>
           <p className="text-xl text-center text-gray-600 dark:text-gray-300 mb-16 max-w-3xl mx-auto">
-            {language === 'ar' 
+            {language === 'ar'
               ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركات الرائدة في مختلف الصناعات'
               : 'We are proud to work with the best brands and leading companies across various industries'
             }
           </p>
         </ScrollAnimationWrapper>
-        
+
         {/* Client Logos Grid */}
         <ScrollAnimationWrapper delay={0.4}>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-16">
@@ -84,8 +89,8 @@ function ClientsPage({ language = 'en' }) {
                 whileHover={{ scale: 1.05, y: -5 }}
                 className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
               >
-                <img 
-                  src={client.logo} 
+                <img
+                  src={client.logo}
                   alt={client.name}
                   className="max-w-full max-h-16 object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
                 />
@@ -100,7 +105,7 @@ function ClientsPage({ language = 'en' }) {
             <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">
               {language === 'ar' ? 'قصص نجاح عملائنا' : 'Client Success Stories'}
             </h2>
-            
+
             <div className="grid md:grid-cols-3 gap-6">
               {successStories.map((story, index) => (
                 <motion.div
@@ -126,7 +131,7 @@ function ClientsPage({ language = 'en' }) {
               {language === 'ar' ? 'هل تريد أن تكون العميل التالي؟' : 'Want to be our next success story?'}
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-8">
-              {language === 'ar' 
+              {language === 'ar'
                 ? 'انضم إلى قائمة عملائنا الناجحين واحصل على نتائج مذهلة'
                 : 'Join our list of successful clients and achieve amazing results'
               }

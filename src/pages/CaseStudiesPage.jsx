@@ -299,8 +299,8 @@ function ScrollAnimationWrapper({ children, className = "", delay = 0 }) {
       ref={ref}
       initial={{ opacity: 0, y: 50, scale: 0.9 }}
       animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 50, scale: 0.9 }}
-      transition={{ 
-        duration: 0.6, 
+      transition={{
+        duration: 0.6,
         delay: delay,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
@@ -312,7 +312,7 @@ function ScrollAnimationWrapper({ children, className = "", delay = 0 }) {
 }
 
 export default function CaseStudiesPage({ language = 'en', isDark = false }) {
-  
+
   const [selectedCase, setSelectedCase] = useState(null)
   const t = content[language]
   const isRTL = language === 'ar'
@@ -324,7 +324,7 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
         <div className="absolute inset-0 " />
         <div className="container mx-auto px-6 relative">
           <ScrollAnimationWrapper className="text-center max-w-4xl mx-auto">
-            <Badge className="mb-6 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black border-0 px-6 py-2 text-sm font-medium">
+            <Badge className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black mb-6">
               {t.hero.badge}
             </Badge>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 bg-clip-text text-transparent">
@@ -544,5 +544,5 @@ export default function CaseStudiesPage({ language = 'en', isDark = false }) {
       </section>
     </div>
   )
-  
+
 }
