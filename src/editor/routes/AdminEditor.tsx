@@ -103,9 +103,12 @@ export default function AdminEditor() {
 
   return (
     <div className="h-screen bg-background overflow-hidden">
-      {/* Top Toolbar */}
+      {/* Top Toolbar - Temporarily disabled for debugging */}
       <div className="h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <EditorToolbar />
+        <div className="flex items-center justify-between h-full px-4">
+          <h1 className="font-semibold text-sm">Theme Editor</h1>
+          <div className="text-xs text-muted-foreground">Debug Mode</div>
+        </div>
       </div>
 
       {/* Main Editor Layout */}
