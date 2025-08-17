@@ -131,66 +131,62 @@ export default function ImageWithTextRenderer({
         </div>
       )}
 
-      {/* Rich Text Styles */}
-      <style jsx="true">{`
-        .rich-text-content h1,
-        .rich-text-content h2,
-        .rich-text-content h3,
-        .rich-text-content h4,
-        .rich-text-content h5,
-        .rich-text-content h6 {
-          font-family: ${themeTokens.typography.headingFont};
-          color: ${themeTokens.colors.foreground};
-        }
-
-        .rich-text-content p {
-          color: ${themeTokens.colors.foreground};
-          line-height: 1.7;
-          margin-bottom: 1em;
-        }
-
-        .rich-text-content ul,
-        .rich-text-content ol {
-          color: ${themeTokens.colors.foreground};
-        }
-
-        .rich-text-content a {
-          color: ${themeTokens.colors.primary};
-          text-decoration: underline;
-        }
-
-        .rich-text-content a:hover {
-          color: ${themeTokens.colors.secondary};
-        }
-
-        .rich-text-content strong {
-          color: ${themeTokens.colors.foreground};
-          font-weight: 600;
-        }
-
-        .rich-text-content blockquote {
-          border-left: 4px solid ${themeTokens.colors.primary};
-          margin: 1.5em 0;
-          padding-left: 1em;
-          font-style: italic;
-          color: ${themeTokens.colors.muted};
-        }
-
-        /* RTL Support */
-        ${themeTokens.rtl ? `
-          .rich-text-content {
-            direction: rtl;
-            text-align: right;
+      {/* Add dynamic styles */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .rich-text-content-${section.id} h1,
+          .rich-text-content-${section.id} h2,
+          .rich-text-content-${section.id} h3,
+          .rich-text-content-${section.id} h4,
+          .rich-text-content-${section.id} h5,
+          .rich-text-content-${section.id} h6 {
+            font-family: ${themeTokens.typography.headingFont};
+            color: ${themeTokens.colors.foreground};
           }
-          
-          .rich-text-content blockquote {
-            border-left: none;
-            border-right: 4px solid ${themeTokens.colors.primary};
-            padding-left: 0;
-            padding-right: 1em;
+
+          .rich-text-content-${section.id} p {
+            color: ${themeTokens.colors.foreground};
+            line-height: 1.7;
+            margin-bottom: 1em;
           }
-        ` : ''}
-      `}</style>
+
+          .rich-text-content-${section.id} ul,
+          .rich-text-content-${section.id} ol {
+            color: ${themeTokens.colors.foreground};
+          }
+
+          .rich-text-content-${section.id} a {
+            color: ${themeTokens.colors.primary};
+            text-decoration: underline;
+          }
+
+          .rich-text-content-${section.id} a:hover {
+            color: ${themeTokens.colors.secondary};
+          }
+
+          .rich-text-content-${section.id} strong {
+            color: ${themeTokens.colors.foreground};
+            font-weight: 600;
+          }
+
+          .rich-text-content-${section.id} blockquote {
+            border-left: ${themeTokens.rtl ? 'none' : '4px solid ' + themeTokens.colors.primary};
+            border-right: ${themeTokens.rtl ? '4px solid ' + themeTokens.colors.primary : 'none'};
+            margin: 1.5em 0;
+            padding-left: ${themeTokens.rtl ? '0' : '1em'};
+            padding-right: ${themeTokens.rtl ? '1em' : '0'};
+            font-style: italic;
+            color: ${themeTokens.colors.muted};
+          }
+
+          ${themeTokens.rtl ? `
+            .rich-text-content-${section.id} {
+              direction: rtl;
+              text-align: right;
+            }
+          ` : ''}
+        `
+      }} />
     </section>
   );
 }
