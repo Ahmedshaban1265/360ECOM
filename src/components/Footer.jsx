@@ -53,7 +53,7 @@ export default function Footer({ language }) {
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">E-commerce Development</Link></li>
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">Digital Marketing</Link></li>
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">Web Development</Link></li>
-                                <li><Link to="/services" className="hover:text-blue-600 transition-colors">SEO Optimization</Link></li>
+                                <li><Link to="/360academy" className="hover:text-blue-600 transition-colors">{language === 'ar' ? 'أكاديمية 360' : '360Academy'}</Link></li>
                             </ul>
                         </div>
 
