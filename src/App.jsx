@@ -81,6 +81,9 @@ function AppContent() {
 
         {/* Admin login */}
         <Route path="/admin-login" element={<AdminLogin />} />
+
+        {/* Admin Theme Editor */}
+        <Route path="/admin/editor" element={<AdminEditor />} />
       </Routes>
 
       <Footer language={language} />
