@@ -40,6 +40,7 @@ function useCurrentPage(setCurrentPage) {
 function AppContent() {
   const [language, setLanguage] = useState('en');
   const [isDark, setIsDark] = useState(true);
+  const location = useLocation();
 
   const { isAuthenticated } = useAuth();
   const {
@@ -53,14 +54,20 @@ function AppContent() {
 
   useCurrentPage(setCurrentPage);
 
+  // Check if we're in the theme editor
+  const isInThemeEditor = location.pathname === '/admin/editor';
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navigation
-        language={language}
-        setLanguage={setLanguage}
-        isDark={isDark}
-        setIsDark={setIsDark}
-      />
+      {/* Hide navigation in theme editor */}
+      {!isInThemeEditor && (
+        <Navigation
+          language={language}
+          setLanguage={setLanguage}
+          isDark={isDark}
+          setIsDark={setIsDark}
+        />
+      )}
 
       <Routes>
         {/* Public pages */}
@@ -85,7 +92,8 @@ function AppContent() {
         <Route path="/admin/editor" element={<AdminEditor />} />
       </Routes>
 
-      <Footer language={language} />
+      {/* Hide footer in theme editor */}
+      {!isInThemeEditor && <Footer language={language} />}
 
       {isAuthenticated && <EditButton />}
 
