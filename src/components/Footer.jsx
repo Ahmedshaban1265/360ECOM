@@ -26,7 +26,7 @@ export default function Footer({ language }) {
                             <div className="mb-4">
                                 <img src={newLogo} alt="360ECOM" className="h-8 w-auto" />
                             </div>
-                            <p className="text-muted-foreground mb-6">
+                            <p className="text-muted-foreground mb-6" lang={language}>
                                 {t.footer.description}
                             </p>
                             <div className={`flex ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
