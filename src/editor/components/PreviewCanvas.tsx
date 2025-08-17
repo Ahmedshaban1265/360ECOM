@@ -58,7 +58,7 @@ const ZOOM_LEVELS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 export default function PreviewCanvas() {
   const currentTemplate = useCurrentTemplate();
   const deviceType = useDeviceType();
-  const { setDeviceType, setSelectedSection, setSelectedBlock } = useEditorStore();
+  const { setDeviceType, setSelectedSection, setSelectedBlock, setSelectedElement } = useEditorStore();
   
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -146,8 +146,11 @@ export default function PreviewCanvas() {
 
   const handleElementClick = (element: HTMLElement, elementType: string) => {
     console.log('Element clicked:', { element, elementType });
-    // Here we can implement editing logic for the live website
-    // For now, just log the element that was clicked
+    // Set the selected element in the store for the properties panel
+    setSelectedElement(element);
+    // Clear section/block selection since we're now editing individual elements
+    setSelectedSection(null);
+    setSelectedBlock(null);
   };
 
   if (!currentTemplate) {
