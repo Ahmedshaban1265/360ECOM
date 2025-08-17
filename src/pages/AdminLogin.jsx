@@ -22,8 +22,8 @@ export default function AdminLogin() {
     setError('');
 
     if (credentials.username === 'admin' && credentials.password === 'AhmadShaban1265@') {
-      login(); 
-      navigate('/?edit=true');
+      login();
+      navigate('/admin/editor');
     } else {
       setError('Invalid username or password');
     }
@@ -142,4 +142,3 @@ export default function AdminLogin() {
     </div>
   );
 }
-

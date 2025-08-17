@@ -27,7 +27,7 @@ import AcademyPage from '@/pages/AcademyPage';
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
 import AdminRoute from '@/components/AdminRoute';
-import GrapesEditor from './components/GrapesEditor';
+import AdminEditor from '@/editor/routes/AdminEditor';
 
 function useCurrentPage(setCurrentPage) {
   const location = useLocation();
@@ -40,6 +40,7 @@ function useCurrentPage(setCurrentPage) {
 function AppContent() {
   const [language, setLanguage] = useState('en');
   const [isDark, setIsDark] = useState(true);
+  const location = useLocation();
 
   const { isAuthenticated } = useAuth();
   const {
@@ -53,14 +54,20 @@ function AppContent() {
 
   useCurrentPage(setCurrentPage);
 
+  // Check if we're in the theme editor
+  const isInThemeEditor = location.pathname === '/admin/editor';
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Navigation
-        language={language}
-        setLanguage={setLanguage}
-        isDark={isDark}
-        setIsDark={setIsDark}
-      />
+      {/* Hide navigation in theme editor */}
+      {!isInThemeEditor && (
+        <Navigation
+          language={language}
+          setLanguage={setLanguage}
+          isDark={isDark}
+          setIsDark={setIsDark}
+        />
+      )}
 
       <Routes>
         {/* Public pages */}
@@ -80,19 +87,30 @@ function AppContent() {
 
         {/* Admin login */}
         <Route path="/admin-login" element={<AdminLogin />} />
+
+        {/* Admin Theme Editor */}
+        <Route path="/admin/editor" element={<AdminEditor />} />
       </Routes>
 
-      <Footer language={language} />
+      {/* Hide footer in theme editor */}
+      {!isInThemeEditor && <Footer language={language} />}
 
       {isAuthenticated && <EditButton />}
 
       {editMode && (
         <div className="fixed inset-0 bg-white z-[9999] overflow-auto">
-          <GrapesEditor
-            pageId={currentPage}
-            data={draftPages[currentPage] || pages[currentPage] || { html: '', css: '' }}
-            onSave={(newData) => updateDraftPage(currentPage, newData)}
-          />
+          <div className="p-8 text-center">
+            <h2 className="text-2xl font-bold mb-4">Legacy Edit Mode</h2>
+            <p className="text-muted-foreground mb-4">
+              This edit mode has been replaced with the new Theme Editor.
+            </p>
+            <a
+              href="/admin/editor"
+              className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+            >
+              Open Theme Editor
+            </a>
+          </div>
         </div>
       )}
     </div>
