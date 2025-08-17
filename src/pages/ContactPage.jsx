@@ -18,13 +18,13 @@ export default function ContactPage({ language }) {
                             <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {t.contact.badge}
                             </Badge>
-                            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+                            <h1 className="text-4xl lg:text-5xl font-bold mb-6" lang={language}>
                                 {t.contact.title}
                                 <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block">
                                     {t.contact.titleHighlight}
                                 </span>
                             </h1>
-                            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                            <p className="text-xl text-muted-foreground max-w-3xl mx-auto" lang={language}>
                                 {t.contact.description}
                             </p>
                         </div>
