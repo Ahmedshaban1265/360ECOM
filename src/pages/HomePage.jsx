@@ -23,7 +23,9 @@ import {
     Calendar,
     Award,
     Target,
-    Smartphone
+    Smartphone,
+    BookOpen,
+    Clock
 } from "lucide-react";
 import ScrollAnimationWrapper from "@/components/ScrollAnimationWrapper";
 import useCountUp from "@/hooks/useCountUp";
@@ -401,7 +403,7 @@ export default function HomePage({ language = "en" }) {
                             </h2>
                             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
                                 {language === 'ar'
-                                    ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركات الرائدة'
+                                    ? 'نفخر بالع��ل مع أفضل العلامات التجارية والشركات الرائدة'
                                     : 'We are proud to work with the best brands and leading companies'
                                 }
                             </p>
