@@ -201,65 +201,61 @@ export function ThemeRenderer({
       </div>
 
       {/* Theme-specific styles */}
-      <style jsx="true">{`
-        .theme-preview {
-          /* Custom CSS properties that can be used by section renderers */
-          --section-padding: ${deviceType === 'mobile' ? '1rem' : deviceType === 'tablet' ? '1.5rem' : '2rem'};
-          --container-max-width: ${deviceType === 'mobile' ? '100%' : deviceType === 'tablet' ? '768px' : '1200px'};
-        }
-
-        .theme-preview .section-container {
-          max-width: var(--container-max-width);
-          margin: 0 auto;
-          padding-left: var(--section-padding);
-          padding-right: var(--section-padding);
-        }
-
-        /* Dark mode styles */
-        .theme-preview.dark {
-          color-scheme: dark;
-        }
-
-        /* RTL styles */
-        .theme-preview.rtl {
-          text-align: right;
-        }
-
-        .theme-preview.rtl .section-container {
-          direction: rtl;
-        }
-
-        /* Device-specific styles */
-        .mobile-preview {
-          font-size: 14px;
-        }
-
-        .tablet-preview {
-          font-size: 15px;
-        }
-
-        /* Selection states */
-        .theme-preview [data-section-id] {
-          position: relative;
-        }
-
-        .theme-preview [data-block-id] {
-          position: relative;
-        }
-
-        /* Responsive utilities */
-        @media (max-width: 768px) {
-          .theme-preview .hide-mobile {
-            display: none;
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .theme-preview {
+            --section-padding: ${deviceType === 'mobile' ? '1rem' : deviceType === 'tablet' ? '1.5rem' : '2rem'};
+            --container-max-width: ${deviceType === 'mobile' ? '100%' : deviceType === 'tablet' ? '768px' : '1200px'};
           }
-        }
 
-        @media (max-width: 1024px) {
-          .theme-preview .hide-tablet {
-            display: none;
+          .theme-preview .section-container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding-left: var(--section-padding);
+            padding-right: var(--section-padding);
           }
-        }
-      `}</style>
+
+          .theme-preview.dark {
+            color-scheme: dark;
+          }
+
+          .theme-preview.rtl {
+            text-align: right;
+          }
+
+          .theme-preview.rtl .section-container {
+            direction: rtl;
+          }
+
+          .mobile-preview {
+            font-size: 14px;
+          }
+
+          .tablet-preview {
+            font-size: 15px;
+          }
+
+          .theme-preview [data-section-id] {
+            position: relative;
+          }
+
+          .theme-preview [data-block-id] {
+            position: relative;
+          }
+
+          @media (max-width: 768px) {
+            .theme-preview .hide-mobile {
+              display: none;
+            }
+          }
+
+          @media (max-width: 1024px) {
+            .theme-preview .hide-tablet {
+              display: none;
+            }
+          }
+        `
+      }} />
     </div>
   );
 }
