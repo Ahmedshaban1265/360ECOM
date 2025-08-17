@@ -79,7 +79,7 @@ export default function Footer({ language }) {
                 </ScrollAnimationWrapper>
 
                 <div className="border-t mt-8 pt-8 text-center text-muted-foreground">
-                    <p>{t.footer.copyright}</p>
+                    <p lang={language}>{t.footer.copyright}</p>
                 </div>
             </div>
         </footer>
