@@ -27,7 +27,6 @@ import AcademyPage from '@/pages/AcademyPage';
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
 import AdminRoute from '@/components/AdminRoute';
-import GrapesEditor from './components/GrapesEditor';
 import AdminEditor from '@/editor/routes/AdminEditor';
 
 function useCurrentPage(setCurrentPage) {
