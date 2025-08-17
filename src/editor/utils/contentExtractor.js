@@ -129,7 +129,7 @@ export const projectsPageContent = {
 /**
  * Extract dynamic content for any page
  */
-export function extractPageContent(pageId) {
+export function getPageContent(pageId) {
   switch (pageId) {
     case 'home':
       return homePageContent;
