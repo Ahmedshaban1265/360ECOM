@@ -90,7 +90,14 @@ export const useEditorStore = create<EditorStore>()(
         try {
           const template = await storageService.getDraft(templateId);
           if (template) {
-            set({ 
+            // Initialize history with the loaded template
+            const initialHistoryEntry = {
+              template: JSON.parse(JSON.stringify(template)),
+              action: 'Load template',
+              timestamp: Date.now()
+            };
+
+            set({
               selectedTemplate: templateId,
               currentTemplate: template,
               selectedSection: null,
@@ -98,12 +105,10 @@ export const useEditorStore = create<EditorStore>()(
               isDirty: false,
               locale: template.locale,
               isRTL: template.themeTokens.rtl || false,
-              isDarkMode: template.themeTokens.darkMode || false
+              isDarkMode: template.themeTokens.darkMode || false,
+              history: [initialHistoryEntry],
+              historyIndex: 0
             });
-            
-            // Initialize history with current state
-            get().clearHistory();
-            get().addToHistory('Load template');
           }
         } catch (error) {
           console.error('Failed to load template:', error);
