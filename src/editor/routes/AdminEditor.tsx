@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useEditorStore } from '../store/editorStore';
 import { initializeDefaultTemplates } from '../defaults/templates';
-import { initializeDefaultTemplates } from '../defaults/templates';
 
 // UI Components
 import { Loader2 } from 'lucide-react';
