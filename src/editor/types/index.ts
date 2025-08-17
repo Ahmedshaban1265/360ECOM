@@ -96,6 +96,7 @@ export interface EditorState {
   history: TemplateDocument[];
   isDirty: boolean;
   lastSaved?: string;
+  currentTemplate: TemplateDocument | null;
 }
 
 // Storage Service Interface
