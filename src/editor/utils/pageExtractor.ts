@@ -1,5 +1,6 @@
 import { TemplateDocument, SectionInstance } from '../types';
 import { DEFAULT_THEME_TOKENS } from '../defaults/templates';
+import { getPageContent, contentToSections } from './contentExtractor.js';
 
 // Real page mappings to routes
 export const REAL_PAGE_MAPPINGS: Record<string, string> = {
@@ -21,11 +22,29 @@ export const REAL_PAGE_MAPPINGS: Record<string, string> = {
  * Extract content structure from real page components and convert to editor sections
  */
 export function extractPageContent(pageComponent: any, pageId: string): TemplateDocument {
+  // Get dynamic content from the actual website pages
+  const pageContent = getPageContent(pageId);
+
+  // Convert page content to editor sections
+  const sections: SectionInstance[] = contentToSections(pageContent, pageId);
+
+  // Return the template document
+  return {
+    id: pageId,
+    sections,
+    themeTokens: DEFAULT_THEME_TOKENS,
+    locale: 'en',
+    version: 1,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Legacy switch-based content extraction (kept for reference)
+ */
+function legacyExtractPageContent(pageId: string): SectionInstance[] {
   const sections: SectionInstance[] = [];
-  
-  // For now, create a basic structure that can be edited
-  // This would be expanded to actually parse the React component structure
-  
+
   switch (pageId) {
     case 'home':
       sections.push(
