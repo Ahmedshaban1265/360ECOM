@@ -4,7 +4,17 @@ import { useAuth } from '@/context/AuthContext';
 import { useEditorStore } from '../store/editorStore';
 import { initializeDefaultTemplates } from '../defaults/templates';
 
+// Layout Components
+import EditorToolbar from '../components/EditorToolbar';
+import LeftNavTemplates from '../components/LeftNavTemplates';
+import SectionsTree from '../components/SectionsTree';
+import PropertiesPanel from '../components/PropertiesPanel';
+import PreviewCanvas from '../components/PreviewCanvas';
+
 // UI Components
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminEditor() {
