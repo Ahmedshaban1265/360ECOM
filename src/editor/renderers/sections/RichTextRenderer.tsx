@@ -69,10 +69,10 @@ export default function RichTextRenderer({
           `}
           style={contentStyle}
         >
-          <div 
+          <div
             dangerouslySetInnerHTML={{ __html: content }}
             className={`
-              rich-text-content
+              rich-text-content-${section.id}
               ${textAlign === 'center' ? 'text-center' : ''}
               ${textAlign === 'right' ? 'text-right' : ''}
               ${textAlign === 'justify' ? 'text-justify' : ''}
