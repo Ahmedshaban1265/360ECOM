@@ -63,7 +63,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                     </motion.div>
 
                     {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center space-x-7">
+                    <div className="hidden md:flex items-center space-x-6">
                         {[
                             { key: "home", path: "/" },
                             { key: "services", path: "/services" },
@@ -100,15 +100,16 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                             </motion.div>
                         ))}
 
-                        <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.9 }} >
                             <Button
                                 onClick={toggleLanguage}
                                 variant="ghost"
                                 size="icon"
-                                className="relative overflow-hidden px-6"
+                                className="relative overflow-hidden px-5"
+
                             >
                                 <Languages className="w-5 h-5 " />
-                                <span className="ml-1 text-xs">
+                                <span className="text-xs">
                                     {language.toUpperCase()}
                                 </span>
                             </Button>
