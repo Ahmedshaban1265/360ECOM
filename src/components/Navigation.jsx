@@ -206,7 +206,8 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                     { key: "about", path: "/about" },
                                     { key: "clients", path: "/clients" },
                                     { key: "case-studies", path: "/case-studies" },
-                                    { key: "projectsPage", path: "/our-projects" },
+                                    { key: "ProjectsPage", path: "/our-projects" },
+                                    { key: "academy", path: "/360academy" },
                                     { key: "testimonials", path: "/testimonials" },
                                     { key: "contact", path: "/contact" },
                                 ].map((item, index) => (
