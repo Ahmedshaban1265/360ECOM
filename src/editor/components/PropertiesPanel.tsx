@@ -53,11 +53,21 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
   const [localValue, setLocalValue] = useState(value ?? field.default ?? '');
   const [isValid, setIsValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const debounceRef = useRef<NodeJS.Timeout>();
 
   // Update local value when prop value changes
   useEffect(() => {
     setLocalValue(value ?? field.default ?? '');
   }, [value, field.default]);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   // Validation
   const validateValue = (val: any) => {
