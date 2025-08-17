@@ -132,7 +132,7 @@ export default function ImageWithTextRenderer({
       )}
 
       {/* Rich Text Styles */}
-      <style jsx>{`
+      <style jsx="true">{`
         .rich-text-content h1,
         .rich-text-content h2,
         .rich-text-content h3,
