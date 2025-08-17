@@ -103,14 +103,13 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
   // Handle value change with debouncing for text inputs
   const handleChange = (newValue: any) => {
     setLocalValue(newValue);
-    
+
     if (validateValue(newValue)) {
       // Debounce text inputs, immediate for others
       if (field.type === 'text' || field.type === 'richtext') {
-        const timeoutId = setTimeout(() => {
+        setTimeout(() => {
           onChange(newValue);
         }, 300);
-        return () => clearTimeout(timeoutId);
       } else {
         onChange(newValue);
       }
