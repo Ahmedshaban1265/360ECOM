@@ -21,6 +21,7 @@ function DropdownMenuPortal({
 const DropdownMenuTrigger = React.forwardRef((props, ref) => {
   return (<DropdownMenuPrimitive.Trigger ref={ref} data-slot="dropdown-menu-trigger" {...props} />);
 })
+DropdownMenuTrigger.displayName = "DropdownMenuTrigger"
 
 const DropdownMenuContent = React.forwardRef(({
   className,
@@ -41,6 +42,7 @@ const DropdownMenuContent = React.forwardRef(({
     </DropdownMenuPrimitive.Portal>
   );
 })
+DropdownMenuContent.displayName = "DropdownMenuContent"
 
 function DropdownMenuGroup({
   ...props
@@ -67,6 +69,7 @@ const DropdownMenuItem = React.forwardRef(({
       {...props} />
   );
 })
+DropdownMenuItem.displayName = "DropdownMenuItem"
 
 function DropdownMenuCheckboxItem({
   className,
