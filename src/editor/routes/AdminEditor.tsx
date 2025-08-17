@@ -6,7 +6,6 @@ import { initializeDefaultTemplates } from '../defaults/templates';
 
 // Layout Components
 import EditorToolbar from '../components/EditorToolbar';
-import LeftNavTemplates from '../components/LeftNavTemplates';
 import SectionsTree from '../components/SectionsTree';
 import PropertiesPanel from '../components/PropertiesPanel';
 import PreviewCanvas from '../components/PreviewCanvas';
