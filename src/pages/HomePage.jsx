@@ -23,7 +23,9 @@ import {
     Calendar,
     Award,
     Target,
-    Smartphone
+    Smartphone,
+    BookOpen,
+    Clock
 } from "lucide-react";
 import ScrollAnimationWrapper from "@/components/ScrollAnimationWrapper";
 import useCountUp from "@/hooks/useCountUp";
@@ -401,7 +403,7 @@ export default function HomePage({ language = "en" }) {
                             </h2>
                             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
                                 {language === 'ar'
-                                    ? 'نفخر بالعمل مع أفضل العلامات التجارية والشركات الرائدة'
+                                    ? 'نفخر بالع��ل مع أفضل العلامات التجارية والشركات الرائدة'
                                     : 'We are proud to work with the best brands and leading companies'
                                 }
                             </p>
@@ -824,6 +826,117 @@ export default function HomePage({ language = "en" }) {
                             <Link to="/testimonials">
                                 <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
                                     Read More Testimonials
+                                    <ArrowRight className="ml-2 w-5 h-5" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </ScrollAnimationWrapper>
+                </div>
+            </section>
+
+            {/* 360Academy Preview Section */}
+            <section className="py-20 bg-muted/30">
+                <div className="container mx-auto px-4">
+                    <ScrollAnimationWrapper>
+                        <div className="text-center mb-16">
+                            <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
+                                {language === 'ar' ? 'أكاديمية 360' : '360Academy'}
+                            </Badge>
+                            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+                                {language === 'ar' ? 'طور مهاراتك مع' : 'Master Your Skills'}
+                                <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block">
+                                    {language === 'ar' ? 'الدورات الاحترافية' : 'Professional Courses'}
+                                </span>
+                            </h2>
+                            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                                {language === 'ar'
+                                    ? 'انضم إلى آلاف الطلاب الذين حولوا مسارهم المهني مع دوراتنا المصممة من قبل خبراء الصناعة'
+                                    : 'Join thousands of students who transformed their careers with our expertly designed courses'
+                                }
+                            </p>
+                        </div>
+                    </ScrollAnimationWrapper>
+
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                        {[
+                            {
+                                title: language === 'ar' ? 'تطوير شوبيفاي' : 'Shopify Development',
+                                description: language === 'ar' ? 'أتقن بناء متاجر شوبيفاي عالية التحويل' : 'Master building high-converting Shopify stores',
+                                icon: <ShoppingCart className="w-8 h-8" />,
+                                duration: language === 'ar' ? '12 أسبوع' : '12 weeks',
+                                students: '2,500+',
+                                price: '$599'
+                            },
+                            {
+                                title: language === 'ar' ? 'التسويق الرقمي' : 'Digital Marketing',
+                                description: language === 'ar' ? 'تعلم إنشاء حملات تسويقية ناجحة' : 'Learn to create winning marketing campaigns',
+                                icon: <TrendingUp className="w-8 h-8" />,
+                                duration: language === 'ar' ? '10 أسابيع' : '10 weeks',
+                                students: '3,200+',
+                                price: '$499'
+                            },
+                            {
+                                title: language === 'ar' ? 'شراء الوسائط' : 'Media Buying',
+                                description: language === 'ar' ? 'كن خبيراً في تحسين إنفاق الإعلانات' : 'Become an expert in optimizing ad spend',
+                                icon: <Target className="w-8 h-8" />,
+                                duration: language === 'ar' ? '8 أسابيع' : '8 weeks',
+                                students: '1,800+',
+                                price: '$699'
+                            },
+                            {
+                                title: language === 'ar' ? 'أساسيات شوبيفاي' : 'Shopify Basics',
+                                description: language === 'ar' ? 'أطلق متجرك الإلكتروني الأول بنجاح' : 'Launch your first online store successfully',
+                                icon: <BookOpen className="w-8 h-8" />,
+                                duration: language === 'ar' ? '6 أسابيع' : '6 weeks',
+                                students: '4,100+',
+                                price: '$299'
+                            }
+                        ].map((course, index) => (
+                            <ScrollAnimationWrapper key={index} delay={index * 0.1}>
+                                <motion.div whileHover={{ y: -10 }}>
+                                    <Card className="h-full border-0 shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden">
+                                        <div className="relative h-32 bg-gradient-to-br from-blue-100 via-blue-50 to-blue-100 dark:from-blue-900/20 dark:via-blue-600/20 dark:to-blue-400/20 flex items-center justify-center">
+                                            <div className="text-blue-600">
+                                                {course.icon}
+                                            </div>
+                                        </div>
+                                        <CardHeader>
+                                            <CardTitle className="text-lg group-hover:text-blue-600 transition-colors" lang={language}>
+                                                {course.title}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <CardDescription className="text-sm leading-relaxed mb-4" lang={language}>
+                                                {course.description}
+                                            </CardDescription>
+                                            <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                                                <div className="flex items-center">
+                                                    <Clock className="w-4 h-4 mr-1" />
+                                                    {course.duration}
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <Users className="w-4 h-4 mr-1" />
+                                                    {course.students}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-xl font-bold text-blue-600">{course.price}</span>
+                                                <Button size="sm" className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
+                                                    <span lang={language}>{language === 'ar' ? 'تفاصيل' : 'Details'}</span>
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </ScrollAnimationWrapper>
+                        ))}
+                    </div>
+
+                    <ScrollAnimationWrapper>
+                        <div className="text-center">
+                            <Link to="/360academy">
+                                <Button size="lg" className="cursor-pointer bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 hover:from-blue-700 hover:via-blue-500 hover:to-blue-400">
+                                    <span lang={language}>{language === 'ar' ? 'استكشف جميع الدورات' : 'Explore All Courses'}</span>
                                     <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
                             </Link>

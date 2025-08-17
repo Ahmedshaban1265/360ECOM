@@ -40,7 +40,7 @@ export default function ServicesPage({ language }) {
     ];
 
     return (
-        <div className="min-h-screen bg-background text-foreground pt-20">
+        <div className="min-h-screen bg-background text-foreground pt-20" dir={isRTL ? "rtl" : "ltr"}>
             <section className="py-20">
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>

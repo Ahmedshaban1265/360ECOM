@@ -22,6 +22,7 @@ import CaseStudiesPage from '@/pages/CaseStudiesPage';
 import ProjectsPage from '@/pages/ProjectsPage';
 import BookingPage from '@/pages/BookingPage';
 import ArabicExample from '@/pages/ArabicExample';
+import AcademyPage from '@/pages/AcademyPage';
 
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
@@ -73,6 +74,7 @@ function AppContent() {
         <Route path="/contact" element={<ContactPage language={language} />} />
         <Route path="/case-studies" element={<CaseStudiesPage language={language} />} />
         <Route path="/our-projects" element={<ProjectsPage language={language} />} />
+        <Route path="/360academy" element={<AcademyPage language={language} />} />
         <Route path="/booking" element={<BookingPage language={language} />} />
         <Route path="/arabic-example" element={<ArabicExample />} />
 

@@ -10,7 +10,7 @@ export default function ContactPage({ language }) {
     const isRTL = language === "ar";
 
     return (
-        <div className="min-h-screen bg-background text-foreground pt-20">
+        <div className="min-h-screen bg-background text-foreground pt-20" dir={isRTL ? "rtl" : "ltr"}>
             <section className="py-20">
                 <div className="container mx-auto px-4">
                     <ScrollAnimationWrapper>
@@ -18,13 +18,13 @@ export default function ContactPage({ language }) {
                             <Badge className="mb-4 bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 text-black">
                                 {t.contact.badge}
                             </Badge>
-                            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+                            <h1 className="text-4xl lg:text-5xl font-bold mb-6" lang={language}>
                                 {t.contact.title}
                                 <span className="bg-gradient-to-r from-blue-600 via-blue-400 to-blue-200 bg-clip-text text-transparent block">
                                     {t.contact.titleHighlight}
                                 </span>
                             </h1>
-                            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                            <p className="text-xl text-muted-foreground max-w-3xl mx-auto" lang={language}>
                                 {t.contact.description}
                             </p>
                         </div>
@@ -33,9 +33,9 @@ export default function ContactPage({ language }) {
                     <div className="grid lg:grid-cols-2 gap-12">
                         <ScrollAnimationWrapper>
                             <Card className="p-8 border-0 shadow-lg">
-                                <h3 className="text-2xl font-bold mb-6">{t.contact.getInTouch}</h3>
+                                <h3 className="text-2xl font-bold mb-6" lang={language}>{t.contact.getInTouch}</h3>
                                 <div className="space-y-6">
-                                    <div className="flex items-center space-x-4">
+                                    <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
                                         <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
                                             <Mail className="w-6 h-6 text-blue-600" />
                                         </div>

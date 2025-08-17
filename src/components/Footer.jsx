@@ -26,10 +26,10 @@ export default function Footer({ language }) {
                             <div className="mb-4">
                                 <img src={newLogo} alt="360ECOM" className="h-8 w-auto" />
                             </div>
-                            <p className="text-muted-foreground mb-6">
+                            <p className="text-muted-foreground mb-6" lang={language}>
                                 {t.footer.description}
                             </p>
-                            <div className="flex space-x-4">
+                            <div className={`flex ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
                                 {socialLinks.map((social, index) => (
                                     <motion.a
                                         key={index}
@@ -48,27 +48,27 @@ export default function Footer({ language }) {
                         </div>
 
                         <div>
-                            <h4 className="font-semibold mb-4">{t.footer.services}</h4>
+                            <h4 className="font-semibold mb-4" lang={language}>{t.footer.services}</h4>
                             <ul className="space-y-2 text-muted-foreground">
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">E-commerce Development</Link></li>
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">Digital Marketing</Link></li>
                                 <li><Link to="/services" className="hover:text-blue-600 transition-colors">Web Development</Link></li>
-                                <li><Link to="/services" className="hover:text-blue-600 transition-colors">SEO Optimization</Link></li>
+                                <li><Link to="/360academy" className="hover:text-blue-600 transition-colors">{language === 'ar' ? 'أكاديمية 360' : '360Academy'}</Link></li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="font-semibold mb-4">{t.footer.company}</h4>
+                            <h4 className="font-semibold mb-4" lang={language}>{t.footer.company}</h4>
                             <ul className="space-y-2 text-muted-foreground">
-                                <li><Link to="/about" className="hover:text-blue-600 transition-colors">About Us</Link></li>
-                                <li><Link to="/about" className="hover:text-blue-600 transition-colors">Our Team</Link></li>
-                                <li><Link to="/contact" className="hover:text-blue-600 transition-colors">Careers</Link></li>
-                                <li><Link to="/contact" className="hover:text-blue-600 transition-colors">Contact</Link></li>
+                                <li><Link to="/about" className="hover:text-blue-600 transition-colors" lang={language}>{language === 'ar' ? 'من نحن' : 'About Us'}</Link></li>
+                                <li><Link to="/team" className="hover:text-blue-600 transition-colors" lang={language}>{language === 'ar' ? 'فريقنا' : 'Our Team'}</Link></li>
+                                <li><Link to="/contact" className="hover:text-blue-600 transition-colors" lang={language}>{language === 'ar' ? 'الوظائف' : 'Careers'}</Link></li>
+                                <li><Link to="/contact" className="hover:text-blue-600 transition-colors" lang={language}>{language === 'ar' ? 'تواصل معنا' : 'Contact'}</Link></li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="font-semibold mb-4">{t.footer.connect}</h4>
+                            <h4 className="font-semibold mb-4" lang={language}>{t.footer.connect}</h4>
                             <ul className="space-y-2 text-muted-foreground">
                                 <li><a href="mailto:hello@360ecom.com" className="hover:text-blue-600 transition-colors">hello@360ecom.com</a></li>
                                 <li><a href="tel:+1234567890" className="hover:text-blue-600 transition-colors">+1 (234) 567-890</a></li>
@@ -79,7 +79,7 @@ export default function Footer({ language }) {
                 </ScrollAnimationWrapper>
 
                 <div className="border-t mt-8 pt-8 text-center text-muted-foreground">
-                    <p>{t.footer.copyright}</p>
+                    <p lang={language}>{t.footer.copyright}</p>
                 </div>
             </div>
         </footer>
