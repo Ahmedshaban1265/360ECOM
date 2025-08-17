@@ -29,7 +29,7 @@ export default function Footer({ language }) {
                             <p className="text-muted-foreground mb-6">
                                 {t.footer.description}
                             </p>
-                            <div className="flex space-x-4">
+                            <div className={`flex ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
                                 {socialLinks.map((social, index) => (
                                     <motion.a
                                         key={index}
