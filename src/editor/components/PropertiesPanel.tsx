@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useEditorStore, useCurrentTemplate, useSelectedSection, useSelectedBlock } from '../store/editorStore';
 import { getSectionSchema, getBlockSchema } from '../schemas/sections';
 import { FieldBase, SectionInstance, BlockInstance } from '../types';
