@@ -1,38 +1,39 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useEditorStore, useHistoryState, useIsDirty } from '../store/editorStore';
+import { useEditorStore } from '../store/editorStore';
 import { DeviceType } from '../types';
+import TemplateDropdown from './TemplateDropdown';
 
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
 } from '@/components/ui/tooltip';
 
 // Icons
-import { 
-  Monitor, 
-  Tablet, 
-  Smartphone, 
-  Undo, 
-  Redo, 
-  Save, 
-  Upload, 
-  Download, 
-  Settings, 
-  Moon, 
-  Sun, 
+import {
+  Monitor,
+  Tablet,
+  Smartphone,
+  Undo,
+  Redo,
+  Save,
+  Upload,
+  Download,
+  Settings,
+  Moon,
+  Sun,
   Languages,
   ArrowLeft,
   Eye,
@@ -50,30 +51,35 @@ export default function EditorToolbar() {
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
 
-  const {
-    selectedTemplate,
-    deviceType,
-    isDarkMode,
-    isRTL,
-    locale,
-    lastSaved,
-    setDeviceType,
-    setDarkMode,
-    setRTL,
-    setLocale,
-    saveTemplate,
-    publishTemplate,
-    resetToPublished,
-    undo,
-    redo,
-    exportTemplate,
-    importTemplate
-  } = useEditorStore();
+  // Use individual selectors to prevent unnecessary re-renders
+  const selectedTemplate = useEditorStore(state => state.selectedTemplate);
+  const deviceType = useEditorStore(state => state.deviceType);
+  const isDarkMode = useEditorStore(state => state.isDarkMode);
+  const isRTL = useEditorStore(state => state.isRTL);
+  const locale = useEditorStore(state => state.locale);
+  const lastSaved = useEditorStore(state => state.lastSaved);
+  const isDirty = useEditorStore(state => state.isDirty);
+  const historyIndex = useEditorStore(state => state.historyIndex);
+  const history = useEditorStore(state => state.history);
 
-  const isDirty = useIsDirty();
-  const { canUndo, canRedo } = useHistoryState();
+  // Action functions
+  const setDeviceType = useEditorStore(state => state.setDeviceType);
+  const setDarkMode = useEditorStore(state => state.setDarkMode);
+  const setRTL = useEditorStore(state => state.setRTL);
+  const setLocale = useEditorStore(state => state.setLocale);
+  const saveTemplate = useEditorStore(state => state.saveTemplate);
+  const publishTemplate = useEditorStore(state => state.publishTemplate);
+  const resetToPublished = useEditorStore(state => state.resetToPublished);
+  const undo = useEditorStore(state => state.undo);
+  const redo = useEditorStore(state => state.redo);
+  const exportTemplate = useEditorStore(state => state.exportTemplate);
+  const importTemplate = useEditorStore(state => state.importTemplate);
 
-  const handleSave = async () => {
+  // Derived state for history
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < history.length - 1;
+
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
       await saveTemplate();
@@ -82,9 +88,9 @@ export default function EditorToolbar() {
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [saveTemplate]);
 
-  const handlePublish = async () => {
+  const handlePublish = useCallback(async () => {
     setIsPublishing(true);
     try {
       await publishTemplate();
@@ -93,9 +99,9 @@ export default function EditorToolbar() {
     } finally {
       setIsPublishing(false);
     }
-  };
+  }, [publishTemplate]);
 
-  const handleExport = async () => {
+  const handleExport = useCallback(async () => {
     try {
       const data = await exportTemplate();
       const blob = new Blob([data], { type: 'application/json' });
@@ -110,9 +116,9 @@ export default function EditorToolbar() {
     } catch (error) {
       console.error('Export failed:', error);
     }
-  };
+  }, [exportTemplate, selectedTemplate]);
 
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -126,10 +132,10 @@ export default function EditorToolbar() {
       }
     };
     reader.readAsText(file);
-    
+
     // Reset input
     event.target.value = '';
-  };
+  }, [importTemplate]);
 
   const formatLastSaved = (timestamp?: string) => {
     if (!timestamp) return 'Never';
@@ -140,7 +146,7 @@ export default function EditorToolbar() {
   return (
     <TooltipProvider>
       <div className="flex items-center justify-between h-full px-4">
-        {/* Left Side - Navigation & Template Info */}
+        {/* Left Side - Navigation & Template Selection */}
         <div className="flex items-center gap-4">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -159,19 +165,13 @@ export default function EditorToolbar() {
 
           <Separator orientation="vertical" className="h-6" />
 
-          <div className="flex items-center gap-2">
-            <h1 className="font-semibold text-sm">Theme Editor</h1>
-            {selectedTemplate && (
-              <>
-                <Badge variant="outline" className="text-xs">
-                  {selectedTemplate}
-                </Badge>
-                {isDirty && (
-                  <Badge variant="secondary" className="text-xs">
-                    Unsaved
-                  </Badge>
-                )}
-              </>
+          <div className="flex items-center gap-3">
+            <TemplateDropdown />
+
+            {isDirty && (
+              <Badge variant="secondary" className="text-xs">
+                Unsaved Changes
+              </Badge>
             )}
           </div>
 
@@ -266,7 +266,7 @@ export default function EditorToolbar() {
                 onClick={() => setLocale('ar')}
                 className={locale === 'ar' ? 'bg-accent' : ''}
               >
-                العربية
+                ا��عربية
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
