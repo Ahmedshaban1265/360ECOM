@@ -57,7 +57,7 @@ export default function AdminEditor() {
     if (isAuthenticated) {
       initializeEditor();
     }
-  }, [isAuthenticated, selectedTemplate, loadTemplate]);
+  }, [isAuthenticated, selectedTemplate]);
 
   // Show loading state
   if (isLoading || isInitializing) {
