@@ -74,6 +74,7 @@ function AppContent() {
         <Route path="/contact" element={<ContactPage language={language} />} />
         <Route path="/case-studies" element={<CaseStudiesPage language={language} />} />
         <Route path="/our-projects" element={<ProjectsPage language={language} />} />
+        <Route path="/360academy" element={<AcademyPage language={language} />} />
         <Route path="/booking" element={<BookingPage language={language} />} />
         <Route path="/arabic-example" element={<ArabicExample />} />
 
