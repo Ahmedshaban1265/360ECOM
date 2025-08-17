@@ -128,7 +128,7 @@ const ArabicExample = () => {
                 نص تجريبي باللغة العربية باستخدام خط القاهرة. ١٢٣٤٥٦٧٨٩٠
               </ArabicText>
             </div>
-          </div>
+          </CardContent>
         </Card>
 
         {/* Implementation Guide */}
