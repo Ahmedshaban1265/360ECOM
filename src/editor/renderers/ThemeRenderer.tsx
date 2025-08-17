@@ -201,7 +201,7 @@ export function ThemeRenderer({
       </div>
 
       {/* Theme-specific styles */}
-      <style jsx>{`
+      <style jsx="true">{`
         .theme-preview {
           /* Custom CSS properties that can be used by section renderers */
           --section-padding: ${deviceType === 'mobile' ? '1rem' : deviceType === 'tablet' ? '1.5rem' : '2rem'};
