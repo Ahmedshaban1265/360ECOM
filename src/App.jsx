@@ -21,6 +21,7 @@ import ContactPage from '@/pages/ContactPage';
 import CaseStudiesPage from '@/pages/CaseStudiesPage';
 import ProjectsPage from '@/pages/ProjectsPage';
 import BookingPage from '@/pages/BookingPage';
+import ArabicExample from '@/pages/ArabicExample';
 
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
