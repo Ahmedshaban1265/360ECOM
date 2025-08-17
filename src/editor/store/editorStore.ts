@@ -11,10 +11,11 @@ interface EditorActions {
   saveTemplate: () => Promise<void>;
   publishTemplate: () => Promise<void>;
   resetToPublished: () => Promise<void>;
-  
+
   // Selection
   setSelectedSection: (sectionId: string | null) => void;
   setSelectedBlock: (blockId: string | null) => void;
+  setSelectedElement: (element: HTMLElement | null) => void;
   clearSelection: () => void;
   
   // Device and appearance
@@ -71,6 +72,7 @@ export const useEditorStore = create<EditorStore>()(
       selectedTemplate: null,
       selectedSection: null,
       selectedBlock: null,
+      selectedElement: null,
       deviceType: 'desktop',
       isDarkMode: false,
       isRTL: false,
@@ -169,8 +171,12 @@ export const useEditorStore = create<EditorStore>()(
         set({ selectedBlock: blockId });
       },
 
+      setSelectedElement: (element: HTMLElement | null) => {
+        set({ selectedElement: element });
+      },
+
       clearSelection: () => {
-        set({ selectedSection: null, selectedBlock: null });
+        set({ selectedSection: null, selectedBlock: null, selectedElement: null });
       },
 
       // Device and appearance

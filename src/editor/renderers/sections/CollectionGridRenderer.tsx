@@ -1,4 +1,5 @@
 import { SectionInstance, DeviceType, ThemeTokens } from '../../types';
+import { REAL_PROJECTS, PROJECT_CATEGORIES } from '../../data/projectsData.js';
 
 interface CollectionGridRendererProps {
   section: SectionInstance;
@@ -8,54 +9,8 @@ interface CollectionGridRendererProps {
   onBlockClick?: (blockId: string) => void;
 }
 
-// Sample collection items for preview
-const SAMPLE_ITEMS = [
-  {
-    id: 1,
-    title: 'Modern Web Design',
-    category: 'Web Development',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop',
-    description: 'A clean and modern website design with focus on user experience.'
-  },
-  {
-    id: 2,
-    title: 'Mobile App UI',
-    category: 'Mobile Design',
-    image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=300&fit=crop',
-    description: 'Intuitive mobile application interface design for iOS and Android.'
-  },
-  {
-    id: 3,
-    title: 'Brand Identity',
-    category: 'Branding',
-    image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=300&fit=crop',
-    description: 'Complete brand identity package including logo and visual guidelines.'
-  },
-  {
-    id: 4,
-    title: 'E-commerce Platform',
-    category: 'Web Development',
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=300&fit=crop',
-    description: 'Full-featured e-commerce website with payment integration.'
-  },
-  {
-    id: 5,
-    title: 'Digital Marketing',
-    category: 'Marketing',
-    image: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=400&h=300&fit=crop',
-    description: 'Comprehensive digital marketing campaign with social media strategy.'
-  },
-  {
-    id: 6,
-    title: 'Data Visualization',
-    category: 'Analytics',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop',
-    description: 'Interactive dashboard for business analytics and reporting.'
-  }
-];
-
 interface CollectionItemProps {
-  item: typeof SAMPLE_ITEMS[0];
+  item: typeof REAL_PROJECTS[0];
   aspectRatio: string;
   deviceType: DeviceType;
   themeTokens: ThemeTokens;
@@ -162,10 +117,10 @@ export default function CollectionGridRenderer({
   };
 
   // Get unique categories for filters
-  const categories = ['All', ...Array.from(new Set(SAMPLE_ITEMS.map(item => item.category)))];
+  const categories = PROJECT_CATEGORIES;
 
   // Show limited items based on itemsPerPage setting
-  const displayItems = SAMPLE_ITEMS.slice(0, itemsPerPage);
+  const displayItems = REAL_PROJECTS.slice(0, itemsPerPage);
 
   return (
     <section className={`relative ${paddingClass}`}>
@@ -255,7 +210,7 @@ export default function CollectionGridRenderer({
         </div>
 
         {/* Load More Button (if there are more items) */}
-        {SAMPLE_ITEMS.length > itemsPerPage && (
+        {REAL_PROJECTS.length > itemsPerPage && (
           <div className="text-center mt-8 md:mt-12">
             <button
               className="px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors"

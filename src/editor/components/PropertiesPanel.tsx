@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditorStore, useCurrentTemplate, useSelectedSection, useSelectedBlock } from '../store/editorStore';
 import { getSectionSchema, getBlockSchema } from '../schemas/sections';
 import { FieldBase, SectionInstance, BlockInstance } from '../types';
+import ElementEditor from './ElementEditor';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -379,11 +380,13 @@ export default function PropertiesPanel() {
   const currentTemplate = useCurrentTemplate();
   const selectedSection = useSelectedSection();
   const selectedBlock = useSelectedBlock();
-  
+  const selectedElement = useEditorStore(state => state.selectedElement);
+
   const {
     updateSectionSettings,
     updateBlockSettings,
-    updateThemeTokens
+    updateThemeTokens,
+    setSelectedElement
   } = useEditorStore();
 
   const section = currentTemplate?.sections.find(s => s.id === selectedSection);
@@ -407,6 +410,22 @@ export default function PropertiesPanel() {
   const handleThemeSettingsChange = (settings: Record<string, any>) => {
     updateThemeTokens(settings);
   };
+
+  // Show element editor if an element is selected
+  if (selectedElement) {
+    return (
+      <div className="h-full p-4">
+        <ElementEditor
+          element={selectedElement}
+          onClose={() => setSelectedElement(null)}
+          onSave={() => {
+            // Element editor handles saving via EditingService
+            console.log('Element saved');
+          }}
+        />
+      </div>
+    );
+  }
 
   // No selection state
   if (!selectedSection && !selectedBlock) {

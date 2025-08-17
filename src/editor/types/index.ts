@@ -88,6 +88,7 @@ export interface EditorState {
   selectedTemplate: string | null;
   selectedSection: string | null;
   selectedBlock: string | null;
+  selectedElement: HTMLElement | null;
   deviceType: DeviceType;
   isDarkMode: boolean;
   isRTL: boolean;

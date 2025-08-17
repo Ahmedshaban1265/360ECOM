@@ -20,21 +20,21 @@ function Tooltip({
   );
 }
 
-function TooltipTrigger({
-  ...props
-}) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
-}
+const TooltipTrigger = React.forwardRef((props, ref) => {
+  return <TooltipPrimitive.Trigger ref={ref} data-slot="tooltip-trigger" {...props} />;
+})
+TooltipTrigger.displayName = "TooltipTrigger"
 
-function TooltipContent({
+const TooltipContent = React.forwardRef(({
   className,
   sideOffset = 0,
   children,
   ...props
-}) {
+}, ref) => {
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
+        ref={ref}
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(
@@ -48,6 +48,7 @@ function TooltipContent({
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );
-}
+})
+TooltipContent.displayName = "TooltipContent"
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }

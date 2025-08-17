@@ -18,20 +18,20 @@ function DropdownMenuPortal({
   return (<DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />);
 }
 
-function DropdownMenuTrigger({
-  ...props
-}) {
-  return (<DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />);
-}
+const DropdownMenuTrigger = React.forwardRef((props, ref) => {
+  return (<DropdownMenuPrimitive.Trigger ref={ref} data-slot="dropdown-menu-trigger" {...props} />);
+})
+DropdownMenuTrigger.displayName = "DropdownMenuTrigger"
 
-function DropdownMenuContent({
+const DropdownMenuContent = React.forwardRef(({
   className,
   sideOffset = 4,
   ...props
-}) {
+}, ref) => {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
+        ref={ref}
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
@@ -41,7 +41,8 @@ function DropdownMenuContent({
         {...props} />
     </DropdownMenuPrimitive.Portal>
   );
-}
+})
+DropdownMenuContent.displayName = "DropdownMenuContent"
 
 function DropdownMenuGroup({
   ...props
@@ -49,14 +50,15 @@ function DropdownMenuGroup({
   return (<DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />);
 }
 
-function DropdownMenuItem({
+const DropdownMenuItem = React.forwardRef(({
   className,
   inset,
   variant = "default",
   ...props
-}) {
+}, ref) => {
   return (
     <DropdownMenuPrimitive.Item
+      ref={ref}
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
@@ -66,7 +68,8 @@ function DropdownMenuItem({
       )}
       {...props} />
   );
-}
+})
+DropdownMenuItem.displayName = "DropdownMenuItem"
 
 function DropdownMenuCheckboxItem({
   className,
