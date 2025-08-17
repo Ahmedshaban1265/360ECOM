@@ -112,9 +112,9 @@ export default function ImageWithTextRenderer({
                 fontFamily: themeTokens.typography.bodyFont
               }}
             >
-              <div 
+              <div
                 dangerouslySetInnerHTML={{ __html: content }}
-                className="rich-text-content"
+                className={`rich-text-content-${section.id}`}
               />
             </div>
           </div>
