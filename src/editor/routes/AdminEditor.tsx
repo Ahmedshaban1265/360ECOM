@@ -23,6 +23,7 @@ export default function AdminEditor() {
   const { selectedTemplate, loadTemplate } = useEditorStore();
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
+  const hasInitialized = useRef(false);
 
   // Authentication guard
   useEffect(() => {
