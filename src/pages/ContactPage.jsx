@@ -33,9 +33,9 @@ export default function ContactPage({ language }) {
                     <div className="grid lg:grid-cols-2 gap-12">
                         <ScrollAnimationWrapper>
                             <Card className="p-8 border-0 shadow-lg">
-                                <h3 className="text-2xl font-bold mb-6">{t.contact.getInTouch}</h3>
+                                <h3 className="text-2xl font-bold mb-6" lang={language}>{t.contact.getInTouch}</h3>
                                 <div className="space-y-6">
-                                    <div className="flex items-center space-x-4">
+                                    <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'}`}>
                                         <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
                                             <Mail className="w-6 h-6 text-blue-600" />
                                         </div>
