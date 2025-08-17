@@ -27,6 +27,7 @@ import {
 
 // Preview Renderers
 import { ThemeRenderer } from '../renderers/ThemeRenderer';
+import LiveWebsiteRenderer from './LiveWebsiteRenderer';
 
 const DEVICE_PRESETS = {
   desktop: { 
@@ -141,6 +142,12 @@ export default function PreviewCanvas() {
   const handleBlockClick = (sectionId: string, blockId: string) => {
     setSelectedSection(sectionId);
     setSelectedBlock(blockId);
+  };
+
+  const handleElementClick = (element: HTMLElement, elementType: string) => {
+    console.log('Element clicked:', { element, elementType });
+    // Here we can implement editing logic for the live website
+    // For now, just log the element that was clicked
   };
 
   if (!currentTemplate) {
@@ -262,11 +269,8 @@ export default function PreviewCanvas() {
                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
-              <ThemeRenderer
-                template={currentTemplate}
-                deviceType={deviceType}
-                onSectionClick={handleSectionClick}
-                onBlockClick={handleBlockClick}
+              <LiveWebsiteRenderer
+                onElementClick={handleElementClick}
               />
             )}
           </div>
