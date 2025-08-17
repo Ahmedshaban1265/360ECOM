@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Menu, Sun, Moon, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button.jsx";
 import content from "../utils/content";
-import newLogo from "@/assets/new-logo.png";
+import newLogo from "@/assets/360ecomlogo.png";
 
 export default function Navigation({ language, setLanguage, isDark, setIsDark }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
