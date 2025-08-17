@@ -103,20 +103,48 @@ export default function AdminEditor() {
 
   return (
     <div className="h-screen bg-background overflow-hidden">
-      {/* Simple debug view to isolate the issue */}
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-4">Theme Editor Debug</h1>
-        <div className="space-y-4">
-          <p>Selected Template: {selectedTemplate || 'None'}</p>
-          <p>Is Authenticated: {isAuthenticated ? 'Yes' : 'No'}</p>
-          <p>Is Loading: {isLoading ? 'Yes' : 'No'}</p>
-          <p>Is Initializing: {isInitializing ? 'Yes' : 'No'}</p>
-          {initError && (
-            <div className="p-4 bg-red-100 border border-red-400 rounded">
-              <p className="text-red-700">Error: {initError}</p>
+      {/* Top Toolbar */}
+      <div className="h-14 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <EditorToolbar />
+      </div>
+
+      {/* Main Editor Layout */}
+      <div className="h-[calc(100vh-3.5rem)]">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          {/* Left Panel - Templates */}
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
+            <div className="h-full border-r border-border bg-background">
+              <LeftNavTemplates />
             </div>
-          )}
-        </div>
+          </ResizablePanel>
+
+          <ResizableHandle />
+
+          {/* Center Panel - Sections Tree */}
+          <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
+            <div className="h-full border-r border-border bg-background">
+              <SectionsTree />
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle />
+
+          {/* Main Content - Preview Canvas */}
+          <ResizablePanel defaultSize={40} minSize={30}>
+            <div className="h-full bg-muted/20">
+              <PreviewCanvas />
+            </div>
+          </ResizablePanel>
+
+          <ResizableHandle />
+
+          {/* Right Panel - Properties */}
+          <ResizablePanel defaultSize={15} minSize={15} maxSize={25}>
+            <div className="h-full border-l border-border bg-background">
+              <PropertiesPanel />
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
   );
