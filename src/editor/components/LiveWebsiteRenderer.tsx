@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelectedTemplate, useDeviceType } from '../store/editorStore';
+import { editingService } from '../services/EditingService';
 
 // Import actual website pages
 import HomePage from '@/pages/HomePage';
@@ -55,7 +56,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
     if (!websiteRef.current) return;
 
     const websiteElement = websiteRef.current;
-    
+
     // Find all editable elements (headings, paragraphs, images, etc.)
     const editableSelectors = [
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -71,9 +72,13 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
 
     // Add editing overlay and click handlers
     editableElementsArray.forEach((element, index) => {
-      // Add data attributes for identification
-      element.setAttribute('data-editor-id', `element-${index}`);
+      // Generate unique ID based on element content and position
+      const elementId = `${pageId}-${element.tagName.toLowerCase()}-${index}`;
+      element.setAttribute('data-editor-id', elementId);
       element.setAttribute('data-editor-type', element.tagName.toLowerCase());
+
+      // Apply saved edits to this element
+      editingService.applyElementEdits(element, elementId, pageId);
       
       // Add hover effect
       element.style.cursor = 'pointer';
@@ -107,7 +112,15 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         // Call the click handler
         if (onElementClick) {
           const elementType = element.getAttribute('data-editor-type') || 'unknown';
+          const elementId = element.getAttribute('data-editor-id') || `unknown-${index}`;
           onElementClick(element, elementType);
+
+          // Store reference to selected element for editing
+          (element as any)._editorData = {
+            id: elementId,
+            type: elementType,
+            pageId: pageId
+          };
         }
       };
 
