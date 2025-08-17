@@ -105,7 +105,7 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                 onClick={toggleLanguage}
                                 variant="ghost"
                                 size="icon"
-                                className="relative overflow-hidden px-5"
+                                className="relative overflow-hidden px-6"
                             >
                                 <Languages className="w-5 h-5 " />
                                 <span className="ml-1 text-xs">
