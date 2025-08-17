@@ -411,6 +411,22 @@ export default function PropertiesPanel() {
     updateThemeTokens(settings);
   };
 
+  // Show element editor if an element is selected
+  if (selectedElement) {
+    return (
+      <div className="h-full p-4">
+        <ElementEditor
+          element={selectedElement}
+          onClose={() => setSelectedElement(null)}
+          onSave={() => {
+            // Element editor handles saving via EditingService
+            console.log('Element saved');
+          }}
+        />
+      </div>
+    );
+  }
+
   // No selection state
   if (!selectedSection && !selectedBlock) {
     return (
