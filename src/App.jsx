@@ -23,6 +23,7 @@ import ProjectsPage from '@/pages/ProjectsPage';
 import BookingPage from '@/pages/BookingPage';
 // import ArabicExample from '@/pages/ArabicExample';
 import AcademyPage from '@/pages/AcademyPage';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
