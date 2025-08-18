@@ -81,7 +81,7 @@ export const useEditorStore = create<EditorStore>()(
       selectedBlock: null,
       selectedElement: null,
       deviceType: 'desktop',
-      isDarkMode: false,
+      isDarkMode: true,
       isRTL: false,
       locale: 'en',
       historyIndex: -1,
