@@ -25,12 +25,21 @@ export default function AdminEditor() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
+  const isUpdatingTheme = useRef(false);
 
   // Sync editor store dark mode when theme context changes
   useEffect(() => {
+    if (isUpdatingTheme.current) {
+      isUpdatingTheme.current = false;
+      return;
+    }
+
     const shouldBeDark = theme === 'dark';
-    setDarkMode(shouldBeDark);
-  }, [theme, setDarkMode]); // Update when theme changes
+    if (isDarkMode !== shouldBeDark) {
+      isUpdatingTheme.current = true;
+      setDarkMode(shouldBeDark);
+    }
+  }, [theme, isDarkMode, setDarkMode]);
 
   // Authentication guard
   useEffect(() => {
