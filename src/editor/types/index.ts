@@ -1,6 +1,7 @@
 // Core Types for Theme Editor
 export type Locale = 'en' | 'ar';
 export type DeviceType = 'desktop' | 'tablet' | 'mobile';
+export type SidebarTab = 'sections' | 'properties' | 'templates' | 'pages';
 
 // Theme Tokens
 export interface ThemeTokens {
