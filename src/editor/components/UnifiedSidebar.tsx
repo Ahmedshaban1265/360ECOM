@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useEditorStore } from '../store/editorStore';
+import { SidebarTab } from '../types';
 import SectionsTree from './SectionsTree';
 import PropertiesPanel from './PropertiesPanel';
 import LeftNavTemplates from './LeftNavTemplates';
@@ -25,8 +26,6 @@ import {
   ChevronLeft,
   X
 } from 'lucide-react';
-
-export type SidebarTab = 'sections' | 'properties' | 'templates' | 'pages';
 
 interface SidebarTabConfig {
   id: SidebarTab;
