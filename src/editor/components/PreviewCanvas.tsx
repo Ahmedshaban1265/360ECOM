@@ -153,11 +153,15 @@ export default function PreviewCanvas() {
   const handleSectionClick = (sectionId: string) => {
     setSelectedSection(sectionId);
     setSelectedBlock(null);
+    // Auto-open properties panel when section is selected
+    openSidebarTab('properties');
   };
 
   const handleBlockClick = (sectionId: string, blockId: string) => {
     setSelectedSection(sectionId);
     setSelectedBlock(blockId);
+    // Auto-open properties panel when block is selected
+    openSidebarTab('properties');
   };
 
   const handleElementClick = (element: HTMLElement, elementType: string) => {
@@ -167,6 +171,8 @@ export default function PreviewCanvas() {
     // Clear section/block selection since we're now editing individual elements
     setSelectedSection(null);
     setSelectedBlock(null);
+    // Auto-open properties panel when element is selected
+    openSidebarTab('properties');
   };
 
   if (!currentTemplate) {
