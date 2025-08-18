@@ -93,7 +93,7 @@ export default function PreviewCanvas() {
     setZoom(1);
   };
 
-  // Calculate canvas dimensions
+  // Calculate canvas dimensions and styles for different devices
   const getCanvasStyle = () => {
     const style: React.CSSProperties = {
       transform: `scale(${zoom})`,
@@ -105,13 +105,17 @@ export default function PreviewCanvas() {
       style.width = '100%';
       style.height = '100%';
       style.minHeight = '600px';
+      style.backgroundColor = 'hsl(var(--background))';
     } else {
+      // Mobile and tablet get device frames
       style.width = `${deviceConfig.width}px`;
       style.height = `${deviceConfig.height}px`;
-      style.border = '1px solid hsl(var(--border))';
-      style.borderRadius = '12px';
+      style.border = deviceType === 'mobile' ? '8px solid #1f2937' : '12px solid #374151';
+      style.borderRadius = deviceType === 'mobile' ? '32px' : '24px';
       style.overflow = 'hidden';
       style.backgroundColor = 'hsl(var(--background))';
+      style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+      style.position = 'relative';
     }
 
     return style;
@@ -120,17 +124,23 @@ export default function PreviewCanvas() {
   // Calculate container dimensions for proper centering
   const getContainerStyle = () => {
     if (deviceType === 'desktop') {
-      return {};
+      return {
+        height: '100%',
+        width: '100%'
+      };
     }
 
     const scaledWidth = deviceConfig.width * zoom;
     const scaledHeight = deviceConfig.height * zoom;
 
     return {
-      width: `${scaledWidth}px`,
-      height: `${scaledHeight}px`,
+      width: `${scaledWidth + (deviceType === 'mobile' ? 16 : 24)}px`, // Add border width
+      height: `${scaledHeight + (deviceType === 'mobile' ? 16 : 24)}px`,
       margin: '0 auto',
-      position: 'relative' as const
+      position: 'relative' as const,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     };
   };
 
@@ -170,10 +180,10 @@ export default function PreviewCanvas() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-background">
       {/* Preview Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-background">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur">
+        <div className="flex items-center gap-3">
           <h3 className="font-semibold text-sm">Preview</h3>
           <Badge variant="outline" className="text-xs">
             {currentTemplate.id}
@@ -193,10 +203,10 @@ export default function PreviewCanvas() {
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
                   onClick={() => handleDeviceChange(device)}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 p-0"
                   title={config.name}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-3 h-3" />
                 </Button>
               );
             })}
@@ -209,14 +219,14 @@ export default function PreviewCanvas() {
               size="sm"
               onClick={handleZoomOut}
               disabled={zoom <= ZOOM_LEVELS[0]}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
               title="Zoom Out"
             >
-              <ZoomOut className="w-4 h-4" />
+              <ZoomOut className="w-3 h-3" />
             </Button>
 
             <Select value={zoom.toString()} onValueChange={(value) => setZoom(parseFloat(value))}>
-              <SelectTrigger className="w-20 h-8 text-xs">
+              <SelectTrigger className="w-16 h-7 text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -233,20 +243,20 @@ export default function PreviewCanvas() {
               size="sm"
               onClick={handleZoomIn}
               disabled={zoom >= ZOOM_LEVELS[ZOOM_LEVELS.length - 1]}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
               title="Zoom In"
             >
-              <ZoomIn className="w-4 h-4" />
+              <ZoomIn className="w-3 h-3" />
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={handleZoomReset}
-              className="h-8 w-8 p-0"
+              className="h-7 w-7 p-0"
               title="Reset Zoom"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3 h-3" />
             </Button>
           </div>
 
@@ -260,25 +270,89 @@ export default function PreviewCanvas() {
       </div>
 
       {/* Preview Content */}
-      <div className="flex-1 overflow-auto bg-muted/10">
-        <div className="p-8" style={getContainerStyle()}>
+      <div className="flex-1 overflow-auto bg-muted/5">
+        <div className="p-4 h-full" style={getContainerStyle()}>
           <div
             ref={canvasRef}
             style={getCanvasStyle()}
-            className="bg-background shadow-lg"
+            className="relative overflow-hidden"
           >
+            {/* Device frame decorations for mobile */}
+            {deviceType === 'mobile' && (
+              <>
+                {/* Home indicator for iPhone-like frame */}
+                <div 
+                  className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-black rounded-full z-50"
+                />
+                {/* Notch for iPhone-like frame */}
+                <div 
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-800 rounded-b-2xl z-50"
+                />
+              </>
+            )}
+
             {isLoading ? (
-              <div className="flex items-center justify-center h-64">
+              <div className="flex items-center justify-center h-full">
                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
-              <LiveWebsiteRenderer
-                onElementClick={handleElementClick}
-              />
+              <div className="h-full overflow-y-auto">
+                <LiveWebsiteRenderer
+                  onElementClick={handleElementClick}
+                />
+              </div>
             )}
           </div>
         </div>
       </div>
+
+      {/* Custom styles for responsive design */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          /* Mobile viewport adjustments */
+          .mobile-viewport {
+            font-size: 14px;
+          }
+          
+          .mobile-viewport .container {
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+          }
+          
+          .mobile-viewport nav {
+            padding: 0.5rem 0.75rem !important;
+          }
+          
+          .mobile-viewport h1 {
+            font-size: 1.5rem !important;
+            line-height: 2rem !important;
+          }
+          
+          .mobile-viewport h2 {
+            font-size: 1.25rem !important;
+            line-height: 1.75rem !important;
+          }
+          
+          .mobile-viewport .grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+          }
+          
+          /* Tablet viewport adjustments */
+          .tablet-viewport {
+            font-size: 15px;
+          }
+          
+          .tablet-viewport .container {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          
+          .tablet-viewport .grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        `
+      }} />
     </div>
   );
 }
