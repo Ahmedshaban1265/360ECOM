@@ -20,7 +20,18 @@ export default function AdminEditor() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { selectedTemplate, loadTemplate, isDarkMode, setDarkMode } = useEditorStore();
+  const {
+    selectedTemplate,
+    loadTemplate,
+    isDarkMode,
+    setDarkMode,
+    isSidebarOpen,
+    activeTab,
+    setSidebarOpen,
+    setSidebarTab,
+    toggleSidebar,
+    openSidebarTab
+  } = useEditorStore();
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
