@@ -114,7 +114,7 @@ export const useEditorStore = create<EditorStore>()(
               isDirty: false,
               locale: template.locale,
               isRTL: template.themeTokens.rtl || false,
-              isDarkMode: template.themeTokens.darkMode || false,
+              isDarkMode: template.themeTokens.darkMode !== undefined ? template.themeTokens.darkMode : true,
               history: [initialHistoryEntry],
               historyIndex: 0
             });
