@@ -27,19 +27,11 @@ export default function AdminEditor() {
   const hasInitialized = useRef(false);
   const isUpdatingTheme = useRef(false);
 
-  // Sync editor store dark mode when theme context changes
+  // One-way sync: theme context -> editor store (prevents infinite loops)
   useEffect(() => {
-    if (isUpdatingTheme.current) {
-      isUpdatingTheme.current = false;
-      return;
-    }
-
     const shouldBeDark = theme === 'dark';
-    if (isDarkMode !== shouldBeDark) {
-      isUpdatingTheme.current = true;
-      setDarkMode(shouldBeDark);
-    }
-  }, [theme, isDarkMode, setDarkMode]);
+    setDarkMode(shouldBeDark);
+  }, [theme, setDarkMode]);
 
   // Authentication guard
   useEffect(() => {
