@@ -75,6 +75,7 @@ export default function EditorToolbar() {
   const historyIndex = useEditorStore(state => state.historyIndex);
   const history = useEditorStore(state => state.history);
 
+  // Use theme context as single source of truth for dark mode
   const isDarkMode = theme === 'dark';
 
   // Action functions
@@ -88,6 +89,7 @@ export default function EditorToolbar() {
   const redo = useEditorStore(state => state.redo);
   const exportTemplate = useEditorStore(state => state.exportTemplate);
   const importTemplate = useEditorStore(state => state.importTemplate);
+  const updateEditorDarkMode = useEditorStore(state => state.setDarkMode);
 
   // Derived state for history
   const canUndo = historyIndex > 0;
