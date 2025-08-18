@@ -317,7 +317,11 @@ export default function EditorToolbar() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleTheme}
+                onClick={() => {
+                  toggleTheme();
+                  // Also update editor store to stay in sync
+                  updateEditorDarkMode(!isDarkMode);
+                }}
                 className="h-8 w-8 p-0"
               >
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
