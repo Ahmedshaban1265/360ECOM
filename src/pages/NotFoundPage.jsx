@@ -96,29 +96,8 @@ export default function NotFoundPage() {
             }
           }
           
-          @keyframes spin-slow {
-            from {
-              transform: rotate(0deg);
-            }
-            to {
-              transform: rotate(360deg);
-            }
-          }
-          
           .animate-float {
             animation: float 6s ease-in-out infinite;
-          }
-          
-          .animate-spin-slow {
-            animation: spin-slow 8s linear infinite;
-          }
-          
-          .animation-delay-75 {
-            animation-delay: 75ms;
-          }
-          
-          .animation-delay-150 {
-            animation-delay: 150ms;
           }
           
           .animation-delay-300 {
