@@ -89,7 +89,6 @@ export default function EditorToolbar() {
   const redo = useEditorStore(state => state.redo);
   const exportTemplate = useEditorStore(state => state.exportTemplate);
   const importTemplate = useEditorStore(state => state.importTemplate);
-  const updateEditorDarkMode = useEditorStore(state => state.setDarkMode);
 
   // Derived state for history
   const canUndo = historyIndex > 0;
@@ -317,11 +316,7 @@ export default function EditorToolbar() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => {
-                  toggleTheme();
-                  // Also update editor store to stay in sync
-                  updateEditorDarkMode(!isDarkMode);
-                }}
+                onClick={toggleTheme}
                 className="h-8 w-8 p-0"
               >
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
