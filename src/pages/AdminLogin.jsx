@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext'; 
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase"; 
 
 export default function AdminLogin() {
   const [credentials, setCredentials] = useState({
-    username: '',
+    email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -15,21 +17,32 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth(); 
+  
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError('');
 
-    if (credentials.username === 'admin' && credentials.password === 'AhmadShaban1265@') {
-      login();
-      navigate('/admin/editor');
-    } else {
-      setError('Invalid username or password');
-    }
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      credentials.email,
+      credentials.password
+    );
 
-    setIsLoading(false);
-  };
+
+    login();
+    navigate('/admin/editor');
+
+  } catch (err) {
+    console.error(err);
+    setError('Invalid email or password');
+  }
+
+  setIsLoading(false);
+};
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -40,7 +53,7 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen my-10 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -63,17 +76,17 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Username
+              email
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                name="username"
-                value={credentials.username}
+                name="email"
+                value={credentials.email}
                 onChange={handleInputChange}
                 className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="Enter username"
+                placeholder="Enter email"
                 required
               />
             </div>
