@@ -59,11 +59,18 @@ interface EditorActions {
   markDirty: () => void;
   markClean: () => void;
   getCurrentTemplate: () => TemplateDocument | null;
+
+  // Auto-save functionality
+  enableAutoSave: (interval?: number) => void;
+  disableAutoSave: () => void;
 }
 
 interface EditorStore extends EditorState, EditorActions {}
 
 const MAX_HISTORY = 50;
+const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
+
+let autoSaveInterval: NodeJS.Timeout | null = null;
 
 export const useEditorStore = create<EditorStore>()(
   devtools(
@@ -124,8 +131,10 @@ export const useEditorStore = create<EditorStore>()(
         try {
           await storageService.saveDraft(selectedTemplate, currentTemplate);
           set({ isDirty: false, lastSaved: new Date().toISOString() });
+          console.log('Template saved successfully');
         } catch (error) {
           console.error('Failed to save template:', error);
+          throw new Error('Failed to save template. Please try again.');
         }
       },
 
@@ -136,8 +145,10 @@ export const useEditorStore = create<EditorStore>()(
         try {
           await storageService.publish(selectedTemplate, currentTemplate);
           set({ isDirty: false, lastSaved: new Date().toISOString() });
+          console.log('Template published successfully');
         } catch (error) {
           console.error('Failed to publish template:', error);
+          throw new Error('Failed to publish template. Please try again.');
         }
       },
 
@@ -615,6 +626,10 @@ export const useEditorStore = create<EditorStore>()(
       // Utility
       markDirty: () => {
         set({ isDirty: true });
+        // Auto-enable auto-save when content becomes dirty
+        if (!autoSaveInterval) {
+          get().enableAutoSave();
+        }
       },
 
       markClean: () => {
@@ -623,6 +638,32 @@ export const useEditorStore = create<EditorStore>()(
 
       getCurrentTemplate: () => {
         return get().currentTemplate;
+      },
+
+      // Auto-save functionality
+      enableAutoSave: (interval = AUTO_SAVE_INTERVAL) => {
+        if (autoSaveInterval) {
+          clearInterval(autoSaveInterval);
+        }
+
+        autoSaveInterval = setInterval(async () => {
+          const { isDirty, selectedTemplate, currentTemplate } = get();
+          if (isDirty && selectedTemplate && currentTemplate) {
+            try {
+              await get().saveTemplate();
+              console.log('Auto-saved template');
+            } catch (error) {
+              console.warn('Auto-save failed:', error);
+            }
+          }
+        }, interval);
+      },
+
+      disableAutoSave: () => {
+        if (autoSaveInterval) {
+          clearInterval(autoSaveInterval);
+          autoSaveInterval = null;
+        }
       }
     }),
     {
