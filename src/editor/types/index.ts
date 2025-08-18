@@ -99,6 +99,10 @@ export interface EditorState {
   isDirty: boolean;
   lastSaved?: string;
   currentTemplate: TemplateDocument | null;
+
+  // Sidebar state
+  isSidebarOpen: boolean;
+  activeTab: SidebarTab | null;
 }
 
 // Storage Service Interface
