@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEditorStore } from '../store/editorStore';
 import { DeviceType } from '../types';
@@ -50,6 +50,18 @@ export default function EditorToolbar() {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+
+  // Enable auto-save when component mounts
+  useEffect(() => {
+    const { enableAutoSave } = useEditorStore.getState();
+    enableAutoSave();
+
+    return () => {
+      const { disableAutoSave } = useEditorStore.getState();
+      disableAutoSave();
+    };
+  }, []);
 
   // Use individual selectors to prevent unnecessary re-renders
   const selectedTemplate = useEditorStore(state => state.selectedTemplate);
@@ -83,8 +95,20 @@ export default function EditorToolbar() {
     setIsSaving(true);
     try {
       await saveTemplate();
+      // Show success feedback
+      const successEl = document.createElement('div');
+      successEl.textContent = 'Saved successfully!';
+      successEl.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(successEl);
+      setTimeout(() => successEl.remove(), 3000);
     } catch (error) {
       console.error('Save failed:', error);
+      // Show error feedback
+      const errorEl = document.createElement('div');
+      errorEl.textContent = error instanceof Error ? error.message : 'Save failed';
+      errorEl.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(errorEl);
+      setTimeout(() => errorEl.remove(), 5000);
     } finally {
       setIsSaving(false);
     }
@@ -94,8 +118,20 @@ export default function EditorToolbar() {
     setIsPublishing(true);
     try {
       await publishTemplate();
+      // Show success feedback
+      const successEl = document.createElement('div');
+      successEl.textContent = 'Published successfully!';
+      successEl.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(successEl);
+      setTimeout(() => successEl.remove(), 3000);
     } catch (error) {
       console.error('Publish failed:', error);
+      // Show error feedback
+      const errorEl = document.createElement('div');
+      errorEl.textContent = error instanceof Error ? error.message : 'Publish failed';
+      errorEl.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(errorEl);
+      setTimeout(() => errorEl.remove(), 5000);
     } finally {
       setIsPublishing(false);
     }
