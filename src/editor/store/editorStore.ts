@@ -19,6 +19,12 @@ interface EditorActions {
   setSelectedBlock: (blockId: string | null) => void;
   setSelectedElement: (element: HTMLElement | null) => void;
   clearSelection: () => void;
+
+  // Sidebar
+  setSidebarOpen: (isOpen: boolean) => void;
+  setSidebarTab: (tab: SidebarTab | null) => void;
+  toggleSidebar: () => void;
+  openSidebarTab: (tab: SidebarTab) => void;
   
   // Device and appearance
   setDeviceType: (device: DeviceType) => void;
