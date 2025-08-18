@@ -431,8 +431,8 @@ export default function PropertiesPanel() {
   if (!selectedSection && !selectedBlock) {
     return (
       <div className="h-full flex flex-col">
-        <div className="p-4 border-b border-border">
-          <h2 className="font-semibold text-sm">Properties</h2>
+        <div className="p-3 border-b border-border bg-background/50">
+          <h2 className="font-semibold text-sm text-foreground">Properties</h2>
           <p className="text-xs text-muted-foreground mt-1">
             Select a section or block to edit
           </p>
@@ -501,11 +501,18 @@ export default function PropertiesPanel() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b border-border">
-        <h2 className="font-semibold text-sm">Properties</h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          {selectedBlock ? `Block: ${blockSchema?.label || 'Unknown'}` : 
-           selectedSection ? `Section: ${sectionSchema?.label || 'Unknown'}` : 
+      <div className="p-3 border-b border-border bg-background/50">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="font-semibold text-sm text-foreground">Properties</h2>
+          {(selectedSection || selectedBlock) && (
+            <Badge variant="outline" className="text-xs">
+              {selectedBlock ? 'Block' : 'Section'}
+            </Badge>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {selectedBlock ? `${blockSchema?.label || 'Unknown Block'}` :
+           selectedSection ? `${sectionSchema?.label || 'Unknown Section'}` :
            'No selection'}
         </p>
       </div>

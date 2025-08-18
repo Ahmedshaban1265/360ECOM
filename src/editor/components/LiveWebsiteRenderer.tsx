@@ -163,40 +163,35 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       width: '100%',
       height: '100%',
       overflow: 'auto',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'hsl(var(--background))',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     };
 
+    // For mobile and tablet, we don't need additional styling here
+    // as the frame is handled by the PreviewCanvas component
+    return baseStyles;
+  };
+
+  // Get responsive class based on device type
+  const getResponsiveClass = () => {
     switch (deviceType) {
       case 'mobile':
-        return {
-          ...baseStyles,
-          maxWidth: '375px',
-          margin: '0 auto',
-          border: '1px solid #e5e7eb',
-          borderRadius: '12px'
-        };
+        return 'mobile-viewport';
       case 'tablet':
-        return {
-          ...baseStyles,
-          maxWidth: '768px',
-          margin: '0 auto',
-          border: '1px solid #e5e7eb',
-          borderRadius: '8px'
-        };
+        return 'tablet-viewport';
       default:
-        return baseStyles;
+        return 'desktop-viewport';
     }
   };
 
   return (
-    <div 
+    <div
       ref={websiteRef}
-      className="live-website-renderer"
+      className={`live-website-renderer ${getResponsiveClass()}`}
       style={getDeviceStyles()}
     >
       {/* Render the actual website with navigation and footer */}
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-full bg-background text-foreground">
         {/* Navigation */}
         <Navigation
           language={language}
@@ -219,12 +214,14 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         __html: `
           .live-website-renderer {
             position: relative;
+            height: 100%;
+            overflow: hidden;
           }
-          
+
           .live-website-renderer [data-editor-id]:hover {
             position: relative;
           }
-          
+
           .live-website-renderer [data-editor-id]:hover::after {
             content: attr(data-editor-type);
             position: absolute;
@@ -240,11 +237,11 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             z-index: 1000;
             pointer-events: none;
           }
-          
+
           .live-website-renderer a {
             pointer-events: none;
           }
-          
+
           .live-website-renderer button {
             pointer-events: auto;
           }

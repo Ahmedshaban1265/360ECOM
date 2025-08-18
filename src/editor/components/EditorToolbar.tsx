@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@/context/ThemeContext';
 import { useEditorStore } from '../store/editorStore';
 import { DeviceType } from '../types';
 import TemplateDropdown from './TemplateDropdown';
@@ -48,13 +49,25 @@ const DEVICE_CONFIGS = {
 
 export default function EditorToolbar() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+
+  // Enable auto-save when component mounts
+  useEffect(() => {
+    const { enableAutoSave } = useEditorStore.getState();
+    enableAutoSave();
+
+    return () => {
+      const { disableAutoSave } = useEditorStore.getState();
+      disableAutoSave();
+    };
+  }, []);
 
   // Use individual selectors to prevent unnecessary re-renders
   const selectedTemplate = useEditorStore(state => state.selectedTemplate);
   const deviceType = useEditorStore(state => state.deviceType);
-  const isDarkMode = useEditorStore(state => state.isDarkMode);
   const isRTL = useEditorStore(state => state.isRTL);
   const locale = useEditorStore(state => state.locale);
   const lastSaved = useEditorStore(state => state.lastSaved);
@@ -62,9 +75,11 @@ export default function EditorToolbar() {
   const historyIndex = useEditorStore(state => state.historyIndex);
   const history = useEditorStore(state => state.history);
 
+  // Use theme context as single source of truth for dark mode
+  const isDarkMode = theme === 'dark';
+
   // Action functions
   const setDeviceType = useEditorStore(state => state.setDeviceType);
-  const setDarkMode = useEditorStore(state => state.setDarkMode);
   const setRTL = useEditorStore(state => state.setRTL);
   const setLocale = useEditorStore(state => state.setLocale);
   const saveTemplate = useEditorStore(state => state.saveTemplate);
@@ -83,8 +98,20 @@ export default function EditorToolbar() {
     setIsSaving(true);
     try {
       await saveTemplate();
+      // Show success feedback
+      const successEl = document.createElement('div');
+      successEl.textContent = 'Saved successfully!';
+      successEl.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(successEl);
+      setTimeout(() => successEl.remove(), 3000);
     } catch (error) {
       console.error('Save failed:', error);
+      // Show error feedback
+      const errorEl = document.createElement('div');
+      errorEl.textContent = error instanceof Error ? error.message : 'Save failed';
+      errorEl.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(errorEl);
+      setTimeout(() => errorEl.remove(), 5000);
     } finally {
       setIsSaving(false);
     }
@@ -94,8 +121,20 @@ export default function EditorToolbar() {
     setIsPublishing(true);
     try {
       await publishTemplate();
+      // Show success feedback
+      const successEl = document.createElement('div');
+      successEl.textContent = 'Published successfully!';
+      successEl.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(successEl);
+      setTimeout(() => successEl.remove(), 3000);
     } catch (error) {
       console.error('Publish failed:', error);
+      // Show error feedback
+      const errorEl = document.createElement('div');
+      errorEl.textContent = error instanceof Error ? error.message : 'Publish failed';
+      errorEl.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50';
+      document.body.appendChild(errorEl);
+      setTimeout(() => errorEl.remove(), 5000);
     } finally {
       setIsPublishing(false);
     }
@@ -277,7 +316,7 @@ export default function EditorToolbar() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setDarkMode(!isDarkMode)}
+                onClick={toggleTheme}
                 className="h-8 w-8 p-0"
               >
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
