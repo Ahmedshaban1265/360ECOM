@@ -7,8 +7,7 @@ import { initializeDefaultTemplates } from '../defaults/templates';
 
 // Layout Components
 import EditorToolbar from '../components/EditorToolbar';
-import SectionsTree from '../components/SectionsTree';
-import PropertiesPanel from '../components/PropertiesPanel';
+import UnifiedSidebar from '../components/UnifiedSidebar';
 import PreviewCanvas from '../components/PreviewCanvas';
 
 // UI Components
