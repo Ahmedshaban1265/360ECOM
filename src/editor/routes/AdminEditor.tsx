@@ -26,11 +26,11 @@ export default function AdminEditor() {
   const [initError, setInitError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
 
-  // Initialize editor store dark mode from theme context on mount
+  // Sync editor store dark mode when theme context changes
   useEffect(() => {
     const shouldBeDark = theme === 'dark';
     setDarkMode(shouldBeDark);
-  }, []); // Run only once on mount
+  }, [theme, setDarkMode]); // Update when theme changes
 
   // Authentication guard
   useEffect(() => {
