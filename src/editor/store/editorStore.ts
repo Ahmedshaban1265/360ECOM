@@ -202,6 +202,30 @@ export const useEditorStore = create<EditorStore>()(
         set({ selectedSection: null, selectedBlock: null, selectedElement: null });
       },
 
+      // Sidebar
+      setSidebarOpen: (isOpen: boolean) => {
+        set({ isSidebarOpen: isOpen });
+      },
+
+      setSidebarTab: (tab: SidebarTab | null) => {
+        set({
+          activeTab: tab,
+          isSidebarOpen: tab !== null
+        });
+      },
+
+      toggleSidebar: () => {
+        const { isSidebarOpen } = get();
+        set({ isSidebarOpen: !isSidebarOpen });
+      },
+
+      openSidebarTab: (tab: SidebarTab) => {
+        set({
+          activeTab: tab,
+          isSidebarOpen: true
+        });
+      },
+
       // Device and appearance
       setDeviceType: (device: DeviceType) => {
         set({ deviceType: device });
