@@ -21,19 +21,9 @@ export default function NotFoundPage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 px-4">
       <div className="text-center space-y-8 max-w-md mx-auto">
-        {/* Floating Icon Animation */}
-        <div className="relative">
-          <div className="w-32 h-32 mx-auto mb-6 relative">
-            {/* Animated background circles */}
-            <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse"></div>
-            <div className="absolute inset-2 rounded-full bg-primary/20 animate-ping animation-delay-75"></div>
-            <div className="absolute inset-4 rounded-full bg-primary/30 animate-pulse animation-delay-150"></div>
-            
-            {/* Central icon */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Compass className="w-16 h-16 text-primary animate-spin-slow" />
-            </div>
-          </div>
+        {/* Simple Icon */}
+        <div className="mb-6">
+          <SearchX className="w-16 h-16 mx-auto text-primary" />
         </div>
 
         {/* 404 Heading */}
