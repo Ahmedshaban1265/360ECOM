@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
 import { useEditorStore } from '../store/editorStore';
 import { initializeDefaultTemplates } from '../defaults/templates';
 
@@ -19,10 +20,26 @@ import { Loader2 } from 'lucide-react';
 export default function AdminEditor() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
-  const { selectedTemplate, loadTemplate } = useEditorStore();
+  const { theme, setTheme } = useTheme();
+  const { selectedTemplate, loadTemplate, isDarkMode, setDarkMode } = useEditorStore();
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
+
+  // Sync theme between editor store and theme context
+  useEffect(() => {
+    if (isDarkMode !== (theme === 'dark')) {
+      setTheme(isDarkMode ? 'dark' : 'light');
+    }
+  }, [isDarkMode, theme, setTheme]);
+
+  // Update editor store when theme context changes
+  useEffect(() => {
+    const shouldBeDark = theme === 'dark';
+    if (isDarkMode !== shouldBeDark) {
+      setDarkMode(shouldBeDark);
+    }
+  }, [theme, isDarkMode, setDarkMode]);
 
   // Authentication guard
   useEffect(() => {
