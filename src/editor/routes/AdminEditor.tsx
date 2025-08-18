@@ -110,10 +110,18 @@ export default function AdminEditor() {
       {/* Main Editor Layout */}
       <div className="h-[calc(100vh-3.5rem)]">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left Panel - Sections Tree */}
-          <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
-            <div className="h-full border-r border-border bg-background">
-              <SectionsTree />
+          {/* Left Side Panels - Side by Side */}
+          <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
+            <div className="h-full flex">
+              {/* Sections Tree Panel */}
+              <div className="w-1/2 border-r border-border bg-background">
+                <SectionsTree />
+              </div>
+
+              {/* Properties Panel */}
+              <div className="w-1/2 border-r border-border bg-background">
+                <PropertiesPanel />
+              </div>
             </div>
           </ResizablePanel>
 
@@ -123,15 +131,6 @@ export default function AdminEditor() {
           <ResizablePanel defaultSize={55} minSize={40}>
             <div className="h-full bg-muted/20">
               <PreviewCanvas />
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle />
-
-          {/* Right Panel - Properties */}
-          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
-            <div className="h-full border-l border-border bg-background">
-              <PropertiesPanel />
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
