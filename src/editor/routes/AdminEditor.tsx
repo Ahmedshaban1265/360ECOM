@@ -25,7 +25,6 @@ export default function AdminEditor() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
-  const isUpdatingTheme = useRef(false);
 
   // One-way sync: theme context -> editor store (prevents infinite loops)
   useEffect(() => {
