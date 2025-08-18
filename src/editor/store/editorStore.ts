@@ -98,6 +98,10 @@ export const useEditorStore = create<EditorStore>()(
       lastSaved: undefined,
       currentTemplate: null,
 
+      // Sidebar state
+      isSidebarOpen: true,
+      activeTab: 'sections' as SidebarTab,
+
       // Template operations
       setSelectedTemplate: (templateId: string) => {
         set({ selectedTemplate: templateId, selectedSection: null, selectedBlock: null });
