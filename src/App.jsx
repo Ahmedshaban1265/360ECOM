@@ -23,6 +23,7 @@ import ProjectsPage from '@/pages/ProjectsPage';
 import BookingPage from '@/pages/BookingPage';
 // import ArabicExample from '@/pages/ArabicExample';
 import AcademyPage from '@/pages/AcademyPage';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 // Admin
 import AdminLogin from '@/pages/AdminLogin';
@@ -90,6 +91,9 @@ function AppContent() {
 
         {/* Admin Theme Editor */}
         <Route path="/admin/editor" element={<AdminEditor />} />
+
+        {/* 404 Catch-all route - must be last */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {/* Hide footer in theme editor */}

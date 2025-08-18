@@ -58,7 +58,13 @@ const ZOOM_LEVELS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 export default function PreviewCanvas() {
   const currentTemplate = useCurrentTemplate();
   const deviceType = useDeviceType();
-  const { setDeviceType, setSelectedSection, setSelectedBlock, setSelectedElement } = useEditorStore();
+  const {
+    setDeviceType,
+    setSelectedSection,
+    setSelectedBlock,
+    setSelectedElement,
+    openSidebarTab
+  } = useEditorStore();
   
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -147,11 +153,15 @@ export default function PreviewCanvas() {
   const handleSectionClick = (sectionId: string) => {
     setSelectedSection(sectionId);
     setSelectedBlock(null);
+    // Auto-open properties panel when section is selected
+    openSidebarTab('properties');
   };
 
   const handleBlockClick = (sectionId: string, blockId: string) => {
     setSelectedSection(sectionId);
     setSelectedBlock(blockId);
+    // Auto-open properties panel when block is selected
+    openSidebarTab('properties');
   };
 
   const handleElementClick = (element: HTMLElement, elementType: string) => {
@@ -161,6 +171,8 @@ export default function PreviewCanvas() {
     // Clear section/block selection since we're now editing individual elements
     setSelectedSection(null);
     setSelectedBlock(null);
+    // Auto-open properties panel when element is selected
+    openSidebarTab('properties');
   };
 
   if (!currentTemplate) {

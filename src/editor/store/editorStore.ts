@@ -4,6 +4,8 @@ import { EditorState, TemplateDocument, SectionInstance, BlockInstance, DeviceTy
 import { storageService } from '../services/StorageService';
 import { DEFAULT_THEME_TOKENS } from '../defaults/templates';
 
+export type SidebarTab = 'sections' | 'properties' | 'templates' | 'pages';
+
 interface EditorActions {
   // Template operations
   setSelectedTemplate: (templateId: string) => void;
@@ -17,6 +19,12 @@ interface EditorActions {
   setSelectedBlock: (blockId: string | null) => void;
   setSelectedElement: (element: HTMLElement | null) => void;
   clearSelection: () => void;
+
+  // Sidebar
+  setSidebarOpen: (isOpen: boolean) => void;
+  setSidebarTab: (tab: SidebarTab | null) => void;
+  toggleSidebar: () => void;
+  openSidebarTab: (tab: SidebarTab) => void;
   
   // Device and appearance
   setDeviceType: (device: DeviceType) => void;
@@ -89,6 +97,10 @@ export const useEditorStore = create<EditorStore>()(
       isDirty: false,
       lastSaved: undefined,
       currentTemplate: null,
+
+      // Sidebar state
+      isSidebarOpen: true,
+      activeTab: 'sections' as SidebarTab,
 
       // Template operations
       setSelectedTemplate: (templateId: string) => {
@@ -188,6 +200,30 @@ export const useEditorStore = create<EditorStore>()(
 
       clearSelection: () => {
         set({ selectedSection: null, selectedBlock: null, selectedElement: null });
+      },
+
+      // Sidebar
+      setSidebarOpen: (isOpen: boolean) => {
+        set({ isSidebarOpen: isOpen });
+      },
+
+      setSidebarTab: (tab: SidebarTab | null) => {
+        set({
+          activeTab: tab,
+          isSidebarOpen: tab !== null
+        });
+      },
+
+      toggleSidebar: () => {
+        const { isSidebarOpen } = get();
+        set({ isSidebarOpen: !isSidebarOpen });
+      },
+
+      openSidebarTab: (tab: SidebarTab) => {
+        set({
+          activeTab: tab,
+          isSidebarOpen: true
+        });
       },
 
       // Device and appearance
