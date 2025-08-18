@@ -91,6 +91,9 @@ function AppContent() {
 
         {/* Admin Theme Editor */}
         <Route path="/admin/editor" element={<AdminEditor />} />
+
+        {/* 404 Catch-all route - must be last */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {/* Hide footer in theme editor */}
