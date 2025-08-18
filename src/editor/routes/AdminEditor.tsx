@@ -126,32 +126,19 @@ export default function AdminEditor() {
       </div>
 
       {/* Main Editor Layout */}
-      <div className="h-[calc(100vh-3.5rem)]">
-        <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left Side Panels - Side by Side */}
-          <ResizablePanel defaultSize={45} minSize={30} maxSize={60}>
-            <div className="h-full flex">
-              {/* Sections Tree Panel */}
-              <div className="w-1/2 border-r border-border bg-background">
-                <SectionsTree />
-              </div>
+      <div className="h-[calc(100vh-3.5rem)] flex">
+        {/* Unified Sidebar */}
+        <UnifiedSidebar
+          isOpen={isSidebarOpen}
+          activeTab={activeTab}
+          onToggle={toggleSidebar}
+          onTabChange={setSidebarTab}
+        />
 
-              {/* Properties Panel */}
-              <div className="w-1/2 border-r border-border bg-background">
-                <PropertiesPanel />
-              </div>
-            </div>
-          </ResizablePanel>
-
-          <ResizableHandle />
-
-          {/* Main Content - Preview Canvas */}
-          <ResizablePanel defaultSize={55} minSize={40}>
-            <div className="h-full bg-muted/20">
-              <PreviewCanvas />
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+        {/* Main Content - Preview Canvas */}
+        <div className="flex-1 bg-muted/20 overflow-hidden">
+          <PreviewCanvas />
+        </div>
       </div>
     </div>
   );
