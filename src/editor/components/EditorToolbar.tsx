@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@/context/ThemeContext';
 import { useEditorStore } from '../store/editorStore';
 import { DeviceType } from '../types';
 import TemplateDropdown from './TemplateDropdown';
@@ -48,6 +49,7 @@ const DEVICE_CONFIGS = {
 
 export default function EditorToolbar() {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
@@ -66,7 +68,6 @@ export default function EditorToolbar() {
   // Use individual selectors to prevent unnecessary re-renders
   const selectedTemplate = useEditorStore(state => state.selectedTemplate);
   const deviceType = useEditorStore(state => state.deviceType);
-  const isDarkMode = useEditorStore(state => state.isDarkMode);
   const isRTL = useEditorStore(state => state.isRTL);
   const locale = useEditorStore(state => state.locale);
   const lastSaved = useEditorStore(state => state.lastSaved);
@@ -74,9 +75,10 @@ export default function EditorToolbar() {
   const historyIndex = useEditorStore(state => state.historyIndex);
   const history = useEditorStore(state => state.history);
 
+  const isDarkMode = theme === 'dark';
+
   // Action functions
   const setDeviceType = useEditorStore(state => state.setDeviceType);
-  const setDarkMode = useEditorStore(state => state.setDarkMode);
   const setRTL = useEditorStore(state => state.setRTL);
   const setLocale = useEditorStore(state => state.setLocale);
   const saveTemplate = useEditorStore(state => state.saveTemplate);
@@ -313,7 +315,7 @@ export default function EditorToolbar() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setDarkMode(!isDarkMode)}
+                onClick={toggleTheme}
                 className="h-8 w-8 p-0"
               >
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
