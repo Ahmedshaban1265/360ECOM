@@ -1,11 +1,13 @@
 import { StorageDriver, TemplateDocument, ThemeTokens } from '../types';
 import { LocalStorageDriver } from './LocalStorageDriver';
+import { FirestoreDriver } from './FirestoreDriver';
 
 export class StorageService {
   private driver: StorageDriver;
 
   constructor(driver?: StorageDriver) {
-    this.driver = driver || new LocalStorageDriver();
+    // Default to Firestore if available, otherwise fall back to localStorage
+    this.driver = driver || new FirestoreDriver();
   }
 
   // Switch storage driver (e.g., from LocalStorage to Firebase)

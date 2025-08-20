@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 import ScrollAnimationWrapper from "@/components/ScrollAnimationWrapper";
 import content from "@/utils/content";
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 export default function ContactPage({ language }) {
+    useLivePublishedEdits('contact');
     const t = content[language];
     const isRTL = language === "ar";
 

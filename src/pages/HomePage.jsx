@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import React, { useState, useEffect, useRef } from "react";
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import {
     ArrowRight,
@@ -54,6 +55,9 @@ export default function HomePage({ language = "en" }) {
     // Stats counter refs
     const statsRef = useRef(null)
     const statsInView = useInView(statsRef, { margin: "-100px" })
+
+    // Live published edits for this page (no structure change)
+    useLivePublishedEdits('home')
 
     useEffect(() => {
         // const handleMouseMove = (e) => {

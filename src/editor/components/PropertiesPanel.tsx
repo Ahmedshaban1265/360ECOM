@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditorStore, useCurrentTemplate, useSelectedSection, useSelectedBlock } from '../store/editorStore';
 import { getSectionSchema, getBlockSchema } from '../schemas/sections';
 import { FieldBase, SectionInstance, BlockInstance } from '../types';
+import { uploadMedia } from '../services/MediaService';
 import ElementEditor from './ElementEditor';
 
 // UI Components
@@ -289,9 +290,35 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
             placeholder="Image URL or upload"
             className={!isValid ? 'border-destructive' : ''}
           />
-          <Button variant="outline" size="sm" className="w-full">
-            Upload Image
-          </Button>
+          <label className="block w-full">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                try {
+                  const progressBar = document.createElement('div');
+                  progressBar.className = 'w-full h-2 bg-muted rounded overflow-hidden';
+                  const inner = document.createElement('div');
+                  inner.className = 'h-full bg-primary transition-all';
+                  progressBar.appendChild(inner);
+                  (e.target.parentElement as HTMLElement).appendChild(progressBar);
+                  const result = await uploadMedia(file, 'theme-media', (pct) => {
+                    inner.style.width = pct + '%';
+                  });
+                  handleChange(result.url);
+                  progressBar.remove();
+                } catch (err) {
+                  console.error('Upload failed', err);
+                }
+              }}
+              className="hidden"
+            />
+            <Button asChild variant="outline" size="sm" className="w-full">
+              <span>Upload Image</span>
+            </Button>
+          </label>
           {localValue && (
             <div className="mt-2">
               <img

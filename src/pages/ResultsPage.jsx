@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { TrendingUp, Users, ShoppingCart, BarChart3, Target, Award, ArrowUpRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Card } from '@/components/ui/card.jsx'
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 // Import result images
 import shopifyDashboard from '../assets/shopify-dashboard-1.png'
@@ -140,6 +141,7 @@ function ResultsGallery({ language = 'en' }) {
 
 // ResultsPage Component
 function ResultsPage({ language = 'en' }) {
+  useLivePublishedEdits('results')
   const keyMetrics = [
     {
       icon: TrendingUp,

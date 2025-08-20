@@ -4,6 +4,7 @@ import { SidebarTab } from '../types';
 import SectionsTree from './SectionsTree';
 import PropertiesPanel from './PropertiesPanel';
 import LeftNavTemplates from './LeftNavTemplates';
+import ImageLibrary from './ImageLibrary';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ import {
   Settings,
   Layout,
   FolderOpen,
+  Image as ImageIcon,
   ChevronLeft,
   X
 } from 'lucide-react';
@@ -52,6 +54,16 @@ const SIDEBAR_TABS: SidebarTabConfig[] = [
     label: 'Templates',
     icon: Layout,
     component: LeftNavTemplates
+  },
+  {
+    id: 'media',
+    label: 'Media',
+    icon: ImageIcon,
+    component: () => (
+      <div className="h-full">
+        <ImageLibrary onSelect={() => {}} />
+      </div>
+    )
   },
   {
     id: 'pages',
@@ -198,7 +210,9 @@ export default function UnifiedSidebar({
 
               {/* Panel Content */}
               <div className="flex-1 overflow-hidden">
-                <ActiveComponent />
+                <div className="h-full overflow-y-auto">
+                  <ActiveComponent />
+                </div>
               </div>
             </div>
           )}

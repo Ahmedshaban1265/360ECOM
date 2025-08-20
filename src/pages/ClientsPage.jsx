@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { CheckCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Card } from '@/components/ui/card.jsx'
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 // Import client logos
 import clientLogo1 from '../assets/client-logo-1.png'
@@ -28,6 +29,7 @@ function ScrollAnimationWrapper({ children, delay = 0 }) {
 }
 
 function ClientsPage({ language = 'en' }) {
+  useLivePublishedEdits('clients');
   const clientLogos = [
     { name: 'TechFlow', logo: clientLogo1 },
     { name: 'ShopMax', logo: clientLogo2 },

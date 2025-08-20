@@ -16,6 +16,8 @@ import {
   X
 } from 'lucide-react';
 import { editingService } from '../services/EditingService';
+import ImageLibrary from './ImageLibrary';
+import { uploadMedia } from '../services/MediaService';
 
 interface ElementEditorProps {
   element: HTMLElement | null;
@@ -31,6 +33,11 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [backgroundColor, setBackgroundColor] = useState('');
   const [textColor, setTextColor] = useState('');
   const [fontSize, setFontSize] = useState('');
+  const [padding, setPadding] = useState('');
+  const [margin, setMargin] = useState('');
+  const [background, setBackground] = useState('');
+  const [showImageLibrary, setShowImageLibrary] = useState(false);
+  const [uploadPct, setUploadPct] = useState<number>(0);
   
   const [elementData, setElementData] = useState<{
     id: string;
@@ -60,11 +67,14 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       setLinkHref(element.href || '');
     }
 
-    // Load CSS values
+    // Load CSS values (use computed styles to reflect real styles)
     const computedStyle = window.getComputedStyle(element);
-    setBackgroundColor(element.style.backgroundColor || '');
-    setTextColor(element.style.color || '');
-    setFontSize(element.style.fontSize || '');
+    setBackgroundColor(computedStyle.backgroundColor || element.style.backgroundColor || '');
+    setTextColor(computedStyle.color || element.style.color || '');
+    setFontSize(computedStyle.fontSize || element.style.fontSize || '');
+    setPadding(computedStyle.padding || element.style.padding || '');
+    setMargin(computedStyle.margin || element.style.margin || '');
+    setBackground(computedStyle.background || (element as HTMLElement).style.background || '');
   }, [element]);
 
   const handleSave = () => {
@@ -162,6 +172,42 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       element.style.fontSize = fontSize;
     }
 
+    if (padding && padding !== element.style.padding) {
+      editingService.saveElementEdit(
+        pageId,
+        id,
+        type,
+        'style.padding',
+        padding,
+        element.style.padding
+      );
+      element.style.padding = padding;
+    }
+
+    if (margin && margin !== element.style.margin) {
+      editingService.saveElementEdit(
+        pageId,
+        id,
+        type,
+        'style.margin',
+        margin,
+        element.style.margin
+      );
+      element.style.margin = margin;
+    }
+
+    if (background && background !== element.style.background) {
+      editingService.saveElementEdit(
+        pageId,
+        id,
+        type,
+        'style.background',
+        background,
+        element.style.background
+      );
+      element.style.background = background;
+    }
+
     onSave();
   };
 
@@ -255,6 +301,32 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 placeholder="https://example.com/image.jpg"
                 className="text-xs"
               />
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="text-xs" onClick={() => setShowImageLibrary(true)}>
+                  Choose from Library
+                </Button>
+                <label>
+                  <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      setUploadPct(1);
+                      const result = await uploadMedia(file, 'theme-media', (pct) => setUploadPct(pct));
+                      setImageSource(result.url);
+                      setUploadPct(0);
+                    } catch (err) {
+                      console.error('Upload failed', err);
+                      setUploadPct(0);
+                    }
+                  }} />
+                  <Button size="sm" variant="outline" className="text-xs">Upload</Button>
+                </label>
+              </div>
+              {uploadPct > 0 && (
+                <div className="w-full h-2 bg-muted rounded overflow-hidden">
+                  <div className="h-2 bg-primary" style={{ width: `${uploadPct}%` }} />
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label className="text-xs">Alt Text</Label>
@@ -265,6 +337,11 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 className="text-xs"
               />
             </div>
+            {showImageLibrary && (
+              <div className="border rounded-md p-2">
+                <ImageLibrary onSelect={(img) => { setImageSource(img.url); setShowImageLibrary(false); }} />
+              </div>
+            )}
           </>
         )}
 
@@ -320,6 +397,36 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
               value={fontSize}
               onChange={(e) => setFontSize(e.target.value)}
               placeholder="16px, 1rem, etc."
+              className="text-xs"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Padding</Label>
+            <Input
+              value={padding}
+              onChange={(e) => setPadding(e.target.value)}
+              placeholder="e.g. 1rem 2rem"
+              className="text-xs"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Margin</Label>
+            <Input
+              value={margin}
+              onChange={(e) => setMargin(e.target.value)}
+              placeholder="e.g. 0 auto"
+              className="text-xs"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label className="text-xs">Background (CSS)</Label>
+            <Input
+              value={background}
+              onChange={(e) => setBackground(e.target.value)}
+              placeholder="e.g. #fff or url(...) center/cover"
               className="text-xs"
             />
           </div>

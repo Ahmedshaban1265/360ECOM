@@ -53,6 +53,12 @@ function AppContent() {
     updateDraftPage
   } = useContent();
 
+  // Apply live published edits for the current route without changing page structure
+  useEffect(() => {
+    const path = location.pathname === '/' ? 'home' : location.pathname.replace('/', '');
+    setCurrentPage(path);
+  }, [location, setCurrentPage]);
+
   useCurrentPage(setCurrentPage);
 
   // Check if we're in the theme editor

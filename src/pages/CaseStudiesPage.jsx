@@ -3,6 +3,7 @@ import { motion, useInView } from 'framer-motion'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 import {
   ArrowRight,
   TrendingUp,
@@ -312,6 +313,7 @@ function ScrollAnimationWrapper({ children, className = "", delay = 0 }) {
 }
 
 export default function CaseStudiesPage({ language = 'en', isDark = false }) {
+  useLivePublishedEdits('case-studies')
 
   const [selectedCase, setSelectedCase] = useState(null)
   const t = content[language]

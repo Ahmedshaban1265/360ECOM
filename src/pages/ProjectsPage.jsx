@@ -3,6 +3,7 @@ import { motion, useInView } from 'framer-motion'
 import { Button } from '@/components/ui/button.jsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card.jsx'
 import { Badge } from '@/components/ui/badge.jsx'
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 import {
   ExternalLink,
   Github,
@@ -355,6 +356,7 @@ function ProjectCard({ project, language, index }) {
 
 
 function ProjectsPage({ language = 'en' }) {
+  useLivePublishedEdits('our-projects')
   const t = content[language]
   const isRTL = language === 'ar'
   

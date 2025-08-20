@@ -21,6 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import { editingService } from '../services/EditingService';
+import { publishElementEdits } from '../services/EditsFirestoreService';
 
 // Icons
 import {
@@ -121,6 +123,12 @@ export default function EditorToolbar() {
     setIsPublishing(true);
     try {
       await publishTemplate();
+      // Also publish element-level edits for the current page
+      const pageId = useEditorStore.getState().selectedTemplate || 'home';
+      const pageEdits = editingService.getPageEdits(pageId);
+      if (pageEdits && Array.isArray(pageEdits.edits) && pageEdits.edits.length > 0) {
+        await publishElementEdits(pageId, pageEdits.edits);
+      }
       // Show success feedback
       const successEl = document.createElement('div');
       successEl.textContent = 'Published successfully!';

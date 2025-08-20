@@ -3,8 +3,10 @@ import { Check, Clock, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import content from '../utils/content';
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 export default function BookingPage({ language = 'en' }) {
+    useLivePublishedEdits('booking');
     const t = content[language];
     const isRTL = language === 'ar';
 

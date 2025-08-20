@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle, Code, ShoppingCart, TrendingUp } from "lucide-
 import ScrollAnimationWrapper from "@/components/ScrollAnimationWrapper";
 import { motion } from "framer-motion";
 import content from "@/utils/content";
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 // Import images
 import serviceImage1 from "@/assets/VuvKLBzKOhjO.jpg";
@@ -12,6 +13,7 @@ import serviceImage2 from "@/assets/AAURk47hOcIJ.webp";
 import serviceImage3 from "@/assets/NEkzEGDqinT1.jpg";
 
 export default function ServicesPage({ language }) {
+    useLivePublishedEdits('services');
     const t = content[language];
     const isRTL = language === 'ar';
 

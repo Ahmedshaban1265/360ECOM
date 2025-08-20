@@ -25,8 +25,10 @@ import {
 import ScrollAnimationWrapper from "@/components/ScrollAnimationWrapper";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 export default function AcademyPage({ language = "en" }) {
+    useLivePublishedEdits('360academy');
     const isRTL = language === "ar";
 
     const content = {

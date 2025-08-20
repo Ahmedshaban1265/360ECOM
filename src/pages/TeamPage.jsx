@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Linkedin, Twitter, Mail } from 'lucide-react'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Card } from '@/components/ui/card.jsx'
+import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 // Import team member photos
 import teamMember1 from '../assets/team-member-1.png'
@@ -193,6 +194,7 @@ function ProfessionalTeamCarousel({ items, language = 'en' }) {
 
 // TeamPage Component
 function TeamPage({ language = 'en' }) {
+  useLivePublishedEdits('team')
   const teamMembers = [
     {
       name: 'Michael Johnson',

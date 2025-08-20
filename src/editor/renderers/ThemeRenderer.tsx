@@ -97,12 +97,22 @@ function SectionRenderer({
       break;
   }
 
+  // Allow per-section style overrides from settings
+  const customStyle: React.CSSProperties = {
+    backgroundColor: (section.settings as any).styleBackground || undefined,
+    color: (section.settings as any).styleColor || undefined,
+    borderRadius: (section.settings as any).styleBorderRadius || undefined,
+    margin: (section.settings as any).styleMargin || undefined,
+    padding: (section.settings as any).stylePadding || undefined,
+  };
+
   return (
     <div 
       className={sectionClass}
       onClick={handleSectionClick}
       data-section-id={section.id}
       data-section-type={section.type}
+      style={customStyle}
     >
       {/* Selection Overlay */}
       {isSelected && (
