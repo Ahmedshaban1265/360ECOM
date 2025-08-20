@@ -14,10 +14,25 @@ const firebaseConfig = {
     measurementId: "G-07DGG8HD8Y"
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+console.log('Firebase config:', firebaseConfig);
 
-const analytics = getAnalytics(app);
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+console.log('Firebase app initialized:', app);
+
+let analytics;
+try {
+  analytics = getAnalytics(app);
+  console.log('Analytics initialized');
+} catch (e) {
+  console.warn('Analytics failed to initialize:', e);
+}
 
 export const auth = getAuth(app);
+console.log('Auth initialized:', auth);
+
 export const db = getFirestore(app);
+console.log('Firestore initialized:', db);
+
 export const storage = getStorage(app);
+console.log('Storage initialized:', storage);
+console.log('Storage bucket:', storage.app.options.storageBucket);

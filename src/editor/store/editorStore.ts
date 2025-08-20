@@ -40,6 +40,7 @@ interface EditorActions {
   moveSectionDown: (sectionId: string) => void;
   reorderSections: (sectionIds: string[]) => void;
   updateSectionSettings: (sectionId: string, settings: Record<string, any>) => void;
+  updateSectionOrder: (sectionIds: string[]) => void;
   
   // Block operations
   addBlock: (sectionId: string, blockType: string, afterBlockId?: string) => void;
@@ -49,6 +50,7 @@ interface EditorActions {
   moveBlockDown: (sectionId: string, blockId: string) => void;
   reorderBlocks: (sectionId: string, blockIds: string[]) => void;
   updateBlockSettings: (sectionId: string, blockId: string, settings: Record<string, any>) => void;
+  updateBlockOrder: (sectionId: string, blockIds: string[]) => void;
   
   // History (undo/redo)
   undo: () => void;
@@ -243,6 +245,7 @@ export const useEditorStore = create<EditorStore>()(
           };
           set({ currentTemplate: updatedTemplate, isDarkMode: isDark });
           get().markDirty();
+          get().addToHistory('Toggle dark mode');
         }
       },
 
@@ -258,6 +261,7 @@ export const useEditorStore = create<EditorStore>()(
           };
           set({ currentTemplate: updatedTemplate, isRTL });
           get().markDirty();
+          get().addToHistory('Toggle RTL');
         }
       },
 
@@ -270,6 +274,7 @@ export const useEditorStore = create<EditorStore>()(
           };
           set({ currentTemplate: updatedTemplate, locale });
           get().markDirty();
+          get().addToHistory('Change locale');
         }
       },
 
@@ -384,6 +389,19 @@ export const useEditorStore = create<EditorStore>()(
         get().addToHistory('Reorder sections');
       },
 
+      updateSectionOrder: (sectionIds: string[]) => {
+        const { currentTemplate } = get();
+        if (!currentTemplate) return;
+
+        const sectionMap = new Map(currentTemplate.sections.map(s => [s.id, s]));
+        const sections = sectionIds.map(id => sectionMap.get(id)).filter(Boolean) as SectionInstance[];
+        
+        const updatedTemplate = { ...currentTemplate, sections };
+        set({ currentTemplate: updatedTemplate });
+        get().markDirty();
+        get().addToHistory('Reorder sections');
+      },
+
       updateSectionSettings: (sectionId: string, settings: Record<string, any>) => {
         const { currentTemplate } = get();
         if (!currentTemplate) return;
@@ -397,6 +415,7 @@ export const useEditorStore = create<EditorStore>()(
         const updatedTemplate = { ...currentTemplate, sections };
         set({ currentTemplate: updatedTemplate });
         get().markDirty();
+        get().addToHistory('Update section settings');
       },
 
       // Block operations
@@ -543,6 +562,25 @@ export const useEditorStore = create<EditorStore>()(
         get().addToHistory('Reorder blocks');
       },
 
+      updateBlockOrder: (sectionId: string, blockIds: string[]) => {
+        const { currentTemplate } = get();
+        if (!currentTemplate) return;
+
+        const sections = currentTemplate.sections.map(section => {
+          if (section.id === sectionId && section.blocks) {
+            const blockMap = new Map(section.blocks.map(b => [b.id, b]));
+            const blocks = blockIds.map(id => blockMap.get(id)).filter(Boolean) as BlockInstance[];
+            return { ...section, blocks };
+          }
+          return section;
+        });
+
+        const updatedTemplate = { ...currentTemplate, sections };
+        set({ currentTemplate: updatedTemplate });
+        get().markDirty();
+        get().addToHistory('Reorder blocks');
+      },
+
       updateBlockSettings: (sectionId: string, blockId: string, settings: Record<string, any>) => {
         const { currentTemplate } = get();
         if (!currentTemplate) return;
@@ -562,6 +600,7 @@ export const useEditorStore = create<EditorStore>()(
         const updatedTemplate = { ...currentTemplate, sections };
         set({ currentTemplate: updatedTemplate });
         get().markDirty();
+        get().addToHistory('Update block settings');
       },
 
       // History (undo/redo)

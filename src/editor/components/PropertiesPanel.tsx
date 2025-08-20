@@ -4,6 +4,7 @@ import { getSectionSchema, getBlockSchema } from '../schemas/sections';
 import { FieldBase, SectionInstance, BlockInstance } from '../types';
 import { uploadMedia } from '../services/MediaService';
 import ElementEditor from './ElementEditor';
+import ImageLibrary from './ImageLibrary';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { 
   Select, 
   SelectContent, 
@@ -34,6 +36,11 @@ import {
   TabsList, 
   TabsTrigger 
 } from '@/components/ui/tabs';
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 // Icons
 import { 
@@ -42,8 +49,21 @@ import {
   Type, 
   Layout,
   Info,
-  AlertCircle
+  AlertCircle,
+  Droplets,
+  Copy,
+  Check
 } from 'lucide-react';
+
+// Color Palette Presets
+const COLOR_PRESETS = {
+  primary: ['#000000', '#ffffff', '#f8fafc', '#e2e8f0', '#cbd5e1', '#64748b', '#475569', '#334155', '#1e293b', '#0f172a'],
+  accent: ['#3b82f6', '#1d4ed8', '#1e40af', '#1e3a8a', '#1e293b', '#0ea5e9', '#0284c7', '#0369a1', '#075985', '#0c4a6e'],
+  success: ['#10b981', '#059669', '#047857', '#065f46', '#064e3b', '#22c55e', '#16a34a', '#15803d', '#166534', '#14532d'],
+  warning: ['#f59e0b', '#d97706', '#b45309', '#92400e', '#78350f', '#fbbf24', '#f59e0b', '#d97706', '#b45309', '#92400e'],
+  danger: ['#ef4444', '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#f87171', '#ef4444', '#dc2626', '#b91c1c', '#991b1b'],
+  neutral: ['#6b7280', '#4b5563', '#374151', '#1f2937', '#111827', '#9ca3af', '#6b7280', '#4b5563', '#374151', '#1f2937']
+};
 
 interface FieldRendererProps {
   field: FieldBase;
@@ -55,6 +75,7 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
   const [localValue, setLocalValue] = useState(value ?? field.default ?? '');
   const [isValid, setIsValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showImageLibrary, setShowImageLibrary] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout>();
 
   // Update local value when prop value changes
@@ -131,6 +152,112 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
         onChange(newValue);
       }
     }
+  };
+
+  // Color picker component with palette
+  const ColorPicker = ({ value, onChange }: { value: string; onChange: (color: string) => void }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [customColor, setCustomColor] = useState(value);
+
+    const handleColorChange = (color: string) => {
+      setCustomColor(color);
+      onChange(color);
+      setIsOpen(false);
+    };
+
+    const copyToClipboard = async () => {
+      try {
+        await navigator.clipboard.writeText(value);
+        // Could add toast notification here
+      } catch (e) {
+        console.error('Failed to copy color', e);
+      }
+    };
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-12 h-8 p-1 border-2"
+                style={{ backgroundColor: value }}
+                onClick={() => setIsOpen(true)}
+              >
+                <Droplets className="h-4 w-4 text-white drop-shadow-lg" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-4" align="start">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Custom Color</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="color"
+                      value={customColor}
+                      onChange={(e) => setCustomColor(e.target.value)}
+                      className="w-12 h-8 p-1 border-2"
+                    />
+                    <Input
+                      value={customColor}
+                      onChange={(e) => setCustomColor(e.target.value)}
+                      placeholder="#000000"
+                      className="flex-1"
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleColorChange(customColor)}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Color Presets</Label>
+                  {Object.entries(COLOR_PRESETS).map(([category, colors]) => (
+                    <div key={category} className="space-y-1">
+                      <div className="text-xs text-muted-foreground capitalize">{category}</div>
+                      <div className="flex gap-1 flex-wrap">
+                        {colors.map((color) => (
+                          <button
+                            key={color}
+                            className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
+                            style={{ backgroundColor: color }}
+                            onClick={() => handleColorChange(color)}
+                            title={color}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Input
+            value={value}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder="#000000"
+            className="flex-1"
+          />
+          
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={copyToClipboard}
+            className="h-8 w-8 p-0"
+          >
+            <Copy className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+    );
   };
 
   // Render based on field type
@@ -246,20 +373,7 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
 
     case 'color':
       return (
-        <div className="flex items-center gap-2">
-          <Input
-            type="color"
-            value={localValue}
-            onChange={(e) => handleChange(e.target.value)}
-            className="w-12 h-8 p-1 border-2"
-          />
-          <Input
-            value={localValue}
-            onChange={(e) => handleChange(e.target.value)}
-            placeholder="#000000"
-            className="flex-1"
-          />
-        </div>
+        <ColorPicker value={localValue} onChange={handleChange} />
       );
 
     case 'url':
@@ -290,35 +404,52 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
             placeholder="Image URL or upload"
             className={!isValid ? 'border-destructive' : ''}
           />
-          <label className="block w-full">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                try {
-                  const progressBar = document.createElement('div');
-                  progressBar.className = 'w-full h-2 bg-muted rounded overflow-hidden';
-                  const inner = document.createElement('div');
-                  inner.className = 'h-full bg-primary transition-all';
-                  progressBar.appendChild(inner);
-                  (e.target.parentElement as HTMLElement).appendChild(progressBar);
-                  const result = await uploadMedia(file, 'theme-media', (pct) => {
-                    inner.style.width = pct + '%';
-                  });
-                  handleChange(result.url);
-                  progressBar.remove();
-                } catch (err) {
-                  console.error('Upload failed', err);
-                }
-              }}
-              className="hidden"
-            />
-            <Button asChild variant="outline" size="sm" className="w-full">
-              <span>Upload Image</span>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => setShowImageLibrary(true)}
+              className="text-xs"
+            >
+              Choose from Library
             </Button>
-          </label>
+            <label>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  try {
+                    const result = await uploadMedia(file, 'theme-media');
+                    handleChange(result.url);
+                  } catch (err) {
+                    console.error('Upload failed', err);
+                  }
+                }}
+              />
+              <Button size="sm" variant="outline" className="text-xs">
+                Upload
+              </Button>
+            </label>
+          </div>
+          
+          {showImageLibrary && (
+            <div className="border rounded-md p-2 max-h-64 overflow-hidden">
+              <ImageLibrary 
+                onSelect={(img) => {
+                  handleChange(img.url);
+                  setShowImageLibrary(false);
+                }}
+                showUploadButton={false}
+                showSearch={true}
+                showFolders={false}
+                compact={true}
+              />
+            </div>
+          )}
+          
           {localValue && (
             <div className="mt-2">
               <img
@@ -503,6 +634,64 @@ export default function PropertiesPanel() {
                       default: '#7c3aed'
                     },
                     {
+                      id: 'colors.background',
+                      label: 'Background Color',
+                      type: 'color',
+                      default: '#ffffff'
+                    },
+                    {
+                      id: 'colors.text',
+                      label: 'Text Color',
+                      type: 'color',
+                      default: '#000000'
+                    },
+                    {
+                      id: 'typography.bodyFont',
+                      label: 'Body Font',
+                      type: 'select',
+                      options: [
+                        { label: 'Inter', value: 'Inter, system-ui, sans-serif' },
+                        { label: 'Roboto', value: 'Roboto, system-ui, sans-serif' },
+                        { label: 'Open Sans', value: 'Open Sans, system-ui, sans-serif' },
+                        { label: 'Cairo (Arabic)', value: 'Cairo, system-ui, sans-serif' }
+                      ],
+                      default: 'Inter, system-ui, sans-serif'
+                    },
+                    {
+                      id: 'typography.headingFont',
+                      label: 'Heading Font',
+                      type: 'select',
+                      options: [
+                        { label: 'Inter', value: 'Inter, system-ui, sans-serif' },
+                        { label: 'Roboto', value: 'Roboto, system-ui, sans-serif' },
+                        { label: 'Open Sans', value: 'Open Sans, system-ui, sans-serif' },
+                        { label: 'Cairo (Arabic)', value: 'Cairo, system-ui, sans-serif' }
+                      ],
+                      default: 'Inter, system-ui, sans-serif'
+                    },
+                    {
+                      id: 'spacingScale',
+                      label: 'Spacing Scale',
+                      type: 'range',
+                      min: 4,
+                      max: 16,
+                      step: 2,
+                      default: 8
+                    },
+                    {
+                      id: 'radius',
+                      label: 'Border Radius',
+                      type: 'select',
+                      options: [
+                        { label: 'None', value: '0px' },
+                        { label: 'Small', value: '4px' },
+                        { label: 'Medium', value: '8px' },
+                        { label: 'Large', value: '12px' },
+                        { label: 'Extra Large', value: '16px' }
+                      ],
+                      default: '8px'
+                    },
+                    {
                       id: 'darkMode',
                       label: 'Dark Mode',
                       type: 'toggle',
@@ -590,6 +779,12 @@ export default function PropertiesPanel() {
                   default: '#ffffff'
                 },
                 {
+                  id: 'colors.text',
+                  label: 'Text Color',
+                  type: 'color',
+                  default: '#000000'
+                },
+                {
                   id: 'typography.bodyFont',
                   label: 'Body Font',
                   type: 'select',
@@ -600,6 +795,40 @@ export default function PropertiesPanel() {
                     { label: 'Cairo (Arabic)', value: 'Cairo, system-ui, sans-serif' }
                   ],
                   default: 'Inter, system-ui, sans-serif'
+                },
+                {
+                  id: 'typography.headingFont',
+                  label: 'Heading Font',
+                  type: 'select',
+                  options: [
+                    { label: 'Inter', value: 'Inter, system-ui, sans-serif' },
+                    { label: 'Roboto', value: 'Roboto, system-ui, sans-serif' },
+                    { label: 'Open Sans', value: 'Open Sans, system-ui, sans-serif' },
+                    { label: 'Cairo (Arabic)', value: 'Cairo, system-ui, sans-serif' }
+                  ],
+                  default: 'Inter, system-ui, sans-serif'
+                },
+                {
+                  id: 'spacingScale',
+                  label: 'Spacing Scale',
+                  type: 'range',
+                  min: 4,
+                  max: 16,
+                  step: 2,
+                  default: 8
+                },
+                {
+                  id: 'radius',
+                  label: 'Border Radius',
+                  type: 'select',
+                  options: [
+                    { label: 'None', value: '0px' },
+                    { label: 'Small', value: '4px' },
+                    { label: 'Medium', value: '8px' },
+                    { label: 'Large', value: '12px' },
+                    { label: 'Extra Large', value: '16px' }
+                  ],
+                  default: '8px'
                 },
                 {
                   id: 'darkMode',
