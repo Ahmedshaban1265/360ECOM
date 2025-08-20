@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ const handleSubmit = async (e) => {
   setError('');
 
   try {
-    await signInWithEmailAndPassword(
+    const userCredential = await signInWithEmailAndPassword(
       auth,
       credentials.email,
       credentials.password

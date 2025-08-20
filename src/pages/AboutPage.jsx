@@ -1,4 +1,3 @@
-import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Users, Globe, Zap, BarChart3, CheckCircle } from "lucide-react";
