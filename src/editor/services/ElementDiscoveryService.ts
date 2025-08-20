@@ -177,15 +177,6 @@ export class ElementDiscoveryService {
   }
 
   private isEditorElement(element: HTMLElement): boolean {
-    // Never treat elements inside the preview canvas as editor UI
-    // The preview root uses classes like 'editor-responsive-mode' which contain the word 'editor'
-    // and could otherwise be mistakenly matched by the broad selectors below.
-    try {
-      if (element.closest('.live-website-renderer')) {
-        return false;
-      }
-    } catch {}
-
     // Check if element is part of the editor UI
     const editorSelectors = [
       '[data-editor]',
