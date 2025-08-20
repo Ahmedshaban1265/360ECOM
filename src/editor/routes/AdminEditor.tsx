@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useEditorStore } from '../store/editorStore';
 import { initializeDefaultTemplates } from '../defaults/templates';
+import { storageService } from '../services/StorageService';
 
 // Layout Components
 import EditorToolbar from '../components/EditorToolbar';
@@ -58,6 +59,13 @@ export default function AdminEditor() {
         setIsInitializing(true);
         setInitError(null);
         hasInitialized.current = true;
+
+        // Initialize storage driver explicitly if needed (ensures localStorage fallback in dev)
+        const useFirebase = (typeof window !== 'undefined') && (import.meta as any)?.env?.VITE_USE_FIREBASE === 'true';
+        if (!useFirebase) {
+          // Ensure we're not pointing to Firestore by mistake
+          // storageService constructed with LocalStorageDriver via env guard
+        }
 
         // Initialize default templates if they don't exist
         await initializeDefaultTemplates();

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { motion } from 'framer-motion'
+// import { motion } from 'framer-motion'
 import { TrendingUp, Users, ShoppingCart, BarChart3, Target, Award, ArrowUpRight } from 'lucide-react'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Card } from '@/components/ui/card.jsx'

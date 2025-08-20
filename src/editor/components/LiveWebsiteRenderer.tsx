@@ -46,7 +46,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const [language, setLanguage] = useState('en');
   const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
-  const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
+  // Keep a list of discovered editable elements for cleanup and diagnostics
+  const [editableElements, setEditableElements] = useState<ReturnType<typeof elementDiscoveryService.getAllElements>>([]);
 
   // Get the current page component
   const pageId = selectedTemplate || 'home';
@@ -102,7 +103,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
     // Cleanup function
     return () => {
       clearTimeout(timer);
-      // Clean up event listeners
+      // Clean up indicators
       const elements = elementDiscoveryService.getAllElements();
       elements.forEach(editableElement => {
         const { element } = editableElement;

@@ -35,6 +35,8 @@ export class ElementDiscoveryService {
   // Discover all editable elements on the current page
   discoverElements(): EditableElement[] {
     const elements: EditableElement[] = [];
+    // Reset registry on each discovery to avoid stale references across renders
+    this.clearRegistry();
     
     console.log('ElementDiscoveryService: Starting element discovery...');
     
@@ -196,6 +198,14 @@ export class ElementDiscoveryService {
       if (editableElement.element === element) {
         return editableElement;
       }
+    }
+    // Fallback: try lookup by DOM id or data-edit-id if present
+    if (element.id && this.elementRegistry.has(element.id)) {
+      return this.elementRegistry.get(element.id) || null;
+    }
+    const dataEditId = (element as HTMLElement).dataset?.editId;
+    if (dataEditId && this.elementRegistry.has(dataEditId)) {
+      return this.elementRegistry.get(dataEditId) || null;
     }
     return null;
   }

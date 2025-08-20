@@ -6,8 +6,19 @@ export class StorageService {
   private driver: StorageDriver;
 
   constructor(driver?: StorageDriver) {
-    // Default to Firestore if available, otherwise fall back to localStorage
-    this.driver = driver || new FirestoreDriver();
+    // Prefer explicit driver if provided
+    if (driver) {
+      this.driver = driver;
+      return;
+    }
+
+    // Use Firebase only when explicitly enabled via env flag
+    const useFirebase = (typeof window !== 'undefined') && (import.meta as any)?.env?.VITE_USE_FIREBASE === 'true';
+    if (useFirebase) {
+      this.driver = new FirestoreDriver();
+    } else {
+      this.driver = new LocalStorageDriver();
+    }
   }
 
   // Switch storage driver (e.g., from LocalStorage to Firebase)
