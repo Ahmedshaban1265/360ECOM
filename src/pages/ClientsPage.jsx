@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+// import { motion } from 'framer-motion'
 import { CheckCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge.jsx'
 import { Card } from '@/components/ui/card.jsx'

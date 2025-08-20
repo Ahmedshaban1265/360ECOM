@@ -94,7 +94,7 @@ export default function EditorToolbar() {
 
   // Derived state for history
   const canUndo = historyIndex > 0;
-  const canRedo = historyIndex < history.length - 1;
+  const canRedo = historyIndex < (history?.length || 0) - 1;
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -126,8 +126,12 @@ export default function EditorToolbar() {
       // Also publish element-level edits for the current page
       const pageId = useEditorStore.getState().selectedTemplate || 'home';
       const pageEdits = editingService.getPageEdits(pageId);
-      if (pageEdits && Array.isArray(pageEdits.edits) && pageEdits.edits.length > 0) {
-        await publishElementEdits(pageId, pageEdits.edits);
+      // Only attempt Firestore publish when enabled
+      const useFirebase = (typeof window !== 'undefined') && (import.meta as any)?.env?.VITE_USE_FIREBASE === 'true';
+      if (useFirebase) {
+        if (pageEdits && Array.isArray(pageEdits.edits) && pageEdits.edits.length > 0) {
+          await publishElementEdits(pageId, pageEdits.edits);
+        }
       }
       // Show success feedback
       const successEl = document.createElement('div');
@@ -313,7 +317,7 @@ export default function EditorToolbar() {
                 onClick={() => setLocale('ar')}
                 className={locale === 'ar' ? 'bg-accent' : ''}
               >
-                ا��عربية
+                العربية
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

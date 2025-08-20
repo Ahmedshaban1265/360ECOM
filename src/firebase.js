@@ -19,12 +19,12 @@ console.log('Firebase config:', firebaseConfig);
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 console.log('Firebase app initialized:', app);
 
-let analytics;
+// Analytics is optional and not supported in all environments
 try {
-  analytics = getAnalytics(app);
+  getAnalytics(app);
   console.log('Analytics initialized');
 } catch (e) {
-  console.warn('Analytics failed to initialize:', e);
+  // ignore in non-browser or unsupported envs
 }
 
 export const auth = getAuth(app);

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext'; 
+// Optional Firebase sign-in. If Firebase is not configured, we fall back to local AuthContext
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/firebase"; 
 
@@ -25,16 +26,17 @@ const handleSubmit = async (e) => {
   setError('');
 
   try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      credentials.email,
-      credentials.password
-    );
-
-
+    const useFirebase = (typeof window !== 'undefined') && (import.meta?.env?.VITE_USE_FIREBASE === 'true');
+    if (useFirebase) {
+      await signInWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password
+      );
+    }
+    // Regardless, use local auth flag for the editor access
     login();
     navigate('/admin/editor');
-
   } catch (err) {
     console.error(err);
     setError('Invalid email or password');

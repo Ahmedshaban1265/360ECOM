@@ -135,7 +135,7 @@ export default function PreviewCanvas() {
 
   // Handle device type changes
   const handleDeviceChange = (newDevice: string) => {
-    setDeviceType(newDevice as typeof deviceType);
+    setDeviceType(newDevice as any);
     // Reset zoom when changing devices
     setZoom(1);
   };
@@ -162,7 +162,9 @@ export default function PreviewCanvas() {
   // Toggle fullscreen mode
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      canvasRef.current?.requestFullscreen();
+      // Prefer parent container for fullscreen to avoid scaled child overflow
+      const container = canvasRef.current?.parentElement || canvasRef.current;
+      container?.requestFullscreen();
       setIsFullscreen(true);
     } else {
       document.exitFullscreen();
