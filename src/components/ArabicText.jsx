@@ -19,10 +19,9 @@ import { cn } from '@/lib/utils';
 const ArabicText = ({ 
   children, 
   className = '', 
-  as = 'div',
+  as: Component = 'div',
   ...props 
 }) => {
-  const Component = as;
   return (
     <Component
       lang="ar"
@@ -55,10 +54,9 @@ export const BilingualText = ({
   english, 
   language = 'en', 
   className = '',
-  as = 'div',
+  as: Component = 'div',
   ...props 
 }) => {
-  const Component = as;
   const isArabic = language === 'ar';
   
   return (

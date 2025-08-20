@@ -229,9 +229,23 @@ export default function HomePage({ language = "en" }) {
             <section className="py-20 bg-muted/30" ref={statsRef}>
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                        {t.stats.map((stat, index) => (
-                            <StatItem key={index} stat={stat} index={index} inView={statsInView} />
-                        ))}
+                        {t.stats.map((stat, index) => {
+                            const count = useCountUp(stat.number, 2000, statsInView)
+
+                            return (
+                                <ScrollAnimationWrapper key={index} delay={index * 0.1}>
+                                    <motion.div
+                                        className="text-center group"
+                                        whileHover={{ scale: 1.05 }}
+                                    >
+                                        <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
+                                            {count}{stat.suffix}
+                                        </div>
+                                        <div className="text-muted-foreground">{stat.label}</div>
+                                    </motion.div>
+                                </ScrollAnimationWrapper>
+                            )
+                        })}
                     </div>
                 </div>
             </section>
@@ -1004,21 +1018,4 @@ export default function HomePage({ language = "en" }) {
             </section>
         </div>
     )
-}
-
-function StatItem({ stat, index, inView }) {
-    const count = useCountUp(stat.number, 2000, inView);
-    return (
-        <ScrollAnimationWrapper delay={index * 0.1}>
-            <motion.div
-                className="text-center group"
-                whileHover={{ scale: 1.05 }}
-            >
-                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-blue-700 to-blue-800 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform">
-                    {count}{stat.suffix}
-                </div>
-                <div className="text-muted-foreground">{stat.label}</div>
-            </motion.div>
-        </ScrollAnimationWrapper>
-    );
 }

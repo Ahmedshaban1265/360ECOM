@@ -19,8 +19,9 @@ console.log('Firebase config:', firebaseConfig);
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 console.log('Firebase app initialized:', app);
 
+let analytics;
 try {
-  getAnalytics(app);
+  analytics = getAnalytics(app);
   console.log('Analytics initialized');
 } catch (e) {
   console.warn('Analytics failed to initialize:', e);

@@ -101,7 +101,7 @@ export function runEditorTests() {
 }
 
 // Auto-run tests in development
-if (typeof window !== 'undefined') {
+if (process.env.NODE_ENV === 'development') {
   // Add small delay to ensure modules are loaded
   setTimeout(() => {
     runEditorTests();
