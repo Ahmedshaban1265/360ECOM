@@ -46,11 +46,7 @@ function AppContent() {
   const { isAuthenticated } = useAuth();
   const {
     editMode,
-    currentPage,
-    setCurrentPage,
-    pages,
-    draftPages,
-    updateDraftPage
+    setCurrentPage
   } = useContent();
 
   // Apply live published edits for the current route without changing page structure

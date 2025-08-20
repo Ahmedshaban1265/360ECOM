@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
@@ -13,7 +13,9 @@ import { ThemeProvider } from './context/ThemeContext';
     const root = document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(savedTheme);
-  } catch {}
+  } catch (error) {
+    // ignore theme read errors
+  }
 })();
 
 createRoot(document.getElementById('root')).render(

@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, Clock, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,8 +8,8 @@ import useLivePublishedEdits from '@/hooks/useLivePublishedEdits';
 
 export default function BookingPage({ language = 'en' }) {
     useLivePublishedEdits('booking');
-    const t = content[language];
-    const isRTL = language === 'ar';
+    // const t = content[language];
+    // const isRTL = language === 'ar';
 
     const packages = [
         {
