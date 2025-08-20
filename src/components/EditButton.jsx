@@ -41,7 +41,7 @@ export default function EditButton() {
         setIsExpanded(true); // فتح المينيو تلقائيًا
       }
     }
-  }, [location.search, isAuthenticated, location.pathname]);
+  }, [location.search, isAuthenticated, location.pathname, pages, setEditMode, startEditing]);
 
   const handleEditToggle = () => {
     if (!isAuthenticated) {

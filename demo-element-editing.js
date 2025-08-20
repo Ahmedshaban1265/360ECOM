@@ -139,11 +139,5 @@ if (typeof window !== 'undefined') {
   console.log('Run demoElementDiscovery() to understand element detection');
 }
 
-// Export for Node.js environments
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    demonstrateElementEditing,
-    demonstrateImageLibrary,
-    demonstrateElementDiscovery
-  };
-}
+// Export for Node.js environments (CommonJS compatibility when available)
+// Note: intentionally avoiding CommonJS exports to keep ESM/browser clean

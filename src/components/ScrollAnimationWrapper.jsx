@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
 export default function ScrollAnimationWrapper({ children, className = "", delay = 0 }) {
