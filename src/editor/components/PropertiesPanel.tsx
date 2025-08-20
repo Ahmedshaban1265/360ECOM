@@ -44,6 +44,7 @@ import {
   Info,
   AlertCircle
 } from 'lucide-react';
+import { storageService } from '../services/StorageService';
 
 interface FieldRendererProps {
   field: FieldBase;
@@ -438,6 +439,55 @@ export default function PropertiesPanel() {
     updateThemeTokens(settings);
   };
 
+  // Global settings state
+  const [globalSettings, setGlobalSettings] = useState<any | null>(null);
+  const [isSavingGlobal, setIsSavingGlobal] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const gs = await storageService.getGlobalSettings();
+        if (mounted) setGlobalSettings(gs || {});
+      } catch (e) {
+        console.warn('Failed to load global settings', e);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const saveGlobal = async () => {
+    if (!globalSettings) return;
+    setIsSavingGlobal(true);
+    try {
+      await storageService.saveGlobalSettings(globalSettings);
+      try { localStorage.setItem('theme_global_v1', JSON.stringify(globalSettings)); } catch {}
+      // Apply instantly
+      const root = document.documentElement as HTMLElement;
+      if (globalSettings.colors) {
+        if (globalSettings.colors.primary) root.style.setProperty('--theme-primary', globalSettings.colors.primary);
+        if (globalSettings.colors.secondary) root.style.setProperty('--theme-secondary', globalSettings.colors.secondary);
+        if (globalSettings.colors.background) root.style.setProperty('--theme-background', globalSettings.colors.background);
+        if (globalSettings.colors.foreground) root.style.setProperty('--theme-foreground', globalSettings.colors.foreground);
+      }
+      if (globalSettings.typography) {
+        if (globalSettings.typography.bodyFont) root.style.setProperty('--theme-body-font', globalSettings.typography.bodyFont);
+        if (globalSettings.typography.headingFont) root.style.setProperty('--theme-heading-font', globalSettings.typography.headingFont);
+      }
+      if (globalSettings.faviconUrl) {
+        let link = document.querySelector('link[rel="icon"]') as HTMLLinkElement | null;
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        link.href = globalSettings.faviconUrl;
+      }
+    } finally {
+      setIsSavingGlobal(false);
+    }
+  };
+
   // Show element editor if an element is selected
   if (selectedElement) {
     return (
@@ -618,6 +668,80 @@ export default function PropertiesPanel() {
               onChange={handleThemeSettingsChange}
             />
           )}
+
+          {/* Global Settings */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Global Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Logo URL</Label>
+                  <Input
+                    value={globalSettings?.logoUrl || ''}
+                    onChange={(e) => setGlobalSettings({ ...(globalSettings || {}), logoUrl: e.target.value })}
+                    placeholder="https://.../logo.png"
+                    className="text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Favicon URL</Label>
+                  <Input
+                    value={globalSettings?.faviconUrl || ''}
+                    onChange={(e) => setGlobalSettings({ ...(globalSettings || {}), faviconUrl: e.target.value })}
+                    placeholder="https://.../favicon.ico"
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Primary Color</Label>
+                  <Input
+                    type="color"
+                    value={globalSettings?.colors?.primary || '#2563eb'}
+                    onChange={(e) => setGlobalSettings({ ...(globalSettings || {}), colors: { ...(globalSettings?.colors || {}), primary: e.target.value } })}
+                    className="h-8"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Secondary Color</Label>
+                  <Input
+                    type="color"
+                    value={globalSettings?.colors?.secondary || '#7c3aed'}
+                    onChange={(e) => setGlobalSettings({ ...(globalSettings || {}), colors: { ...(globalSettings?.colors || {}), secondary: e.target.value } })}
+                    className="h-8"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Body Font</Label>
+                  <Input
+                    value={globalSettings?.typography?.bodyFont || ''}
+                    onChange={(e) => setGlobalSettings({ ...(globalSettings || {}), typography: { ...(globalSettings?.typography || {}), bodyFont: e.target.value } })}
+                    placeholder="Inter, system-ui, sans-serif"
+                    className="text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Heading Font</Label>
+                  <Input
+                    value={globalSettings?.typography?.headingFont || ''}
+                    onChange={(e) => setGlobalSettings({ ...(globalSettings || {}), typography: { ...(globalSettings?.typography || {}), headingFont: e.target.value } })}
+                    placeholder="Inter, system-ui, sans-serif"
+                    className="text-xs"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button size="sm" onClick={saveGlobal} disabled={isSavingGlobal}>
+                  {isSavingGlobal ? 'Saving...' : 'Save Global Settings'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </ScrollArea>
     </div>
