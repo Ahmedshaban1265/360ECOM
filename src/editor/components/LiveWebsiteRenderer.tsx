@@ -60,9 +60,9 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
     // Find all editable elements (headings, paragraphs, images, etc.)
     const editableSelectors = [
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'p',
-      'img',
-      'button',
+      'p', 'span', 'small', 'strong', 'em',
+      'img', 'picture', 'source',
+      'a', 'button', 'li', 'blockquote', 'figcaption',
       '[data-editable]',
       '.editable'
     ];

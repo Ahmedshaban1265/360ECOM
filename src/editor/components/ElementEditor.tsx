@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,11 +13,17 @@ import {
   Image, 
   Link, 
   Palette,
+  Copy,
+  SquareStack,
+  EyeOff,
+  Eye,
   X
 } from 'lucide-react';
 import { editingService } from '../services/EditingService';
 import ImageLibrary from './ImageLibrary';
 import { uploadMedia } from '../services/MediaService';
+import { saveDraftElementEdits } from '../services/EditsFirestoreService';
+import { getRealPagesList } from '../utils/pageExtractor';
 
 interface ElementEditorProps {
   element: HTMLElement | null;
@@ -36,6 +42,23 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [padding, setPadding] = useState('');
   const [margin, setMargin] = useState('');
   const [background, setBackground] = useState('');
+  const [fontWeight, setFontWeight] = useState('');
+  const [lineHeight, setLineHeight] = useState('');
+  const [letterSpacing, setLetterSpacing] = useState('');
+  const [textTransform, setTextTransform] = useState('');
+  const [width, setWidth] = useState('');
+  const [height, setHeight] = useState('');
+  const [display, setDisplay] = useState('');
+  const [gap, setGap] = useState('');
+  const [border, setBorder] = useState('');
+  const [borderRadius, setBorderRadius] = useState('');
+  const [boxShadow, setBoxShadow] = useState('');
+  const [position, setPosition] = useState('');
+  const [top, setTop] = useState('');
+  const [right, setRight] = useState('');
+  const [bottom, setBottom] = useState('');
+  const [left, setLeft] = useState('');
+  const [zIndex, setZIndex] = useState('');
   const [showImageLibrary, setShowImageLibrary] = useState(false);
   const [uploadPct, setUploadPct] = useState<number>(0);
   
@@ -44,6 +67,8 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     type: string;
     pageId: string;
   } | null>(null);
+
+  const pagesList = useMemo(() => getRealPagesList(), []);
 
   // Load element data when element changes
   useEffect(() => {
@@ -75,6 +100,23 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     setPadding(computedStyle.padding || element.style.padding || '');
     setMargin(computedStyle.margin || element.style.margin || '');
     setBackground(computedStyle.background || (element as HTMLElement).style.background || '');
+    setFontWeight(computedStyle.fontWeight || element.style.fontWeight || '');
+    setLineHeight(computedStyle.lineHeight || element.style.lineHeight || '');
+    setLetterSpacing(computedStyle.letterSpacing || element.style.letterSpacing || '');
+    setTextTransform(computedStyle.textTransform || (element as HTMLElement).style.textTransform || '');
+    setWidth(computedStyle.width || (element as HTMLElement).style.width || '');
+    setHeight(computedStyle.height || (element as HTMLElement).style.height || '');
+    setDisplay(computedStyle.display || (element as HTMLElement).style.display || '');
+    setGap((computedStyle as any).gap || (element as HTMLElement).style.gap || '');
+    setBorder(computedStyle.border || (element as HTMLElement).style.border || '');
+    setBorderRadius(computedStyle.borderRadius || (element as HTMLElement).style.borderRadius || '');
+    setBoxShadow(computedStyle.boxShadow || (element as HTMLElement).style.boxShadow || '');
+    setPosition(computedStyle.position || (element as HTMLElement).style.position || '');
+    setTop(computedStyle.top || (element as HTMLElement).style.top || '');
+    setRight(computedStyle.right || (element as HTMLElement).style.right || '');
+    setBottom(computedStyle.bottom || (element as HTMLElement).style.bottom || '');
+    setLeft(computedStyle.left || (element as HTMLElement).style.left || '');
+    setZIndex(computedStyle.zIndex || (element as HTMLElement).style.zIndex || '');
   }, [element]);
 
   const handleSave = () => {
@@ -208,15 +250,101 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       element.style.background = background;
     }
 
+    // Typography
+    if (fontWeight && fontWeight !== element.style.fontWeight) {
+      editingService.saveElementEdit(pageId, id, type, 'style.fontWeight', fontWeight, element.style.fontWeight);
+      element.style.fontWeight = fontWeight;
+    }
+    if (lineHeight && lineHeight !== element.style.lineHeight) {
+      editingService.saveElementEdit(pageId, id, type, 'style.lineHeight', lineHeight, element.style.lineHeight);
+      element.style.lineHeight = lineHeight;
+    }
+    if (letterSpacing && letterSpacing !== element.style.letterSpacing) {
+      editingService.saveElementEdit(pageId, id, type, 'style.letterSpacing', letterSpacing, element.style.letterSpacing);
+      element.style.letterSpacing = letterSpacing;
+    }
+    if (textTransform && textTransform !== (element as HTMLElement).style.textTransform) {
+      editingService.saveElementEdit(pageId, id, type, 'style.textTransform', textTransform, (element as HTMLElement).style.textTransform);
+      (element as HTMLElement).style.textTransform = textTransform as any;
+    }
+
+    // Layout
+    if (width && width !== (element as HTMLElement).style.width) {
+      editingService.saveElementEdit(pageId, id, type, 'style.width', width, (element as HTMLElement).style.width);
+      (element as HTMLElement).style.width = width;
+    }
+    if (height && height !== (element as HTMLElement).style.height) {
+      editingService.saveElementEdit(pageId, id, type, 'style.height', height, (element as HTMLElement).style.height);
+      (element as HTMLElement).style.height = height;
+    }
+    if (display && display !== (element as HTMLElement).style.display) {
+      editingService.saveElementEdit(pageId, id, type, 'style.display', display, (element as HTMLElement).style.display);
+      (element as HTMLElement).style.display = display as any;
+    }
+    if (gap && gap !== (element as HTMLElement).style.gap) {
+      editingService.saveElementEdit(pageId, id, type, 'style.gap', gap, (element as HTMLElement).style.gap);
+      (element as HTMLElement).style.gap = gap as any;
+    }
+
+    // Border & Shadow
+    if (border && border !== (element as HTMLElement).style.border) {
+      editingService.saveElementEdit(pageId, id, type, 'style.border', border, (element as HTMLElement).style.border);
+      (element as HTMLElement).style.border = border as any;
+    }
+    if (borderRadius && borderRadius !== (element as HTMLElement).style.borderRadius) {
+      editingService.saveElementEdit(pageId, id, type, 'style.borderRadius', borderRadius, (element as HTMLElement).style.borderRadius);
+      (element as HTMLElement).style.borderRadius = borderRadius as any;
+    }
+    if (boxShadow && boxShadow !== (element as HTMLElement).style.boxShadow) {
+      editingService.saveElementEdit(pageId, id, type, 'style.boxShadow', boxShadow, (element as HTMLElement).style.boxShadow);
+      (element as HTMLElement).style.boxShadow = boxShadow as any;
+    }
+
+    // Positioning
+    if (position && position !== (element as HTMLElement).style.position) {
+      editingService.saveElementEdit(pageId, id, type, 'style.position', position, (element as HTMLElement).style.position);
+      (element as HTMLElement).style.position = position as any;
+    }
+    if (top && top !== (element as HTMLElement).style.top) {
+      editingService.saveElementEdit(pageId, id, type, 'style.top', top, (element as HTMLElement).style.top);
+      (element as HTMLElement).style.top = top as any;
+    }
+    if (right && right !== (element as HTMLElement).style.right) {
+      editingService.saveElementEdit(pageId, id, type, 'style.right', right, (element as HTMLElement).style.right);
+      (element as HTMLElement).style.right = right as any;
+    }
+    if (bottom && bottom !== (element as HTMLElement).style.bottom) {
+      editingService.saveElementEdit(pageId, id, type, 'style.bottom', bottom, (element as HTMLElement).style.bottom);
+      (element as HTMLElement).style.bottom = bottom as any;
+    }
+    if (left && left !== (element as HTMLElement).style.left) {
+      editingService.saveElementEdit(pageId, id, type, 'style.left', left, (element as HTMLElement).style.left);
+      (element as HTMLElement).style.left = left as any;
+    }
+    if (zIndex && zIndex !== (element as HTMLElement).style.zIndex) {
+      editingService.saveElementEdit(pageId, id, type, 'style.zIndex', zIndex, (element as HTMLElement).style.zIndex);
+      (element as HTMLElement).style.zIndex = zIndex as any;
+    }
+
+    // Persist draft edits to Firestore
+    try {
+      const pageEdits = editingService.getPageEdits(pageId);
+      if (pageEdits && pageEdits.edits.length > 0) {
+        void saveDraftElementEdits(pageId, pageEdits.edits as any);
+      }
+    } catch (e) {
+      console.warn('Failed to save draft element edits to Firestore', e);
+    }
+
     onSave();
   };
 
   const handleUndo = () => {
     if (!elementData) return;
     
-    const { id, pageId } = elementData;
+    const { pageId } = elementData;
     
-    // Clear all edits for this element
+    // Clear all edits for this element's page
     editingService.clearPageEdits(pageId);
     
     // Reload the page to reset the element
@@ -352,12 +480,20 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
               <Link className="h-3 w-3" />
               Link URL
             </Label>
-            <Input
-              value={linkHref}
-              onChange={(e) => setLinkHref(e.target.value)}
-              placeholder="https://example.com"
-              className="text-xs"
-            />
+            <div className="space-y-1">
+              <Input
+                value={linkHref}
+                onChange={(e) => setLinkHref(e.target.value)}
+                placeholder="https://example.com or internal route"
+                className="text-xs"
+                list="internal-routes"
+              />
+              <datalist id="internal-routes">
+                {pagesList.map((p) => (
+                  <option key={p.id} value={p.route || `/${p.id}`}>{p.name}</option>
+                ))}
+              </datalist>
+            </div>
           </div>
         )}
 
@@ -401,6 +537,45 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label className="text-xs">Font Weight</Label>
+              <Input
+                value={fontWeight}
+                onChange={(e) => setFontWeight(e.target.value)}
+                placeholder="400, 700, bold"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Line Height</Label>
+              <Input
+                value={lineHeight}
+                onChange={(e) => setLineHeight(e.target.value)}
+                placeholder="1.5, 24px"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Letter Spacing</Label>
+              <Input
+                value={letterSpacing}
+                onChange={(e) => setLetterSpacing(e.target.value)}
+                placeholder="0.5px"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Text Transform</Label>
+              <Input
+                value={textTransform}
+                onChange={(e) => setTextTransform(e.target.value)}
+                placeholder="none | uppercase | lowercase | capitalize"
+                className="text-xs"
+              />
+            </div>
+          </div>
+
           <div className="space-y-1">
             <Label className="text-xs">Padding</Label>
             <Input
@@ -421,6 +596,112 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label className="text-xs">Width</Label>
+              <Input
+                value={width}
+                onChange={(e) => setWidth(e.target.value)}
+                placeholder="e.g. 100%, 300px"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Height</Label>
+              <Input
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                placeholder="e.g. auto, 200px"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Display</Label>
+              <Input
+                value={display}
+                onChange={(e) => setDisplay(e.target.value)}
+                placeholder="block | inline | flex | grid"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Gap (flex/grid)</Label>
+              <Input
+                value={gap}
+                onChange={(e) => setGap(e.target.value)}
+                placeholder="e.g. 8px, 1rem"
+                className="text-xs"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label className="text-xs">Border</Label>
+              <Input
+                value={border}
+                onChange={(e) => setBorder(e.target.value)}
+                placeholder="1px solid #e5e7eb"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Border Radius</Label>
+              <Input
+                value={borderRadius}
+                onChange={(e) => setBorderRadius(e.target.value)}
+                placeholder="8px"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1 col-span-2">
+              <Label className="text-xs">Box Shadow</Label>
+              <Input
+                value={boxShadow}
+                onChange={(e) => setBoxShadow(e.target.value)}
+                placeholder="0 1px 3px rgba(0,0,0,0.1)"
+                className="text-xs"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label className="text-xs">Position</Label>
+              <Input
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                placeholder="static | relative | absolute | fixed | sticky"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">z-index</Label>
+              <Input
+                value={zIndex}
+                onChange={(e) => setZIndex(e.target.value)}
+                placeholder="auto | 10"
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Top</Label>
+              <Input value={top} onChange={(e) => setTop(e.target.value)} placeholder="e.g. 0, 10px" className="text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Right</Label>
+              <Input value={right} onChange={(e) => setRight(e.target.value)} placeholder="e.g. 0, 10px" className="text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Bottom</Label>
+              <Input value={bottom} onChange={(e) => setBottom(e.target.value)} placeholder="e.g. 0, 10px" className="text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Left</Label>
+              <Input value={left} onChange={(e) => setLeft(e.target.value)} placeholder="e.g. 0, 10px" className="text-xs" />
+            </div>
+          </div>
+
           <div className="space-y-1">
             <Label className="text-xs">Background (CSS)</Label>
             <Input
@@ -434,24 +715,99 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
 
         <Separator />
 
-        {/* Action Buttons */}
-        <div className="flex gap-2">
+        {/* Element Actions */}
+        <div className="grid grid-cols-2 gap-2">
           <Button
-            onClick={handleSave}
-            size="sm"
-            className="flex-1 text-xs"
-          >
-            <Save className="h-3 w-3 mr-1" />
-            Save Changes
-          </Button>
-          <Button
-            onClick={handleUndo}
+            onClick={() => {
+              if (!element || !elementData) return;
+              const clone = element.cloneNode(true) as HTMLElement;
+              element.parentElement?.insertBefore(clone, element.nextSibling);
+              const parent = element.parentElement;
+              if (parent) {
+                const parentId = `${elementData.pageId}-${parent.tagName.toLowerCase()}-parent-${Date.now()}`;
+                editingService.saveElementEdit(
+                  elementData.pageId,
+                  parentId,
+                  parent.tagName.toLowerCase(),
+                  'innerHTML',
+                  parent.innerHTML,
+                  parent.innerHTML
+                );
+              }
+            }}
             variant="outline"
             size="sm"
             className="text-xs"
           >
-            <Undo className="h-3 w-3" />
+            <Copy className="h-3 w-3 mr-1" /> Duplicate
           </Button>
+
+          <Button
+            onClick={() => {
+              if (!element || !elementData) return;
+              if (element.parentElement && element.parentElement.classList.contains('editor-wrapper')) {
+                const wrapper = element.parentElement;
+                wrapper.replaceWith(element);
+              } else {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'editor-wrapper';
+                element.replaceWith(wrapper);
+                wrapper.appendChild(element);
+              }
+            }}
+            variant="outline"
+            size="sm"
+            className="text-xs"
+          >
+            <SquareStack className="h-3 w-3 mr-1" /> Wrap/Unwrap
+          </Button>
+
+          <Button
+            onClick={() => {
+              if (!element || !elementData) return;
+              const isHidden = (element as HTMLElement).style.display === 'none';
+              const newDisplay = isHidden ? '' : 'none';
+              editingService.saveElementEdit(
+                elementData.pageId,
+                elementData.id,
+                elementData.type,
+                'style.display',
+                newDisplay,
+                (element as HTMLElement).style.display
+              );
+              (element as HTMLElement).style.display = newDisplay;
+            }}
+            variant="outline"
+            size="sm"
+            className="text-xs"
+          >
+            {(element as HTMLElement).style.display === 'none' ? (
+              <Eye className="h-3 w-3 mr-1" />
+            ) : (
+              <EyeOff className="h-3 w-3 mr-1" />
+            )}
+            Toggle Visibility
+          </Button>
+
+          {/* Save / Undo */}
+          <div className="col-span-2 flex gap-2">
+            <Button
+              onClick={handleSave}
+              size="sm"
+              className="flex-1 text-xs"
+            >
+              <Save className="h-3 w-3 mr-1" />
+              Save Changes
+            </Button>
+            <Button
+              onClick={handleUndo}
+              variant="outline"
+              size="sm"
+              className="text-xs"
+            >
+              <Undo className="h-3 w-3" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

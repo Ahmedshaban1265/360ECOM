@@ -129,6 +129,8 @@ export default function EditorToolbar() {
       if (pageEdits && Array.isArray(pageEdits.edits) && pageEdits.edits.length > 0) {
         await publishElementEdits(pageId, pageEdits.edits);
       }
+      // After publishing, optionally clear local draft edits for that page
+      // editingService.clearPageEdits(pageId);
       // Show success feedback
       const successEl = document.createElement('div');
       successEl.textContent = 'Published successfully!';

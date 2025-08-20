@@ -14,9 +14,9 @@ function applyEditToElement(edit: ElementEdit) {
     if (!Number.isNaN(index)) {
       const editableSelectors = [
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'p',
-        'img',
-        'button',
+        'p', 'span', 'small', 'strong', 'em',
+        'img', 'picture', 'source',
+        'a', 'button', 'li', 'blockquote', 'figcaption',
         '[data-editable]',
         '.editable'
       ];

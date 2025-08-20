@@ -30,6 +30,10 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const [isUploading, setIsUploading] = useState(false);
   const [search, setSearch] = useState('');
   const progressRef = useRef<HTMLDivElement | null>(null);
+  const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
+  const [pageSize] = useState<number>(60);
+  const [showing, setShowing] = useState<number>(60);
+  const urlCacheRef = useRef<Map<string, string>>(new Map());
 
   const breadcrumbs = useMemo(() => {
     const parts = currentPrefix.split('/');
@@ -50,9 +54,16 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
       const res = await listAll(folderRef);
       setFolders(res.prefixes.map((p) => p.name));
       const items: ImageItem[] = await Promise.all(
-        res.items.map(async (itemRef) => ({ url: await getDownloadURL(itemRef), path: itemRef.fullPath }))
+        res.items.map(async (itemRef) => {
+          const cached = urlCacheRef.current.get(itemRef.fullPath);
+          if (cached) return { url: cached, path: itemRef.fullPath };
+          const url = await getDownloadURL(itemRef);
+          urlCacheRef.current.set(itemRef.fullPath, url);
+          return { url, path: itemRef.fullPath };
+        })
       );
       setImages(items);
+      setShowing(pageSize);
     } catch (e) {
       console.error('Failed to load images', e);
     } finally {
@@ -104,6 +115,7 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
 
   const navigateTo = (path: string) => {
     setCurrentPrefix(path);
+    setSelectedPaths(new Set());
   };
 
   const removeImage = async (path: string) => {
@@ -116,10 +128,76 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
     }
   };
 
+  const renameImage = async (oldPath: string, newName: string) => {
+    try {
+      if (!newName) return;
+      const segments = oldPath.split('/');
+      const folder = segments.slice(0, -1).join('/');
+      const newPath = `${folder}/${newName}`;
+      await moveImage(oldPath, newPath);
+      await loadList();
+    } catch (e) {
+      console.error('Rename failed', e);
+    }
+  };
+
+  const moveImage = async (oldPath: string, newPath: string) => {
+    try {
+      if (oldPath === newPath) return;
+      const oldRef = ref(storage, oldPath);
+      const resp = await fetch(await getDownloadURL(oldRef));
+      const blob = await resp.blob();
+      const newRef = ref(storage, newPath);
+      await uploadBytesResumable(newRef, blob);
+      await deleteObject(oldRef);
+    } catch (e) {
+      console.error('Move failed', e);
+      throw e;
+    }
+  };
+
+  const moveSelectedToFolder = async () => {
+    const target = prompt('Move to folder (relative to root):', currentPrefix);
+    if (!target) return;
+    const cleanTarget = target.replace(/\/$/, '');
+    try {
+      for (const path of Array.from(selectedPaths)) {
+        const fileName = path.split('/').pop() as string;
+        await moveImage(path, `${cleanTarget}/${fileName}`);
+      }
+      setSelectedPaths(new Set());
+      await loadList();
+    } catch (e) {
+      console.error('Bulk move failed', e);
+    }
+  };
+
+  const bulkDelete = async () => {
+    if (selectedPaths.size === 0) return;
+    if (!confirm(`Delete ${selectedPaths.size} file(s)?`)) return;
+    try {
+      await Promise.all(Array.from(selectedPaths).map((p) => deleteObject(ref(storage, p))));
+      setSelectedPaths(new Set());
+      await loadList();
+    } catch (e) {
+      console.error('Bulk delete failed', e);
+    }
+  };
+
   const filteredImages = useMemo(() => {
     if (!search) return images;
     return images.filter((i) => i.path.toLowerCase().includes(search.toLowerCase()));
   }, [images, search]);
+
+  const visibleImages = useMemo(() => filteredImages.slice(0, showing), [filteredImages, showing]);
+
+  const toggleSelected = (path: string) => {
+    setSelectedPaths((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) next.delete(path); else next.add(path);
+      return next;
+    });
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -156,6 +234,16 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
         }}>
           New Folder
         </Button>
+        {selectedPaths.size > 0 && (
+          <>
+            <Button size="sm" variant="destructive" onClick={bulkDelete}>
+              Delete Selected ({selectedPaths.size})
+            </Button>
+            <Button size="sm" variant="outline" onClick={moveSelectedToFolder}>
+              Move Selected
+            </Button>
+          </>
+        )}
       </div>
 
       <ScrollArea className="flex-1">
@@ -169,14 +257,30 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
             </button>
           ))}
           {/* Files */}
-          {filteredImages.map((img) => (
+          {visibleImages.map((img) => (
             <div key={img.path} className="relative group">
               <Card className="overflow-hidden">
                 <img src={img.url} alt="" className="w-full h-24 object-cover" />
               </Card>
+              <label className="absolute top-1 left-1 bg-white/70 rounded px-1 py-0.5 text-[10px] flex items-center gap-1">
+                <input type="checkbox" checked={selectedPaths.has(img.path)} onChange={() => toggleSelected(img.path)} />
+                <span>Select</span>
+              </label>
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition p-1 flex items-end gap-1 justify-center">
                 {onSelect && <Button size="sm" className="h-6 text-xs" onClick={() => onSelect(img)}>Select</Button>}
                 <Button size="sm" variant="outline" className="h-6 text-xs" onClick={() => removeImage(img.path)}>Delete</Button>
+                <Button size="sm" variant="outline" className="h-6 text-xs" onClick={() => {
+                  const newName = prompt('Rename file to (include extension):', img.path.split('/').pop() || '');
+                  if (newName) renameImage(img.path, newName);
+                }}>Rename</Button>
+                <Button size="sm" variant="outline" className="h-6 text-xs" onClick={() => {
+                  const target = prompt('Move to folder (relative to root):', currentPrefix);
+                  if (target) {
+                    const cleanTarget = target.replace(/\/$/, '');
+                    const fileName = img.path.split('/').pop() as string;
+                    moveImage(img.path, `${cleanTarget}/${fileName}`).then(loadList);
+                  }
+                }}>Move</Button>
               </div>
             </div>
           ))}
@@ -184,6 +288,11 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
             <div className="text-sm text-muted-foreground">No images yet. Upload to get started.</div>
           )}
         </div>
+        {filteredImages.length > showing && (
+          <div className="p-3 flex justify-center">
+            <Button size="sm" variant="outline" onClick={() => setShowing((s) => s + pageSize)}>Load More</Button>
+          </div>
+        )}
       </ScrollArea>
     </div>
   );
