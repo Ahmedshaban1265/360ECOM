@@ -259,7 +259,7 @@ export default function PreviewCanvas() {
     if (editableElement) {
       console.log('PreviewCanvas: Found editable element:', editableElement);
       // Set the selected element in the store for the properties panel
-      setSelectedElement(editableElement);
+      setSelectedElement(editableElement.element);
       // Clear section/block selection since we're now editing individual elements
       setSelectedSection(null);
       setSelectedBlock(null);
