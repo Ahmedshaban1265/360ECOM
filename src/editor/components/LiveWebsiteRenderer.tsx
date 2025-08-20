@@ -46,7 +46,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const [language, setLanguage] = useState('en');
   const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
-  const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
+  const [editableElements, setEditableElements] = useState<ReturnType<typeof elementDiscoveryService.getAllElements>>([] as any);
 
   // Get the current page component
   const pageId = selectedTemplate || 'home';
@@ -221,13 +221,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             pointer-events: none;
           }
 
-          .live-website-renderer a {
-            pointer-events: none;
-          }
-
-          .live-website-renderer button {
-            pointer-events: auto;
-          }
+          /* Keep anchor tags clickable for editor selection; we prevent default in JS */
 
           /* Enhanced responsive behavior */
           .editor-responsive-mode {

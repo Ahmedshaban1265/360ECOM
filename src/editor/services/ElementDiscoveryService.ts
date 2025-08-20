@@ -35,6 +35,8 @@ export class ElementDiscoveryService {
   // Discover all editable elements on the current page
   discoverElements(): EditableElement[] {
     const elements: EditableElement[] = [];
+    // Reset registry to avoid stale references between renders/templates
+    this.clearRegistry();
     
     console.log('ElementDiscoveryService: Starting element discovery...');
     
