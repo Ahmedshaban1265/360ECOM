@@ -97,6 +97,15 @@ export class ElementDiscoveryService {
       ...this.getElementSpecificData(element, tagName)
     };
 
+    // Attach lightweight editor metadata to the DOM element for downstream editors
+    try {
+      (element as any)._editorData = {
+        id,
+        type,
+        pageId: this.pageId
+      };
+    } catch {}
+
     return editableElement;
   }
 
