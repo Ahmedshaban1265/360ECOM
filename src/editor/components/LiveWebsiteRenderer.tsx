@@ -181,12 +181,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       {/* Render the actual website with navigation and footer */}
       <div className="min-h-full bg-background text-foreground">
         {/* Navigation */}
-        <Navigation
-          language={language}
-          setLanguage={setLanguage}
-          isDark={isDark}
-          setIsDark={setIsDark}
-        />
+        <Navigation language={language} setLanguage={setLanguage} isDark={isDark} setIsDark={setIsDark} />
 
         {/* Main Page Content */}
         <main className="website-content">

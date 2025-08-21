@@ -241,7 +241,7 @@ export default function PreviewCanvas() {
       {/* Top Toolbar */}
       <div className="flex items-center justify-between p-3 border-b border-border bg-background/95 backdrop-blur">
         <div className="flex items-center gap-3">
-          <h3 className="font-semibold text-sm">Preview</h3>
+          <h3 className="font-semibold text-sm"></h3>
           <Badge variant="outline" className="text-xs">
             {currentTemplate.id}
           </Badge>
