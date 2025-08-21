@@ -387,6 +387,24 @@ export default function ShopifyImageLibrary({
 
   const selectedImagesList = images.filter(img => selectedImages.has(img.path));
 
+  const handleRetry = () => {
+    setConnectionError(null);
+    setIsLoading(true);
+    FirebaseConnectionTest.testStorageConnection()
+      .then(result => {
+        if (result.success) {
+          loadImages();
+        } else {
+          setConnectionError(result.error || 'Connection failed');
+          setIsLoading(false);
+        }
+      })
+      .catch(error => {
+        setConnectionError('Failed to connect to Firebase Storage');
+        setIsLoading(false);
+      });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] p-0">
