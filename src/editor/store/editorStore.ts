@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { EditorState, TemplateDocument, SectionInstance, BlockInstance, DeviceType, Locale, HistoryEntry } from '../types';
+import { EditorState, TemplateDocument, SectionInstance, BlockInstance, DeviceType, Locale, HistoryEntry, SidebarTab } from '../types';
 import { storageService } from '../services/StorageService';
 import { DEFAULT_THEME_TOKENS } from '../defaults/templates';
 
-export type SidebarTab = 'sections' | 'properties' | 'templates' | 'pages';
+// SidebarTab is sourced from central types
 
 interface EditorActions {
   // Template operations

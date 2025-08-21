@@ -4,7 +4,6 @@ import { useEditorStore, useCurrentTemplate, useDeviceType } from '../store/edit
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Select, 
   SelectContent, 
@@ -15,9 +14,6 @@ import {
 
 // Icons
 import { 
-  Monitor, 
-  Tablet, 
-  Smartphone, 
   RotateCcw, 
   ZoomIn, 
   ZoomOut,
@@ -29,18 +25,9 @@ import {
 } from 'lucide-react';
 
 // Preview Renderers
-import { ThemeRenderer } from '../renderers/ThemeRenderer';
 import LiveWebsiteRenderer from './LiveWebsiteRenderer';
 import { elementDiscoveryService } from '../services/ElementDiscoveryService';
-
-// Real responsive breakpoints from your actual code
-const REAL_RESPONSIVE_BREAKPOINTS = {
-  sm: 640,    // Small devices (landscape phones)
-  md: 768,    // Medium devices (tablets)
-  lg: 1024,   // Large devices (desktops)
-  xl: 1280,   // Extra large devices
-  '2xl': 1536 // 2X large devices
-};
+import { REAL_RESPONSIVE_BREAKPOINTS } from '../constants/responsive';
 
 const DEVICE_PRESETS = {
   desktop: { 
@@ -73,7 +60,7 @@ const DEVICE_PRESETS = {
     breakpoint: 'sm',
     realBreakpoint: REAL_RESPONSIVE_BREAKPOINTS.sm
   }
-};
+} as const;
 
 const ZOOM_LEVELS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -92,16 +79,12 @@ export default function PreviewCanvas() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const deviceConfig = DEVICE_PRESETS[deviceType];
-
-  // No global document mutations for preview sizing; handled locally in the canvas
+  const deviceConfig = DEVICE_PRESETS[deviceType as keyof typeof DEVICE_PRESETS];
 
   // Handle device type changes
   const handleDeviceChange = (newDevice: string) => {
     setDeviceType(newDevice as typeof deviceType);
-    // Reset zoom when changing devices
     setZoom(1);
   };
 
@@ -150,8 +133,8 @@ export default function PreviewCanvas() {
       style.backgroundColor = 'hsl(var(--background))';
     } else {
       // Mobile and tablet get device frames
-      style.width = `${deviceConfig.width}px`;
-      style.height = `${deviceConfig.height}px`;
+      style.width = `${deviceConfig.width}px` as any;
+      style.height = `${deviceConfig.height}px` as any;
       style.border = deviceType === 'mobile' ? '8px solid #1f2937' : '12px solid #374151';
       style.borderRadius = deviceType === 'mobile' ? '32px' : '24px';
       style.overflow = 'hidden';
@@ -169,54 +152,30 @@ export default function PreviewCanvas() {
       return {
         height: '100%',
         width: '100%'
-      };
+      } as const;
     }
 
-    const scaledWidth = deviceConfig.width * zoom;
-    const scaledHeight = deviceConfig.height * zoom;
+    const scaledWidth = (deviceConfig.width as number) * zoom;
+    const scaledHeight = (deviceConfig.height as number) * zoom;
 
     return {
-      width: `${scaledWidth + (deviceType === 'mobile' ? 16 : 24)}px`, // Add border width
+      width: `${scaledWidth + (deviceType === 'mobile' ? 16 : 24)}px`,
       height: `${scaledHeight + (deviceType === 'mobile' ? 16 : 24)}px`,
       margin: '0 auto',
       position: 'relative' as const,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center'
-    };
-  };
-
-  const handleSectionClick = (sectionId: string) => {
-    setSelectedSection(sectionId);
-    setSelectedBlock(null);
-    // Auto-open properties panel when section is selected
-    openSidebarTab('properties');
-  };
-
-  const handleBlockClick = (sectionId: string, blockId: string) => {
-    setSelectedSection(sectionId);
-    setSelectedBlock(blockId);
-    // Auto-open properties panel when block is selected
-    openSidebarTab('properties');
+    } as const;
   };
 
   const handleElementClick = (element: HTMLElement, elementType: string) => {
-    console.log('PreviewCanvas: handleElementClick called with:', { element, elementType });
-    
-    // Use ElementDiscoveryService to get the proper EditableElement
     const editableElement = elementDiscoveryService.getElementByElement(element);
-    
     if (editableElement) {
-      console.log('PreviewCanvas: Found editable element:', editableElement);
-      // Set the selected element in the store for the properties panel
       setSelectedElement(editableElement.element);
-      // Clear section/block selection since we're now editing individual elements
       setSelectedSection(null);
       setSelectedBlock(null);
-      // Auto-open properties panel when element is selected
       openSidebarTab('properties');
-    } else {
-      console.warn('PreviewCanvas: Could not find editable element for:', element);
     }
   };
 
@@ -267,6 +226,16 @@ export default function PreviewCanvas() {
                 </Button>
               );
             })}
+            {/* Full width toggle */}
+            <Button
+              variant={deviceType === 'desktop' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => handleDeviceChange('desktop')}
+              className="h-7 px-2 text-xs"
+              title="Full Width"
+            >
+              Full
+            </Button>
           </div>
 
           {/* Zoom Controls */}
@@ -341,11 +310,9 @@ export default function PreviewCanvas() {
             {/* Device frame decorations for mobile */}
             {deviceType === 'mobile' && (
               <>
-                {/* Home indicator for iPhone-like frame */}
                 <div 
                   className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-black rounded-full z-50"
                 />
-                {/* Notch for iPhone-like frame */}
                 <div 
                   className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-800 rounded-b-2xl z-50"
                 />
@@ -355,7 +322,6 @@ export default function PreviewCanvas() {
             {/* Device frame decorations for tablet */}
             {deviceType === 'tablet' && (
               <>
-                {/* Camera for iPad-like frame */}
                 <div 
                   className="absolute top-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-600 rounded-full z-50"
                 />
@@ -382,173 +348,67 @@ export default function PreviewCanvas() {
         __html: `
           /* Real responsive breakpoints from your actual code */
           .real-responsive-mobile {
-            /* Forces mobile breakpoint behavior */
-            --current-breakpoint: 640px;
+            --current-breakpoint: ${REAL_RESPONSIVE_BREAKPOINTS.sm}px;
             --current-viewport-width: 375px;
           }
           
           .real-responsive-tablet {
-            /* Forces tablet breakpoint behavior */
-            --current-breakpoint: 768px;
+            --current-breakpoint: ${REAL_RESPONSIVE_BREAKPOINTS.md}px;
             --current-viewport-width: 768px;
           }
           
           .real-responsive-desktop {
-            /* Forces desktop breakpoint behavior */
-            --current-breakpoint: 1024px;
+            --current-breakpoint: ${REAL_RESPONSIVE_BREAKPOINTS.lg}px;
             --current-viewport-width: 100%;
           }
 
           /* Real responsive behavior based on your actual CSS classes */
-          .real-responsive-mobile .container {
-            max-width: 100% !important;
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-          }
-          
-          .real-responsive-mobile .grid {
-            grid-template-columns: 1fr !important;
-            gap: 1rem !important;
-          }
-          
+          .real-responsive-mobile .container { max-width: 100% !important; padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+          .real-responsive-mobile .grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
           .real-responsive-mobile .lg\\:grid-cols-2,
           .real-responsive-mobile .lg\\:grid-cols-3,
           .real-responsive-mobile .lg\\:grid-cols-4,
-          .real-responsive-mobile .lg\\:grid-cols-5 {
-            grid-template-columns: 1fr !important;
-          }
-          
+          .real-responsive-mobile .lg\\:grid-cols-5 { grid-template-columns: 1fr !important; }
           .real-responsive-mobile .md\\:grid-cols-2,
-          .real-responsive-mobile .md\\:grid-cols-3 {
-            grid-template-columns: 1fr !important;
-          }
-          
+          .real-responsive-mobile .md\\:grid-cols-3 { grid-template-columns: 1fr !important; }
           .real-responsive-mobile .text-4xl,
           .real-responsive-mobile .text-5xl,
           .real-responsive-mobile .text-6xl,
-          .real-responsive-mobile .text-7xl {
-            font-size: 1.5rem !important;
-            line-height: 2rem !important;
-          }
-          
+          .real-responsive-mobile .text-7xl { font-size: 1.5rem !important; line-height: 2rem !important; }
           .real-responsive-mobile .lg\\:text-5xl,
           .real-responsive-mobile .lg\\:text-6xl,
-          .real-responsive-mobile .lg\\:text-7xl {
-            font-size: 1.25rem !important;
-            line-height: 1.75rem !important;
-          }
-          
-          .real-responsive-mobile .md\\:text-6xl {
-            font-size: 1.5rem !important;
-            line-height: 2rem !important;
-          }
-          
-          .real-responsive-mobile .flex-row {
-            flex-direction: column !important;
-          }
-          
-          .real-responsive-mobile .sm\\:flex-row {
-            flex-direction: column !important;
-          }
-          
-          .real-responsive-mobile .md\\:flex-row {
-            flex-direction: column !important;
-          }
+          .real-responsive-mobile .lg\\:text-7xl { font-size: 1.25rem !important; line-height: 1.75rem !important; }
+          .real-responsive-mobile .md\\:text-6xl { font-size: 1.5rem !important; line-height: 2rem !important; }
+          .real-responsive-mobile .flex-row,
+          .real-responsive-mobile .sm\\:flex-row,
+          .real-responsive-mobile .md\\:flex-row { flex-direction: column !important; }
 
           /* Tablet responsive behavior */
-          .real-responsive-tablet .container {
-            max-width: 768px !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-          }
-          
-          .real-responsive-tablet .grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 1rem !important;
-          }
-          
+          .real-responsive-tablet .container { max-width: 768px !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+          .real-responsive-tablet .grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1rem !important; }
           .real-responsive-tablet .lg\\:grid-cols-4,
-          .real-responsive-tablet .lg\\:grid-cols-5 {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          
-          .real-responsive-tablet .md\\:grid-cols-3 {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-          
+          .real-responsive-tablet .lg\\:grid-cols-5 { grid-template-columns: repeat(2, 1fr) !important; }
+          .real-responsive-tablet .md\\:grid-cols-3 { grid-template-columns: repeat(2, 1fr) !important; }
           .real-responsive-tablet .text-4xl,
-          .real-responsive-tablet .text-5xl {
-            font-size: 2rem !important;
-            line-height: 2.5rem !important;
-          }
-          
-          .real-responsive-tablet .lg\\:text-7xl {
-            font-size: 3rem !important;
-            line-height: 3.5rem !important;
-          }
-          
-          .real-responsive-tablet .md\\:text-6xl {
-            font-size: 2.5rem !important;
-            line-height: 3rem !important;
-          }
+          .real-responsive-tablet .text-5xl { font-size: 2rem !important; line-height: 2.5rem !important; }
+          .real-responsive-tablet .lg\\:text-7xl { font-size: 3rem !important; line-height: 3.5rem !important; }
+          .real-responsive-tablet .md\\:text-6xl { font-size: 2.5rem !important; line-height: 3rem !important; }
 
           /* Desktop responsive behavior */
-          .real-responsive-desktop .container {
-            max-width: 1200px !important;
-            padding-left: 2rem !important;
-            padding-right: 2rem !important;
-          }
-          
-          .real-responsive-desktop .grid {
-            gap: 1.5rem !important;
-          }
-          
-          .real-responsive-desktop .text-4xl {
-            font-size: 2.25rem !important;
-            line-height: 2.5rem !important;
-          }
-          
-          .real-responsive-desktop .text-5xl {
-            font-size: 3rem !important;
-            line-height: 3.5rem !important;
-          }
-          
-          .real-responsive-desktop .text-6xl {
-            font-size: 3.75rem !important;
-            line-height: 4rem !important;
-          }
-          
-          .real-responsive-desktop .text-7xl {
-            font-size: 4.5rem !important;
-            line-height: 5rem !important;
-          }
+          .real-responsive-desktop .container { max-width: 1200px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+          .real-responsive-desktop .grid { gap: 1.5rem !important; }
+          .real-responsive-desktop .text-4xl { font-size: 2.25rem !important; line-height: 2.5rem !important; }
+          .real-responsive-desktop .text-5xl { font-size: 3rem !important; line-height: 3.5rem !important; }
+          .real-responsive-desktop .text-6xl { font-size: 3.75rem !important; line-height: 4rem !important; }
+          .real-responsive-desktop .text-7xl { font-size: 4.5rem !important; line-height: 5rem !important; }
 
           /* Ensure proper scaling */
-          .editor-responsive-mode * {
-            box-sizing: border-box !important;
-          }
-
-          /* Ensure element interactions work in responsive mode */
-          .editor-responsive-mode [data-editable="true"] {
-            cursor: pointer !important;
-            position: relative !important;
-            z-index: 1 !important;
-          }
-
-          .editor-responsive-mode [data-editable="true"]:hover {
-            outline: 2px solid #3b82f6 !important;
-            outline-offset: 2px !important;
-            background-color: rgba(59, 130, 246, 0.1) !important;
-          }
-
-          /* Prevent responsive CSS from interfering with element selection */
+          .editor-responsive-mode * { box-sizing: border-box !important; }
+          .editor-responsive-mode [data-editable="true"] { cursor: pointer !important; position: relative !important; z-index: 1 !important; }
+          .editor-responsive-mode [data-editable="true"]:hover { outline: 2px solid #3b82f6 !important; outline-offset: 2px !important; background-color: rgba(59, 130, 246, 0.1) !important; }
           .real-responsive-mobile [data-editable="true"],
           .real-responsive-tablet [data-editable="true"],
-          .real-responsive-desktop [data-editable="true"] {
-            cursor: pointer !important;
-            position: relative !important;
-            z-index: 1 !important;
-          }
+          .real-responsive-desktop [data-editable="true"] { cursor: pointer !important; position: relative !important; z-index: 1 !important; }
         `
       }} />
     </div>

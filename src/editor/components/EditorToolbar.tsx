@@ -313,7 +313,7 @@ export default function EditorToolbar() {
                 onClick={() => setLocale('ar')}
                 className={locale === 'ar' ? 'bg-accent' : ''}
               >
-                ا��عربية
+                العربية
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

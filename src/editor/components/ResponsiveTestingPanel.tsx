@@ -39,19 +39,12 @@ import {
   Check
 } from 'lucide-react';
 
+import { REAL_RESPONSIVE_BREAKPOINTS } from '../constants/responsive';
+
 interface ResponsiveTestingPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-// Real responsive breakpoints from your actual code
-const REAL_RESPONSIVE_BREAKPOINTS = {
-  sm: 640,    // Small devices (landscape phones)
-  md: 768,    // Medium devices (tablets)
-  lg: 1024,   // Large devices (desktops)
-  xl: 1280,   // Extra large devices
-  '2xl': 1536 // 2X large devices
-};
 
 export default function ResponsiveTestingPanel({ isOpen, onClose }: ResponsiveTestingPanelProps) {
   const deviceType = useDeviceType();

@@ -94,5 +94,14 @@
   "bugs": {
     "url": "https://github.com/Ahmedshaban1265/360ECOM/issues"
   },
-  "homepage": "https://github.com/Ahmedshaban1265/360ECOM#readme"
+  "homepage": "https://github.com/Ahmedshaban1265/360ECOM#readme",
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "@firebase/util",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "protobufjs",
+      "puppeteer"
+    ]
+  }
 }

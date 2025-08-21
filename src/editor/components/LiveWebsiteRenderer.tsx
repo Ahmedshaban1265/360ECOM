@@ -138,8 +138,6 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       fontFamily: 'system-ui, -apple-system, sans-serif'
     };
 
-    // For mobile and tablet, we don't need additional styling here
-    // as the frame is handled by the PreviewCanvas component
     return baseStyles;
   };
 
@@ -147,11 +145,11 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const getResponsiveClass = () => {
     switch (deviceType) {
       case 'mobile':
-        return 'mobile-viewport editor-responsive-mode';
+        return 'real-responsive-mobile editor-responsive-mode';
       case 'tablet':
-        return 'tablet-viewport editor-responsive-mode';
+        return 'real-responsive-tablet editor-responsive-mode';
       default:
-        return 'desktop-viewport';
+        return 'real-responsive-desktop editor-responsive-mode';
     }
   };
 

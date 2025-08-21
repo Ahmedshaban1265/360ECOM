@@ -95,7 +95,7 @@ export interface EditorState {
   isRTL: boolean;
   locale: Locale;
   historyIndex: number;
-  history: TemplateDocument[];
+  history: HistoryEntry[];
   isDirty: boolean;
   lastSaved?: string;
   currentTemplate: TemplateDocument | null;
