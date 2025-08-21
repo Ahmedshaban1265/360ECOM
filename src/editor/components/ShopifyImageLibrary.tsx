@@ -158,8 +158,8 @@ export default function ShopifyImageLibrary({
   useEffect(() => {
     if (open) {
       setConnectionError(null);
-      // Test connection first, then load images
-      FirebaseConnectionTest.testStorageConnection()
+      // Test connection first, then load images (use allowed root path)
+      FirebaseConnectionTest.testStorageConnection(root)
         .then(result => {
           if (result.success) {
             loadImages();
@@ -390,7 +390,7 @@ export default function ShopifyImageLibrary({
   const handleRetry = () => {
     setConnectionError(null);
     setIsLoading(true);
-    FirebaseConnectionTest.testStorageConnection()
+    FirebaseConnectionTest.testStorageConnection(root)
       .then(result => {
         if (result.success) {
           loadImages();

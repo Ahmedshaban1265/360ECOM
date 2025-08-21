@@ -2,13 +2,17 @@ import { storage } from '@/firebase';
 import { ref, listAll, connectStorageEmulator } from 'firebase/storage';
 
 export class FirebaseConnectionTest {
-  
-  static async testStorageConnection(): Promise<{ success: boolean; error?: string; details?: any }> {
+
+  /**
+   * Tests that Firebase Storage is reachable and that the provided root path is readable
+   * with current security rules (unauthenticated listing of bucket root often fails).
+   */
+  static async testStorageConnection(rootPath: string = 'theme-media'): Promise<{ success: boolean; error?: string; details?: any }> {
     try {
       console.log('Testing Firebase Storage connection...');
       
-      // Test basic connection by listing root
-      const rootRef = ref(storage, '');
+      // Test connection by listing a folder that should be readable per rules
+      const rootRef = ref(storage, rootPath);
       
       // Set a shorter timeout for testing
       const timeoutPromise = new Promise((_, reject) => {
@@ -33,6 +37,8 @@ export class FirebaseConnectionTest {
         errorMessage = 'Unauthorized access. Check Firebase Storage rules and authentication.';
       } else if (error?.code === 'storage/project-not-found') {
         errorMessage = 'Firebase project not found. Check your project configuration.';
+      } else if (error?.code === 'storage/unauthorized' || error?.code === 'storage/permission-denied') {
+        errorMessage = 'Unauthorized. Check Storage rules for read access to this path.';
       } else if (error?.message === 'Connection timeout') {
         errorMessage = 'Connection timeout. Check your internet connection.';
       } else if (error?.code === 'storage/unknown') {
