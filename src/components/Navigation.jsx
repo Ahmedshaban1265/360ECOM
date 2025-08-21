@@ -75,7 +75,13 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                             { key: "testimonials", path: "/testimonials" },
                             { key: "contact", path: "/contact" },
                         ].map((item, index) => (
-                            <motion.div key={item.key}>
+                            <motion.div
+                                key={item.key}
+                                whileHover={{ y: -2 }}
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                            >
                                 <Link
                                     to={item.path}
                                     className={`relative hover:text-blue-600 transition-colors group ${
@@ -83,10 +89,6 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                             ? "text-blue-600"
                                             : ""
                                     }`}
-                                    whileHover={{ y: -2 }}
-                                    initial={{ opacity: 0, y: -20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
                                 >
                                     {t.nav[item.key]}
                                     <motion.div
