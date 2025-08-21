@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useEditorStore, useCurrentTemplate, useSelectedSection, useSelectedBlock } from '../store/editorStore';
 import { getSectionSchema, getBlockSchema } from '../schemas/sections';
 import { FieldBase, SectionInstance, BlockInstance } from '../types';
-import { uploadMedia } from '../services/MediaService';
 import ElementEditor from './ElementEditor';
+import ImageSelectionModal from './ImageSelectionModal';
 
 // UI Components
 import { Button } from '@/components/ui/button';
