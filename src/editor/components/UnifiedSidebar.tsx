@@ -4,7 +4,7 @@ import { SidebarTab } from '../types';
 import SectionsTree from './SectionsTree';
 import PropertiesPanel from './PropertiesPanel';
 import LeftNavTemplates from './LeftNavTemplates';
-import ShopifyImageLibrary from './ShopifyImageLibrary';
+import ShopifyImageLibrary, { ImageItem } from './ShopifyImageLibrary';
 
 // UI Components
 import { Button } from '@/components/ui/button';
