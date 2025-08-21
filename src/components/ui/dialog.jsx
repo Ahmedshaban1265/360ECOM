@@ -4,36 +4,30 @@ import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-function Dialog({
-  ...props
-}) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
-}
+const Dialog = React.forwardRef(({ ...props }, ref) => {
+  return <DialogPrimitive.Root ref={ref} data-slot="dialog" {...props} />;
+});
+Dialog.displayName = "Dialog";
 
-function DialogTrigger({
-  ...props
-}) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
-}
+const DialogTrigger = React.forwardRef(({ ...props }, ref) => {
+  return <DialogPrimitive.Trigger ref={ref} data-slot="dialog-trigger" {...props} />;
+});
+DialogTrigger.displayName = "DialogTrigger";
 
-function DialogPortal({
-  ...props
-}) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
-}
+const DialogPortal = React.forwardRef(({ ...props }, ref) => {
+  return <DialogPrimitive.Portal ref={ref} data-slot="dialog-portal" {...props} />;
+});
+DialogPortal.displayName = "DialogPortal";
 
-function DialogClose({
-  ...props
-}) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
-}
+const DialogClose = React.forwardRef(({ ...props }, ref) => {
+  return <DialogPrimitive.Close ref={ref} data-slot="dialog-close" {...props} />;
+});
+DialogClose.displayName = "DialogClose";
 
-function DialogOverlay({
-  className,
-  ...props
-}) {
+const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <DialogPrimitive.Overlay
+      ref={ref}
       data-slot="dialog-overlay"
       className={cn(
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
@@ -41,7 +35,8 @@ function DialogOverlay({
       )}
       {...props} />
   );
-}
+});
+DialogOverlay.displayName = "DialogOverlay";
 
 function DialogContent({
   className,
