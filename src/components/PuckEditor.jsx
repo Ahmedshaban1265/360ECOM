@@ -302,8 +302,8 @@ const getDefaultPageContent = (pageName, language = 'en') => {
                     props: {
                         id: 'hero-description',
                         text: isArabic
-                            ? ''
-                            : '',
+                            ? 'نحن نساعد العلامات التجارية الطموحة على تحقيق نمو استثنائي من خلال التسويق المدفوع بالبيانات وتطوير الويب المهني وحلول التجارة الإلكترونية المتطورة.'
+                            : 'We help ambitious brands achieve extraordinary growth through data-driven marketing, professional web development, and cutting-edge e-commerce solutions.',
                         color: '#e5e7eb',
                         fontSize: 18,
                         align: 'center',

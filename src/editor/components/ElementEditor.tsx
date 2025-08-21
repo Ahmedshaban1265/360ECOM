@@ -29,7 +29,6 @@ import {
   AlignJustify
 } from 'lucide-react';
 import { editingService } from '../services/EditingService';
-import { saveDraftElementEdits } from '../services/EditsFirestoreService';
 import ImageLibrary from './ImageLibrary';
 import { uploadMedia } from '../services/MediaService';
 
@@ -260,16 +259,6 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
         (element.style as any)[property] = value;
       }
     });
-
-    // Persist draft edits to Firestore so changes are saved remotely too
-    try {
-      const pageEdits = editingService.getPageEdits(pageId);
-      if (pageEdits && Array.isArray(pageEdits.edits)) {
-        saveDraftElementEdits(pageId, pageEdits.edits);
-      }
-    } catch (e) {
-      console.warn('Failed to save draft edits to Firestore', e);
-    }
 
     onSave();
   };

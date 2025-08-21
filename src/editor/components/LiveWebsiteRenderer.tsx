@@ -2,8 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelectedTemplate, useDeviceType } from '../store/editorStore';
 import { editingService } from '../services/EditingService';
 import { elementDiscoveryService } from '../services/ElementDiscoveryService';
-import type { EditableElement } from '../services/ElementDiscoveryService';
-import { useTheme } from '@/context/ThemeContext';
 
 // Import actual website pages
 import HomePage from '@/pages/HomePage';
@@ -45,11 +43,10 @@ const PAGE_COMPONENTS = {
 export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRendererProps) {
   const selectedTemplate = useSelectedTemplate();
   const deviceType = useDeviceType();
-  const { theme } = useTheme();
   const [language, setLanguage] = useState('en');
   const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
-  const [editableElements, setEditableElements] = useState<EditableElement[]>([]);
+  const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
 
   // Get the current page component
   const pageId = selectedTemplate || 'home';
@@ -71,15 +68,9 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       const discoveredElements = elementDiscoveryService.discoverElements();
       setEditableElements(discoveredElements);
 
-      // Apply any saved edits and add click handlers directly to elements
+      // Add click handlers directly to elements
       discoveredElements.forEach(editableElement => {
         const { element } = editableElement;
-        // Apply persisted edits for this element
-        try {
-          editingService.applyElementEdits(element, editableElement.id, pageId);
-        } catch (err) {
-          console.warn('Failed to apply edits for element', editableElement.id, err);
-        }
         
         // Add visual indicators
         element.style.cursor = 'pointer';
@@ -98,12 +89,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
 
         // Add click handler
         element.addEventListener('click', (e) => {
-          // Prevent navigation for anchor tags (and their children) inside the editor
-          const target = e.target as HTMLElement;
-          const anchor = target && target.closest ? target.closest('a') : null;
-          if (anchor) {
-            e.preventDefault();
-          }
+          e.preventDefault();
           e.stopPropagation();
           console.log('LiveWebsiteRenderer: Element clicked:', editableElement);
           if (onElementClick) {
@@ -170,7 +156,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   return (
     <div
       ref={websiteRef}
-      className={`live-website-renderer ${getResponsiveClass()} ${theme === 'dark' ? 'dark' : ''}`}
+      className={`live-website-renderer ${getResponsiveClass()}`}
       style={getDeviceStyles()}
     >
       {/* Dynamic viewport meta tag for responsive behavior */}
@@ -181,7 +167,12 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       {/* Render the actual website with navigation and footer */}
       <div className="min-h-full bg-background text-foreground">
         {/* Navigation */}
-        <Navigation language={language} setLanguage={setLanguage} isDark={isDark} setIsDark={setIsDark} />
+        <Navigation
+          language={language}
+          setLanguage={setLanguage}
+          isDark={isDark}
+          setIsDark={setIsDark}
+        />
 
         {/* Main Page Content */}
         <main className="website-content">
@@ -191,6 +182,15 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         {/* Footer */}
         <Footer language={language} />
       </div>
+
+      {/* Responsive utilities overlay */}
+      {deviceType !== 'desktop' && (
+        <div className="responsive-utils">
+          <div>Device: {deviceType}</div>
+          <div>Width: {deviceType === 'mobile' ? '375px' : '768px'}</div>
+          <div>Breakpoint: {deviceType === 'mobile' ? 'sm' : 'md'}</div>
+        </div>
+      )}
 
       {/* Enhanced editing overlay styles */}
       <style dangerouslySetInnerHTML={{
@@ -221,9 +221,13 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             pointer-events: none;
           }
 
-          /* Allow clicking anchors for editor; prevent navigation via JS */
-          .live-website-renderer a { pointer-events: auto; }
-          .live-website-renderer button { pointer-events: auto; }
+          .live-website-renderer a {
+            pointer-events: none;
+          }
+
+          .live-website-renderer button {
+            pointer-events: auto;
+          }
 
           /* Enhanced responsive behavior */
           .editor-responsive-mode {
@@ -236,7 +240,155 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             margin: 0 auto !important;
           }
 
-          .editor-responsive-mode .grid { display: grid !important; }
+          .editor-responsive-mode .grid {
+            display: grid !important;
+          }
+
+          /* Mobile-specific responsive utilities */
+          .mobile-viewport .hidden-mobile,
+          .mobile-viewport .md\\:block,
+          .mobile-viewport .lg\\:block {
+            display: none !important;
+          }
+
+          .mobile-viewport .block-mobile,
+          .mobile-viewport .md\\:hidden,
+          .mobile-viewport .lg\\:hidden {
+            display: block !important;
+          }
+
+          /* Tablet-specific responsive utilities */
+          .tablet-viewport .hidden-tablet,
+          .tablet-viewport .lg\\:block {
+            display: none !important;
+          }
+
+          .tablet-viewport .block-tablet,
+          .tablet-viewport .lg\\:hidden {
+            display: block !important;
+          }
+
+          /* Force responsive grid layouts */
+          .mobile-viewport .grid-cols-1,
+          .mobile-viewport .grid-cols-2,
+          .mobile-viewport .grid-cols-3,
+          .mobile-viewport .grid-cols-4 {
+            grid-template-columns: 1fr !important;
+          }
+
+          .tablet-viewport .grid-cols-1 {
+            grid-template-columns: 1fr !important;
+          }
+
+          .tablet-viewport .grid-cols-2,
+          .tablet-viewport .grid-cols-3,
+          .tablet-viewport .grid-cols-4 {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+
+          /* Responsive spacing utilities */
+          .mobile-viewport .p-4,
+          .mobile-viewport .px-4,
+          .mobile-viewport .py-4 {
+            padding: 0.75rem !important;
+          }
+
+          .mobile-viewport .m-4,
+          .mobile-viewport .mx-4,
+          .mobile-viewport .my-4 {
+            margin: 0.5rem !important;
+          }
+
+          .tablet-viewport .p-4,
+          .tablet-viewport .px-4,
+          .tablet-viewport .py-4 {
+            padding: 1rem !important;
+          }
+
+          .tablet-viewport .m-4,
+          .tablet-viewport .mx-4,
+          .tablet-viewport .my-4 {
+            margin: 0.75rem !important;
+          }
+
+          /* Responsive text sizing */
+          .mobile-viewport .text-lg {
+            font-size: 1rem !important;
+          }
+
+          .mobile-viewport .text-xl {
+            font-size: 1.125rem !important;
+          }
+
+          .mobile-viewport .text-2xl {
+            font-size: 1.25rem !important;
+          }
+
+          .mobile-viewport .text-3xl {
+            font-size: 1.5rem !important;
+          }
+
+          .tablet-viewport .text-lg {
+            font-size: 1.125rem !important;
+          }
+
+          .tablet-viewport .text-xl {
+            font-size: 1.25rem !important;
+          }
+
+          .tablet-viewport .text-2xl {
+            font-size: 1.5rem !important;
+          }
+
+          .tablet-viewport .text-3xl {
+            font-size: 1.875rem !important;
+          }
+
+          /* Responsive navigation */
+          .mobile-viewport nav {
+            padding: 0.5rem 0.75rem !important;
+          }
+
+          .tablet-viewport nav {
+            padding: 0.75rem 1rem !important;
+          }
+
+          /* Responsive images */
+          .mobile-viewport img {
+            max-width: 100% !important;
+            height: auto !important;
+          }
+
+          .tablet-viewport img {
+            max-width: 100% !important;
+            height: auto !important;
+          }
+
+          /* Responsive buttons */
+          .mobile-viewport button {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.875rem !important;
+          }
+
+          .tablet-viewport button {
+            padding: 0.75rem 1.5rem !important;
+            font-size: 1rem !important;
+          }
+
+          /* Responsive forms */
+          .mobile-viewport input,
+          .mobile-viewport textarea,
+          .mobile-viewport select {
+            padding: 0.5rem !important;
+            font-size: 0.875rem !important;
+          }
+
+          .tablet-viewport input,
+          .tablet-viewport textarea,
+          .tablet-viewport select {
+            padding: 0.75rem !important;
+            font-size: 1rem !important;
+          }
         `
       }} />
     </div>

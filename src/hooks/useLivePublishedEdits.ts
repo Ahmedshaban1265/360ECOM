@@ -1,30 +1,6 @@
 import { useEffect } from 'react';
 import { subscribeToLiveEdits, ElementEdit } from '@/editor/services/EditsFirestoreService';
 
-// Inject stable data-editor-id attributes on live pages so edits can be matched reliably
-function injectEditorIds() {
-  const selectors = [
-    'h1','h2','h3','h4','h5','h6','p','span','div','a','img','button','input','textarea',
-    'label','li','td','th','caption','figcaption','blockquote','cite','em','strong','small'
-  ];
-
-  selectors.forEach((selector) => {
-    const nodeList = document.querySelectorAll(selector);
-    nodeList.forEach((el, index) => {
-      const element = el as HTMLElement;
-      // Respect existing id or data-edit-id
-      let id = element.id || element.dataset.editId || '';
-      if (!id) {
-        const tag = element.tagName.toLowerCase();
-        const firstClass = (element.className || '').toString().split(' ').filter(Boolean)[0];
-        const classPart = firstClass ? `.${firstClass}` : '';
-        id = `${tag}${classPart}-${index}`;
-      }
-      element.setAttribute('data-editor-id', id);
-    });
-  });
-}
-
 function applyEditToElement(edit: ElementEdit) {
   // Try exact match by data-editor-id first
   const selector = `[data-editor-id="${edit.id}"]`;
@@ -88,10 +64,6 @@ function applyEditToElement(edit: ElementEdit) {
 export default function useLivePublishedEdits(pageId: string) {
   useEffect(() => {
     if (!pageId) return;
-    // Ensure elements have stable identifiers on the live site
-    try {
-      injectEditorIds();
-    } catch {}
     const unsub = subscribeToLiveEdits(pageId, applyEditToElement);
     return () => unsub();
   }, [pageId]);

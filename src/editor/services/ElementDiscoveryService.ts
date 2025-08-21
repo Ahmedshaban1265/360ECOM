@@ -97,18 +97,6 @@ export class ElementDiscoveryService {
       ...this.getElementSpecificData(element, tagName)
     };
 
-    // Attach minimal editor metadata for compatibility with ElementEditor
-    try {
-      (element as any)._editorData = {
-        id,
-        // Use concrete tag name for editor compatibility (e.g., 'p', 'h1', 'img', 'a')
-        type: tagName,
-        pageId: this.pageId
-      };
-      element.setAttribute('data-editor-id', id);
-      element.setAttribute('data-editor-type', type);
-    } catch {}
-
     return editableElement;
   }
 
