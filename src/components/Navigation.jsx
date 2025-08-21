@@ -214,13 +214,15 @@ export default function Navigation({ language, setLanguage, isDark, setIsDark })
                                     { key: "testimonials", path: "/testimonials" },
                                     { key: "contact", path: "/contact" },
                                 ].map((item, index) => (
-                                    <motion.div key={item.key}>
+                                    <motion.div
+                                        key={item.key}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.1 }}
+                                    >
                                         <Link
                                             to={item.path}
                                             className="text-2xl hover:text-blue-600 transition-colors block text-center"
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.1 }}
                                             onClick={() => setIsMenuOpen(false)}
                                         >
                                             {t.nav[item.key]}
