@@ -4,7 +4,7 @@ import { SidebarTab } from '../types';
 import SectionsTree from './SectionsTree';
 import PropertiesPanel from './PropertiesPanel';
 import LeftNavTemplates from './LeftNavTemplates';
-import ImageLibrary from './ImageLibrary';
+import ShopifyImageLibrary, { ImageItem } from './ShopifyImageLibrary';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,79 @@ import {
   ChevronLeft,
   X
 } from 'lucide-react';
+
+// Media Panel Component
+function MediaPanel() {
+  const [showImageLibrary, setShowImageLibrary] = useState(false);
+
+  const handleImageSelect = (images: ImageItem[]) => {
+    if (images.length > 0) {
+      // Copy the first image URL to clipboard for easy pasting
+      const imageUrl = images[0].url;
+      navigator.clipboard.writeText(imageUrl).then(() => {
+        console.log('Image URL copied to clipboard:', imageUrl);
+      }).catch(err => {
+        console.error('Failed to copy to clipboard:', err);
+      });
+    }
+    setShowImageLibrary(false);
+  };
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="p-4 border-b">
+        <h3 className="font-medium mb-4">Media Library</h3>
+        <div className="space-y-2">
+          <Button
+            onClick={() => setShowImageLibrary(true)}
+            className="w-full"
+            variant="outline"
+          >
+            <ImageIcon className="w-4 h-4 mr-2" />
+            Browse & Upload Images
+          </Button>
+          <p className="text-xs text-muted-foreground text-center">
+            Select images to copy URL to clipboard
+          </p>
+        </div>
+      </div>
+
+      <ScrollArea className="flex-1 p-4">
+        <div className="text-center text-sm text-muted-foreground">
+          <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p className="mb-2">Quick Access to Your Images</p>
+          <p className="text-xs">
+            • Upload new images
+          </p>
+          <p className="text-xs">
+            • Browse existing media
+          </p>
+          <p className="text-xs">
+            • Search and filter
+          </p>
+          <p className="text-xs mb-3">
+            • Copy URLs instantly
+          </p>
+          <Button
+            onClick={() => setShowImageLibrary(true)}
+            variant="ghost"
+            size="sm"
+            className="text-xs"
+          >
+            Open Media Library
+          </Button>
+        </div>
+      </ScrollArea>
+
+      <ShopifyImageLibrary
+        open={showImageLibrary}
+        onOpenChange={setShowImageLibrary}
+        onSelect={handleImageSelect}
+        multiple={false}
+      />
+    </div>
+  );
+}
 
 interface SidebarTabConfig {
   id: SidebarTab;
@@ -59,11 +132,7 @@ const SIDEBAR_TABS: SidebarTabConfig[] = [
     id: 'media',
     label: 'Media',
     icon: ImageIcon,
-    component: () => (
-      <div className="h-full">
-        <ImageLibrary onSelect={() => {}} />
-      </div>
-    )
+    component: () => <MediaPanel />
   },
   {
     id: 'pages',

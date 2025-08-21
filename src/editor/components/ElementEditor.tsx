@@ -16,8 +16,8 @@ import {
   X
 } from 'lucide-react';
 import { editingService } from '../services/EditingService';
-import ImageLibrary from './ImageLibrary';
-import { uploadMedia } from '../services/MediaService';
+import ImageSelectionModal from './ImageSelectionModal';
+import { ImageItem } from './ShopifyImageLibrary';
 
 interface ElementEditorProps {
   element: HTMLElement | null;
@@ -36,8 +36,7 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [padding, setPadding] = useState('');
   const [margin, setMargin] = useState('');
   const [background, setBackground] = useState('');
-  const [showImageLibrary, setShowImageLibrary] = useState(false);
-  const [uploadPct, setUploadPct] = useState<number>(0);
+  const [showImageSelection, setShowImageSelection] = useState(false);
   
   const [elementData, setElementData] = useState<{
     id: string;
@@ -301,32 +300,9 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 placeholder="https://example.com/image.jpg"
                 className="text-xs"
               />
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="text-xs" onClick={() => setShowImageLibrary(true)}>
-                  Choose from Library
-                </Button>
-                <label>
-                  <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    try {
-                      setUploadPct(1);
-                      const result = await uploadMedia(file, 'theme-media', (pct) => setUploadPct(pct));
-                      setImageSource(result.url);
-                      setUploadPct(0);
-                    } catch (err) {
-                      console.error('Upload failed', err);
-                      setUploadPct(0);
-                    }
-                  }} />
-                  <Button size="sm" variant="outline" className="text-xs">Upload</Button>
-                </label>
-              </div>
-              {uploadPct > 0 && (
-                <div className="w-full h-2 bg-muted rounded overflow-hidden">
-                  <div className="h-2 bg-primary" style={{ width: `${uploadPct}%` }} />
-                </div>
-              )}
+              <Button size="sm" variant="outline" className="text-xs w-full" onClick={() => setShowImageSelection(true)}>
+                Select Image
+              </Button>
             </div>
             <div className="space-y-2">
               <Label className="text-xs">Alt Text</Label>
@@ -337,11 +313,13 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 className="text-xs"
               />
             </div>
-            {showImageLibrary && (
-              <div className="border rounded-md p-2">
-                <ImageLibrary onSelect={(img) => { setImageSource(img.url); setShowImageLibrary(false); }} />
-              </div>
-            )}
+            <ImageSelectionModal
+              open={showImageSelection}
+              onOpenChange={setShowImageSelection}
+              onSelect={(image) => {
+                setImageSource(image.url);
+              }}
+            />
           </>
         )}
 

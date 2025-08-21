@@ -1,7 +1,7 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -14,10 +14,49 @@ const firebaseConfig = {
     measurementId: "G-07DGG8HD8Y"
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+let app;
+let analytics;
 
-const analytics = getAnalytics(app);
+try {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+
+  // Initialize analytics only if not in development or testing
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    try {
+      analytics = getAnalytics(app);
+    } catch (analyticsError) {
+      console.warn('Analytics initialization failed:', analyticsError);
+    }
+  }
+
+  console.log('✅ Firebase initialized successfully');
+} catch (error) {
+  console.error('❌ Firebase initialization failed:', error);
+  throw error;
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Connect to emulators in development
+if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  try {
+    // Only connect if not already connected
+    if (!auth._delegate._isConnected) {
+      connectAuthEmulator(auth, 'http://localhost:9099');
+    }
+    if (!db._delegate._databaseId.projectId.includes('demo-')) {
+      connectFirestoreEmulator(db, 'localhost', 8080);
+    }
+    if (!storage._delegate._host.includes('localhost')) {
+      connectStorageEmulator(storage, 'localhost', 9199);
+    }
+    console.log('🔧 Connected to Firebase emulators');
+  } catch (emulatorError) {
+    console.log('⚠️ Firebase emulators not available:', emulatorError.message);
+  }
+}
+
+// Log storage configuration for debugging
+console.log('Firebase Storage configured for bucket:', storage.app.options.storageBucket);
