@@ -4,7 +4,7 @@ import { getSectionSchema, getBlockSchema } from '../schemas/sections';
 import { FieldBase, SectionInstance, BlockInstance } from '../types';
 import ElementEditor from './ElementEditor';
 import ImageSelectionModal from './ImageSelectionModal';
-import { ImageItem } from './ShopifyImageLibrary';
+import type { ImageItem } from './ShopifyImageLibrary';
 
 // UI Components
 import { Button } from '@/components/ui/button';

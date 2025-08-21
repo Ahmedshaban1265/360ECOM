@@ -71,12 +71,19 @@ export default function ImageSelectionModal({
     setView('selection');
   };
 
+  const handleLibraryOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setView('selection');
+      onOpenChange(false);
+    }
+  };
+
   // If showing the library view, render the ShopifyImageLibrary
   if (view === 'library') {
     return (
       <ShopifyImageLibrary
-        open={true}
-        onOpenChange={handleCloseLibrary}
+        open={open}
+        onOpenChange={handleLibraryOpenChange}
         onSelect={handleLibrarySelect}
         multiple={multiple}
       />
