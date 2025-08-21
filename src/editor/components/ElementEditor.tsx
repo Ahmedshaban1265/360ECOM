@@ -16,8 +16,7 @@ import {
   X
 } from 'lucide-react';
 import { editingService } from '../services/EditingService';
-import ImageLibrary from './ImageLibrary';
-import { uploadMedia } from '../services/MediaService';
+import ImageSelectionModal from './ImageSelectionModal';
 
 interface ElementEditorProps {
   element: HTMLElement | null;
