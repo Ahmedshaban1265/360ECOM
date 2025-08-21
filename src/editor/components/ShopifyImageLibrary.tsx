@@ -186,52 +186,128 @@ export default function ShopifyImageLibrary({
 
   const handleFileUpload = async (files: FileList) => {
     if (!files.length) return;
-    
+
     setIsUploading(true);
     setUploadProgress(0);
 
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
+      // Validate file types and sizes
+      const validFiles = Array.from(files).filter(file => {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+        const maxSize = 10 * 1024 * 1024; // 10MB limit
+
+        if (!validExtensions.includes(ext || '')) {
+          console.warn(`Skipping invalid file type: ${file.name}`);
+          return false;
+        }
+
+        if (file.size > maxSize) {
+          console.warn(`Skipping file too large: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+          return false;
+        }
+
+        return true;
+      });
+
+      if (validFiles.length === 0) {
+        throw new Error('No valid image files selected. Please select JPG, PNG, GIF, WebP, or SVG files under 10MB.');
+      }
+
+      console.log(`Uploading ${validFiles.length} files...`);
+
+      const uploadPromises = validFiles.map(async (file, index) => {
         const ext = file.name.split('.').pop() || 'bin';
         const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const fileRef = ref(storage, `${root}/${name}`);
-        
+
         return new Promise<ImageItem>((resolve, reject) => {
           const task = uploadBytesResumable(fileRef, file);
-          
-          task.on('state_changed', 
+
+          // Set timeout for upload
+          const timeout = setTimeout(() => {
+            task.cancel();
+            reject(new Error(`Upload timeout for ${file.name}`));
+          }, 60000); // 60 second timeout per file
+
+          task.on('state_changed',
             (snapshot) => {
               const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              setUploadProgress(progress);
-            },
-            (error) => reject(error),
-            async () => {
-              const url = await getDownloadURL(task.snapshot.ref);
-              resolve({
-                url,
-                path: task.snapshot.ref.fullPath,
-                name,
-                uploadedAt: new Date()
+              // Update progress for the whole batch
+              setUploadProgress(prev => {
+                const fileProgress = progress / validFiles.length;
+                const baseProgress = (index / validFiles.length) * 100;
+                return baseProgress + fileProgress;
               });
+            },
+            (error) => {
+              clearTimeout(timeout);
+              console.error(`Upload failed for ${file.name}:`, error);
+              reject(error);
+            },
+            async () => {
+              clearTimeout(timeout);
+              try {
+                const url = await getDownloadURL(task.snapshot.ref);
+                resolve({
+                  url,
+                  path: task.snapshot.ref.fullPath,
+                  name,
+                  uploadedAt: new Date()
+                });
+              } catch (urlError) {
+                reject(urlError);
+              }
             }
           );
         });
       });
 
-      const newImages = await Promise.all(uploadPromises);
-      
-      // Add new images to the beginning of the list
-      const updatedImages = [...newImages, ...images];
-      setImages(updatedImages);
-      setFilteredImages(updatedImages);
-      
-      // Auto-select uploaded images if in single select mode
-      if (!multiple && newImages.length === 1) {
-        setSelectedImages(new Set([newImages[0].path]));
+      const results = await Promise.allSettled(uploadPromises);
+
+      const successfulUploads: ImageItem[] = [];
+      const failedUploads: string[] = [];
+
+      results.forEach((result, index) => {
+        if (result.status === 'fulfilled') {
+          successfulUploads.push(result.value);
+        } else {
+          failedUploads.push(validFiles[index].name);
+          console.error(`Failed to upload ${validFiles[index].name}:`, result.reason);
+        }
+      });
+
+      if (successfulUploads.length > 0) {
+        // Add new images to the beginning of the list
+        const updatedImages = [...successfulUploads, ...images];
+        setImages(updatedImages);
+        setFilteredImages(updatedImages);
+
+        // Auto-select uploaded images if in single select mode
+        if (!multiple && successfulUploads.length === 1) {
+          setSelectedImages(new Set([successfulUploads[0].path]));
+        }
+
+        console.log(`Successfully uploaded ${successfulUploads.length} files`);
       }
-      
-    } catch (error) {
+
+      if (failedUploads.length > 0) {
+        console.warn(`Failed to upload ${failedUploads.length} files:`, failedUploads);
+        // You could show a toast notification here
+      }
+
+    } catch (error: any) {
       console.error('Upload failed:', error);
+      // Handle specific Firebase Storage errors
+      if (error?.code === 'storage/retry-limit-exceeded') {
+        console.error('Upload retry limit exceeded. Please try again later.');
+      } else if (error?.code === 'storage/unauthorized') {
+        console.error('Upload unauthorized. Please check Firebase Storage rules.');
+      } else if (error?.code === 'storage/canceled') {
+        console.error('Upload was canceled.');
+      } else {
+        console.error('Upload error:', error?.message || error);
+      }
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
