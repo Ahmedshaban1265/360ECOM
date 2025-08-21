@@ -34,9 +34,15 @@ function MediaPanel() {
   const [showImageLibrary, setShowImageLibrary] = useState(false);
 
   const handleImageSelect = (images: ImageItem[]) => {
-    // Here you can handle the selected images
-    // For example, copy to clipboard, insert into content, etc.
-    console.log('Selected images:', images);
+    if (images.length > 0) {
+      // Copy the first image URL to clipboard for easy pasting
+      const imageUrl = images[0].url;
+      navigator.clipboard.writeText(imageUrl).then(() => {
+        console.log('Image URL copied to clipboard:', imageUrl);
+      }).catch(err => {
+        console.error('Failed to copy to clipboard:', err);
+      });
+    }
     setShowImageLibrary(false);
   };
 
@@ -44,27 +50,53 @@ function MediaPanel() {
     <div className="h-full flex flex-col">
       <div className="p-4 border-b">
         <h3 className="font-medium mb-4">Media Library</h3>
-        <Button
-          onClick={() => setShowImageLibrary(true)}
-          className="w-full"
-        >
-          <ImageIcon className="w-4 h-4 mr-2" />
-          Browse Images
-        </Button>
-      </div>
-
-      <div className="flex-1 p-4">
-        <div className="text-center text-sm text-muted-foreground">
-          <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
-          <p>Click "Browse Images" to access your image library</p>
+        <div className="space-y-2">
+          <Button
+            onClick={() => setShowImageLibrary(true)}
+            className="w-full"
+            variant="outline"
+          >
+            <ImageIcon className="w-4 h-4 mr-2" />
+            Browse & Upload Images
+          </Button>
+          <p className="text-xs text-muted-foreground text-center">
+            Select images to copy URL to clipboard
+          </p>
         </div>
       </div>
+
+      <ScrollArea className="flex-1 p-4">
+        <div className="text-center text-sm text-muted-foreground">
+          <ImageIcon className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p className="mb-2">Quick Access to Your Images</p>
+          <p className="text-xs">
+            • Upload new images
+          </p>
+          <p className="text-xs">
+            • Browse existing media
+          </p>
+          <p className="text-xs">
+            • Search and filter
+          </p>
+          <p className="text-xs mb-3">
+            • Copy URLs instantly
+          </p>
+          <Button
+            onClick={() => setShowImageLibrary(true)}
+            variant="ghost"
+            size="sm"
+            className="text-xs"
+          >
+            Open Media Library
+          </Button>
+        </div>
+      </ScrollArea>
 
       <ShopifyImageLibrary
         open={showImageLibrary}
         onOpenChange={setShowImageLibrary}
         onSelect={handleImageSelect}
-        multiple={true}
+        multiple={false}
       />
     </div>
   );
