@@ -157,6 +157,7 @@ export default function ShopifyImageLibrary({
 
   useEffect(() => {
     if (open) {
+      setConnectionError(null);
       // Test connection first, then load images
       FirebaseConnectionTest.testStorageConnection()
         .then(result => {
@@ -164,6 +165,7 @@ export default function ShopifyImageLibrary({
             loadImages();
           } else {
             console.error('Firebase Storage connection failed:', result.error);
+            setConnectionError(result.error || 'Connection failed');
             setIsLoading(false);
             // Set empty state with error info
             setImages([]);
@@ -172,6 +174,7 @@ export default function ShopifyImageLibrary({
         })
         .catch(error => {
           console.error('Connection test failed:', error);
+          setConnectionError('Failed to connect to Firebase Storage');
           setIsLoading(false);
           setImages([]);
           setFilteredImages([]);
