@@ -312,11 +312,13 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 className="text-xs"
               />
             </div>
-            {showImageLibrary && (
-              <div className="border rounded-md p-2">
-                <ImageLibrary onSelect={(img) => { setImageSource(img.url); setShowImageLibrary(false); }} />
-              </div>
-            )}
+            <ImageSelectionModal
+              open={showImageSelection}
+              onOpenChange={setShowImageSelection}
+              onSelect={(image) => {
+                setImageSource(image.url);
+              }}
+            />
           </>
         )}
 
