@@ -101,7 +101,8 @@ export class ElementDiscoveryService {
     try {
       (element as any)._editorData = {
         id,
-        type,
+        // Use concrete tag name for editor compatibility (e.g., 'p', 'h1', 'img', 'a')
+        type: tagName,
         pageId: this.pageId
       };
       element.setAttribute('data-editor-id', id);
