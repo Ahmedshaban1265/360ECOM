@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelectedTemplate, useDeviceType } from '../store/editorStore';
 import { editingService } from '../services/EditingService';
 import { elementDiscoveryService } from '../services/ElementDiscoveryService';
+import type { EditableElement } from '../services/ElementDiscoveryService';
+import { useTheme } from '@/context/ThemeContext';
 
 // Import actual website pages
 import HomePage from '@/pages/HomePage';
@@ -43,10 +45,11 @@ const PAGE_COMPONENTS = {
 export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRendererProps) {
   const selectedTemplate = useSelectedTemplate();
   const deviceType = useDeviceType();
+  const { theme } = useTheme();
   const [language, setLanguage] = useState('en');
   const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
-  const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
+  const [editableElements, setEditableElements] = useState<EditableElement[]>([]);
 
   // Get the current page component
   const pageId = selectedTemplate || 'home';
@@ -68,9 +71,15 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       const discoveredElements = elementDiscoveryService.discoverElements();
       setEditableElements(discoveredElements);
 
-      // Add click handlers directly to elements
+      // Apply any saved edits and add click handlers directly to elements
       discoveredElements.forEach(editableElement => {
         const { element } = editableElement;
+        // Apply persisted edits for this element
+        try {
+          editingService.applyElementEdits(element, editableElement.id, pageId);
+        } catch (err) {
+          console.warn('Failed to apply edits for element', editableElement.id, err);
+        }
         
         // Add visual indicators
         element.style.cursor = 'pointer';
@@ -89,7 +98,10 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
 
         // Add click handler
         element.addEventListener('click', (e) => {
-          e.preventDefault();
+          // Prevent navigation for anchor tags inside the editor
+          if (e.target instanceof HTMLAnchorElement) {
+            e.preventDefault();
+          }
           e.stopPropagation();
           console.log('LiveWebsiteRenderer: Element clicked:', editableElement);
           if (onElementClick) {
@@ -156,7 +168,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   return (
     <div
       ref={websiteRef}
-      className={`live-website-renderer ${getResponsiveClass()}`}
+      className={`live-website-renderer ${getResponsiveClass()} ${theme === 'dark' ? 'dark' : ''}`}
       style={getDeviceStyles()}
     >
       {/* Dynamic viewport meta tag for responsive behavior */}
@@ -212,7 +224,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             pointer-events: none;
           }
 
-          .live-website-renderer a { pointer-events: none; }
+          /* Allow clicking anchors for editor; prevent navigation via JS */
+          .live-website-renderer a { pointer-events: auto; }
           .live-website-renderer button { pointer-events: auto; }
 
           /* Enhanced responsive behavior */

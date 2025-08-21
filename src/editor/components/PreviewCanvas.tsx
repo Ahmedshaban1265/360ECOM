@@ -65,11 +65,11 @@ const DEVICE_PRESETS = {
   },
   mobile: { 
     name: 'Mobile', 
-    width: 375, 
-    height: 667,
+    width: 390, 
+    height: 844,
     icon: MobileIcon,
-    maxWidth: '375px',
-    viewport: '375px',
+    maxWidth: '390px',
+    viewport: '390px',
     breakpoint: 'sm',
     realBreakpoint: REAL_RESPONSIVE_BREAKPOINTS.sm
   }
