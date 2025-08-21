@@ -35,8 +35,7 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [padding, setPadding] = useState('');
   const [margin, setMargin] = useState('');
   const [background, setBackground] = useState('');
-  const [showImageLibrary, setShowImageLibrary] = useState(false);
-  const [uploadPct, setUploadPct] = useState<number>(0);
+  const [showImageSelection, setShowImageSelection] = useState(false);
   
   const [elementData, setElementData] = useState<{
     id: string;
