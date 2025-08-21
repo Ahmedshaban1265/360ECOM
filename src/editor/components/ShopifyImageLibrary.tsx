@@ -156,7 +156,25 @@ export default function ShopifyImageLibrary({
 
   useEffect(() => {
     if (open) {
-      loadImages();
+      // Test connection first, then load images
+      FirebaseConnectionTest.testStorageConnection()
+        .then(result => {
+          if (result.success) {
+            loadImages();
+          } else {
+            console.error('Firebase Storage connection failed:', result.error);
+            setIsLoading(false);
+            // Set empty state with error info
+            setImages([]);
+            setFilteredImages([]);
+          }
+        })
+        .catch(error => {
+          console.error('Connection test failed:', error);
+          setIsLoading(false);
+          setImages([]);
+          setFilteredImages([]);
+        });
     }
   }, [open, loadImages]);
 
