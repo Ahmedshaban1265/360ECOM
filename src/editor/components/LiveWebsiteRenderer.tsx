@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelectedTemplate, useDeviceType } from '../store/editorStore';
 import { editingService } from '../services/EditingService';
+import { elementDiscoveryService } from '../services/ElementDiscoveryService';
+import type { EditableElement } from '../services/ElementDiscoveryService';
+import { useTheme } from '@/context/ThemeContext';
 
 // Import actual website pages
 import HomePage from '@/pages/HomePage';
@@ -42,10 +45,11 @@ const PAGE_COMPONENTS = {
 export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRendererProps) {
   const selectedTemplate = useSelectedTemplate();
   const deviceType = useDeviceType();
+  const { theme } = useTheme();
   const [language, setLanguage] = useState('en');
   const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
-  const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
+  const [editableElements, setEditableElements] = useState<EditableElement[]>([]);
 
   // Get the current page component
   const pageId = selectedTemplate || 'home';
@@ -56,103 +60,80 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
     if (!websiteRef.current) return;
 
     const websiteElement = websiteRef.current;
+    const pageId = selectedTemplate || 'home';
 
-    // Find all editable elements (headings, paragraphs, images, etc.)
-    const editableSelectors = [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'p',
-      'img',
-      'button',
-      '[data-editable]',
-      '.editable'
-    ];
-
-    const elements = websiteElement.querySelectorAll(editableSelectors.join(', ')) as NodeListOf<HTMLElement>;
-    const editableElementsArray = Array.from(elements);
-
-    // Add editing overlay and click handlers
-    editableElementsArray.forEach((element, index) => {
-      // Generate unique ID based on element content and position
-      const elementId = `${pageId}-${element.tagName.toLowerCase()}-${index}`;
-      element.setAttribute('data-editor-id', elementId);
-      element.setAttribute('data-editor-type', element.tagName.toLowerCase());
-
-      // Apply saved edits to this element
-      editingService.applyElementEdits(element, elementId, pageId);
+    // Use ElementDiscoveryService to discover elements
+    const timer = setTimeout(() => {
+      console.log('LiveWebsiteRenderer: Starting element discovery after delay');
+      elementDiscoveryService.setPageId(pageId);
       
-      // Add hover effect
-      element.style.cursor = 'pointer';
-      element.style.transition = 'all 0.2s ease';
-      
-      const handleMouseEnter = () => {
-        element.style.outline = '2px dashed #3b82f6';
-        element.style.outlineOffset = '2px';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-      };
+      // Discover elements but handle clicks manually for now
+      const discoveredElements = elementDiscoveryService.discoverElements();
+      setEditableElements(discoveredElements);
 
-      const handleMouseLeave = () => {
-        element.style.outline = 'none';
-        element.style.backgroundColor = 'transparent';
-      };
-
-      const handleClick = (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Remove previous selections
-        editableElementsArray.forEach(el => {
-          el.style.outline = 'none';
-          el.style.backgroundColor = 'transparent';
-        });
-        
-        // Highlight selected element
-        element.style.outline = '2px solid #3b82f6';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-        
-        // Call the click handler
-        if (onElementClick) {
-          const elementType = element.getAttribute('data-editor-type') || 'unknown';
-          const elementId = element.getAttribute('data-editor-id') || `unknown-${index}`;
-          onElementClick(element, elementType);
-
-          // Store reference to selected element for editing
-          (element as any)._editorData = {
-            id: elementId,
-            type: elementType,
-            pageId: pageId
-          };
+      // Apply any saved edits and add click handlers directly to elements
+      discoveredElements.forEach(editableElement => {
+        const { element } = editableElement;
+        // Apply persisted edits for this element
+        try {
+          editingService.applyElementEdits(element, editableElement.id, pageId);
+        } catch (err) {
+          console.warn('Failed to apply edits for element', editableElement.id, err);
         }
-      };
+        
+        // Add visual indicators
+        element.style.cursor = 'pointer';
+        element.setAttribute('data-editable', 'true');
+        
+        // Add hover effect
+        const mouseEnterHandler = () => {
+          element.style.outline = '2px solid #3b82f6';
+          element.style.outlineOffset = '2px';
+        };
+        const mouseLeaveHandler = () => {
+          element.style.outline = '';
+          element.style.outlineOffset = '';
+        };
+        const clickHandler = (e: Event) => {
+          const target = e.target as HTMLElement;
+          const anchor = target && (target.closest ? target.closest('a') : null);
+          if (anchor) {
+            e.preventDefault();
+          }
+          e.stopPropagation();
+          console.log('LiveWebsiteRenderer: Element clicked:', editableElement);
+          if (onElementClick) {
+            onElementClick(element, editableElement.type);
+          }
+        };
 
-      element.addEventListener('mouseenter', handleMouseEnter);
-      element.addEventListener('mouseleave', handleMouseLeave);
-      element.addEventListener('click', handleClick);
+        element.addEventListener('mouseenter', mouseEnterHandler);
+        element.addEventListener('mouseleave', mouseLeaveHandler);
+        element.addEventListener('click', clickHandler);
 
-      // Store event listeners for cleanup
-      (element as any)._editorEventListeners = {
-        mouseenter: handleMouseEnter,
-        mouseleave: handleMouseLeave,
-        click: handleClick
-      };
-    });
-
-    setEditableElements(editableElementsArray);
+        // Store handlers for cleanup
+        (element as any)._editorHandlers = { mouseEnterHandler, mouseLeaveHandler, clickHandler };
+      });
+    }, 500);
 
     // Cleanup function
     return () => {
-      editableElementsArray.forEach(element => {
-        const listeners = (element as any)._editorEventListeners;
-        if (listeners) {
-          element.removeEventListener('mouseenter', listeners.mouseenter);
-          element.removeEventListener('mouseleave', listeners.mouseleave);
-          element.removeEventListener('click', listeners.click);
-          delete (element as any)._editorEventListeners;
+      clearTimeout(timer);
+      // Clean up event listeners
+      const elements = elementDiscoveryService.getAllElements();
+      elements.forEach(editableElement => {
+        const { element } = editableElement;
+        element.style.cursor = '';
+        element.removeAttribute('data-editable');
+        element.style.outline = '';
+        element.style.outlineOffset = '';
+        const handlers = (element as any)._editorHandlers;
+        if (handlers) {
+          element.removeEventListener('mouseenter', handlers.mouseEnterHandler);
+          element.removeEventListener('mouseleave', handlers.mouseLeaveHandler);
+          element.removeEventListener('click', handlers.clickHandler);
+          delete (element as any)._editorHandlers;
         }
-        
-        // Reset styles
-        element.style.outline = 'none';
-        element.style.backgroundColor = 'transparent';
-        element.style.cursor = 'default';
       });
     };
   }, [selectedTemplate, onElementClick]);
@@ -176,29 +157,41 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const getResponsiveClass = () => {
     switch (deviceType) {
       case 'mobile':
-        return 'mobile-viewport';
+        return 'mobile-viewport editor-responsive-mode';
       case 'tablet':
-        return 'tablet-viewport';
+        return 'tablet-viewport editor-responsive-mode';
       default:
         return 'desktop-viewport';
+    }
+  };
+
+  // Get viewport meta content based on device type
+  const getViewportMeta = () => {
+    switch (deviceType) {
+      case 'mobile':
+        return 'width=375, initial-scale=1, user-scalable=no';
+      case 'tablet':
+        return 'width=768, initial-scale=1, user-scalable=no';
+      default:
+        return 'width=device-width, initial-scale=1';
     }
   };
 
   return (
     <div
       ref={websiteRef}
-      className={`live-website-renderer ${getResponsiveClass()}`}
+      className={`live-website-renderer ${getResponsiveClass()} ${theme === 'dark' ? 'dark' : ''}`}
       style={getDeviceStyles()}
     >
+      {/* Dynamic viewport meta tag for responsive behavior */}
+      <div style={{ display: 'none' }}>
+        <meta name="viewport" content={getViewportMeta()} />
+      </div>
+
       {/* Render the actual website with navigation and footer */}
       <div className="min-h-full bg-background text-foreground">
         {/* Navigation */}
-        <Navigation
-          language={language}
-          setLanguage={setLanguage}
-          isDark={isDark}
-          setIsDark={setIsDark}
-        />
+        <Navigation language={language} setLanguage={setLanguage} isDark={isDark} setIsDark={setIsDark} />
 
         {/* Main Page Content */}
         <main className="website-content">
@@ -209,7 +202,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         <Footer language={language} />
       </div>
 
-      {/* Editing overlay styles */}
+      {/* Enhanced editing overlay styles */}
       <style dangerouslySetInnerHTML={{
         __html: `
           .live-website-renderer {
@@ -238,13 +231,22 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             pointer-events: none;
           }
 
-          .live-website-renderer a {
-            pointer-events: none;
+          /* Allow clicking anchors for editor; prevent navigation via JS */
+          .live-website-renderer a { pointer-events: auto; }
+          .live-website-renderer button { pointer-events: auto; }
+
+          /* Enhanced responsive behavior */
+          .editor-responsive-mode {
+            transform-origin: top left;
+            overflow-x: hidden;
           }
 
-          .live-website-renderer button {
-            pointer-events: auto;
+          .editor-responsive-mode .container {
+            max-width: 100% !important;
+            margin: 0 auto !important;
           }
+
+          .editor-responsive-mode .grid { display: grid !important; }
         `
       }} />
     </div>

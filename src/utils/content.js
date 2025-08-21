@@ -21,7 +21,7 @@ const content = {
             title: "Scale Your",
             titleHighlight: "E-commerce",
             titleEnd: "Business",
-            description: "We help ambitious brands achieve extraordinary growth through data-driven marketing, professional web development, and cutting-edge e-commerce solutions.",
+            description: "",
             ctaPrimary: "Start Your Growth Journey",
             ctaSecondary: "Watch Our Story"
         },

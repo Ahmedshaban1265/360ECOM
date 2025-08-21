@@ -1,59 +1,46 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useEditorStore, useCurrentTemplate, useSelectedSection, useSelectedBlock } from '../store/editorStore';
-import { getSectionSchema, getBlockSchema, getAvailableSections } from '../schemas/sections';
+import { getSectionSchema, getBlockSchema } from '../schemas/sections';
+import { SectionInstance, BlockInstance } from '../types';
 
 // UI Components
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
 import { 
-  Collapsible, 
-  CollapsibleContent, 
-  CollapsibleTrigger 
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 
 // Icons
 import { 
+  GripVertical, 
   Plus, 
-  MoreVertical, 
-  ChevronDown, 
-  ChevronRight,
-  Copy, 
   Trash2, 
+  Copy, 
   MoveUp, 
   MoveDown,
-  Grip,
-  Eye,
-  EyeOff
+  ChevronDown,
+  ChevronRight,
+  Layers,
+  Settings,
+  Image as ImageIcon,
+  Type,
+  Link,
+  Square
 } from 'lucide-react';
 
-interface SectionItemProps {
-  sectionId: string;
-  index: number;
-  total: number;
-}
+interface SectionsTreeProps {}
 
-function SectionItem({ sectionId, index, total }: SectionItemProps) {
+export default function SectionsTree({}: SectionsTreeProps) {
   const currentTemplate = useCurrentTemplate();
   const selectedSection = useSelectedSection();
   const selectedBlock = useSelectedBlock();
@@ -61,6 +48,7 @@ function SectionItem({ sectionId, index, total }: SectionItemProps) {
   const {
     setSelectedSection,
     setSelectedBlock,
+    addSection,
     removeSection,
     duplicateSection,
     moveSectionUp,
@@ -69,448 +57,478 @@ function SectionItem({ sectionId, index, total }: SectionItemProps) {
     removeBlock,
     duplicateBlock,
     moveBlockUp,
-    moveBlockDown,
-    reorderBlocks
+    moveBlockDown
   } = useEditorStore();
 
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
+  const [draggedItem, setDraggedItem] = useState<{
+    type: 'section' | 'block';
+    id: string;
+    sectionId?: string;
+  } | null>(null);
+  const [dragOverItem, setDragOverItem] = useState<{
+    type: 'section' | 'block';
+    id: string;
+    sectionId?: string;
+    position: 'before' | 'after';
+  } | null>(null);
 
-  const section = currentTemplate?.sections.find(s => s.id === sectionId);
-  if (!section) return null;
+  const toggleSectionExpanded = (sectionId: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId);
+    } else {
+      newExpanded.add(sectionId);
+    }
+    setExpandedSections(newExpanded);
+  };
 
-  const schema = getSectionSchema(section.type);
-  const blocks = section.blocks || [];
-  const isSelected = selectedSection === sectionId;
-  const hasBlocks = blocks.length > 0;
-
-  const handleSectionSelect = () => {
+  const handleSectionSelect = (sectionId: string) => {
     setSelectedSection(sectionId);
     setSelectedBlock(null);
   };
 
-  const handleBlockSelect = (blockId: string) => {
+  const handleBlockSelect = (sectionId: string, blockId: string) => {
     setSelectedSection(sectionId);
     setSelectedBlock(blockId);
   };
 
-  const handleAddBlock = (blockType: string) => {
-    addBlock(sectionId, blockType);
+  const handleAddSection = () => {
+    const sectionTypes = ['hero', 'rich-text', 'cards', 'cta-banner', 'collection-grid'];
+    const randomType = sectionTypes[Math.floor(Math.random() * sectionTypes.length)];
+    addSection(randomType);
   };
 
-  const getAvailableBlocks = () => {
-    return schema?.blocks || [];
+  const handleAddBlock = (sectionId: string) => {
+    const blockTypes = ['text', 'image', 'button', 'video'];
+    const randomType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
+    addBlock(sectionId, randomType);
   };
 
-  return (
-    <div className={`border rounded-lg ${isSelected ? 'ring-2 ring-primary ring-offset-1' : 'border-border'}`}>
-      {/* Section Header */}
-      <div
-        className={`flex items-center justify-between p-3 cursor-pointer hover:bg-accent/50 transition-colors ${
-          isSelected ? 'bg-accent' : ''
-        }`}
-        onClick={handleSectionSelect}
-      >
-        <div className="flex items-center gap-2 flex-1">
-          <Grip className="w-4 h-4 text-muted-foreground cursor-grab" />
+  // Drag and Drop handlers
+  const handleDragStart = (e: React.DragEvent, item: { type: 'section' | 'block'; id: string; sectionId?: string }) => {
+    setDraggedItem(item);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', JSON.stringify(item));
+  };
+
+  const handleDragOver = (e: React.DragEvent, targetItem: { type: 'section' | 'block'; id: string; sectionId?: string }) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const position = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+    
+    setDragOverItem({
+      ...targetItem,
+      position
+    });
+  };
+
+  const handleDragLeave = () => {
+    setDragOverItem(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetItem: { type: 'section' | 'block'; id: string; sectionId?: string }) => {
+    e.preventDefault();
+    
+    if (!draggedItem || !dragOverItem || !currentTemplate) return;
+    
+    const { position } = dragOverItem;
+    
+    if (draggedItem.type === 'section' && targetItem.type === 'section') {
+      // Reordering sections
+      const sections = [...currentTemplate.sections];
+      const draggedIndex = sections.findIndex(s => s.id === draggedItem.id);
+      const targetIndex = sections.findIndex(s => s.id === targetItem.id);
+      
+      if (draggedIndex !== -1 && targetIndex !== -1) {
+        const [draggedSection] = sections.splice(draggedIndex, 1);
+        const newIndex = position === 'before' ? targetIndex : targetIndex + 1;
+        sections.splice(newIndex, 0, draggedSection);
+        
+        // Update the template with new order
+        const { updateSectionOrder } = useEditorStore.getState();
+        if (updateSectionOrder) {
+          updateSectionOrder(sections.map(s => s.id));
+        }
+      }
+    } else if (draggedItem.type === 'block' && targetItem.type === 'block' && draggedItem.sectionId === targetItem.sectionId) {
+      // Reordering blocks within the same section
+      const section = currentTemplate.sections.find(s => s.id === draggedItem.sectionId);
+      if (section && section.blocks) {
+        const blocks = [...section.blocks];
+        const draggedIndex = blocks.findIndex(b => b.id === draggedItem.id);
+        const targetIndex = blocks.findIndex(b => b.id === targetItem.id);
+        
+        if (draggedIndex !== -1 && targetIndex !== -1) {
+          const [draggedBlock] = blocks.splice(draggedIndex, 1);
+          const newIndex = position === 'before' ? targetIndex : targetIndex + 1;
+          blocks.splice(newIndex, 0, draggedBlock);
           
-          {hasBlocks && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsExpanded(!isExpanded);
-              }}
-              className="p-0.5 hover:bg-background rounded"
-            >
-              {isExpanded ? (
-                <ChevronDown className="w-3 h-3" />
-              ) : (
-                <ChevronRight className="w-3 h-3" />
-              )}
-            </button>
-          )}
+          // Update the section with new block order
+          const { updateBlockOrder } = useEditorStore.getState();
+          if (updateBlockOrder) {
+            updateBlockOrder(draggedItem.sectionId!, blocks.map(b => b.id));
+          }
+        }
+      }
+    }
+    
+    setDraggedItem(null);
+    setDragOverItem(null);
+  };
 
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-sm">
-                {schema?.label || section.type}
-              </span>
-              <Badge variant="outline" className="text-xs">
-                {section.type}
-              </Badge>
-            </div>
-            {hasBlocks && (
-              <div className="text-xs text-muted-foreground">
-                {blocks.length} block{blocks.length !== 1 ? 's' : ''}
-              </div>
-            )}
-          </div>
-        </div>
+  const getSectionIcon = (sectionType: string) => {
+    switch (sectionType) {
+      case 'hero': return <Square className="w-4 h-4" />;
+      case 'rich-text': return <Type className="w-4 h-4" />;
+      case 'cards': return <Layers className="w-4 h-4" />;
+      case 'cta-banner': return <Settings className="w-4 h-4" />;
+      case 'collection-grid': return <ImageIcon className="w-4 h-4" />;
+      default: return <Layers className="w-4 h-4" />;
+    }
+  };
 
-        <div className="flex items-center gap-1">
-          {/* Add Block Button */}
-          {schema?.blocks && schema.blocks.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Plus className="w-3 h-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {getAvailableBlocks().map((blockSchema) => (
-                  <DropdownMenuItem
-                    key={blockSchema.type}
-                    onClick={() => handleAddBlock(blockSchema.type)}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {blockSchema.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Section Actions */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MoreVertical className="w-3 h-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => duplicateSection(sectionId)}>
-                <Copy className="w-4 h-4 mr-2" />
-                Duplicate
-              </DropdownMenuItem>
-              
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuItem
-                onClick={() => moveSectionUp(sectionId)}
-                disabled={index === 0}
-              >
-                <MoveUp className="w-4 h-4 mr-2" />
-                Move Up
-              </DropdownMenuItem>
-              
-              <DropdownMenuItem
-                onClick={() => moveSectionDown(sectionId)}
-                disabled={index === total - 1}
-              >
-                <MoveDown className="w-4 h-4 mr-2" />
-                Move Down
-              </DropdownMenuItem>
-              
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuItem
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Blocks */}
-      {hasBlocks && (
-        <Collapsible open={isExpanded}>
-          <CollapsibleContent>
-            <DragDropContext
-              onDragEnd={(result) => {
-                const { destination, source, draggableId, type } = result;
-                if (!destination) return;
-                if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-                if (type === 'BLOCK') {
-                  const blockIds = blocks.map(b => b.id);
-                  blockIds.splice(source.index, 1);
-                  blockIds.splice(destination.index, 0, draggableId);
-                  reorderBlocks(sectionId, blockIds);
-                }
-              }}
-            >
-              <Droppable droppableId={`blocks-${sectionId}`} type="BLOCK">
-                {(provided) => (
-                  <div className="border-t border-border" ref={provided.innerRef} {...provided.droppableProps}>
-                    {blocks.map((block, blockIndex) => {
-                      const blockSchema = getBlockSchema(block.type);
-                      const isBlockSelected = selectedBlock === block.id;
-
-                      return (
-                        <Draggable key={block.id} draggableId={block.id} index={blockIndex}>
-                          {(dragProvided) => (
-                            <div
-                              ref={dragProvided.innerRef}
-                              {...dragProvided.draggableProps}
-                              {...dragProvided.dragHandleProps}
-                              className={`flex items-center justify-between p-2 pl-8 border-b border-border last:border-b-0 cursor-pointer hover:bg-accent/30 transition-colors ${
-                                isBlockSelected ? 'bg-accent/50' : ''
-                              }`}
-                              onClick={() => handleBlockSelect(block.id)}
-                            >
-                              <div className="flex items-center gap-2 flex-1">
-                                <Grip className="w-3 h-3 text-muted-foreground cursor-grab" />
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm">
-                                      {blockSchema?.label || block.type}
-                                    </span>
-                                    <Badge variant="secondary" className="text-xs">
-                                      {block.type}
-                                    </Badge>
-                                  </div>
-                                  {block.settings.title && (
-                                    <div className="text-xs text-muted-foreground truncate max-w-32">
-                                      {block.settings.title}
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <MoreVertical className="w-3 h-3" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => duplicateBlock(sectionId, block.id)}>
-                                    <Copy className="w-4 h-4 mr-2" />
-                                    Duplicate
-                                  </DropdownMenuItem>
-                                  
-                                  <DropdownMenuSeparator />
-                                  
-                                  <DropdownMenuItem
-                                    onClick={() => moveBlockUp(sectionId, block.id)}
-                                    disabled={blockIndex === 0}
-                                  >
-                                    <MoveUp className="w-4 h-4 mr-2" />
-                                    Move Up
-                                  </DropdownMenuItem>
-                                  
-                                  <DropdownMenuItem
-                                    onClick={() => moveBlockDown(sectionId, block.id)}
-                                    disabled={blockIndex === blocks.length - 1}
-                                  >
-                                    <MoveDown className="w-4 h-4 mr-2" />
-                                    Move Down
-                                  </DropdownMenuItem>
-                                  
-                                  <DropdownMenuSeparator />
-                                  
-                                  <DropdownMenuItem
-                                    onClick={() => removeBlock(sectionId, block.id)}
-                                    className="text-destructive focus:text-destructive"
-                                  >
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Delete
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          )}
-                        </Draggable>
-                      );
-                    })}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </CollapsibleContent>
-        </Collapsible>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Section</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this section? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => removeSection(sectionId)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-}
-
-export default function SectionsTree() {
-  const currentTemplate = useCurrentTemplate();
-  const { addSection, reorderSections } = useEditorStore();
+  const getBlockIcon = (blockType: string) => {
+    switch (blockType) {
+      case 'text': return <Type className="w-3 h-3" />;
+      case 'image': return <ImageIcon className="w-3 h-3" />;
+      case 'button': return <Square className="w-3 h-3" />;
+      case 'video': return <Square className="w-3 h-3" />;
+      default: return <Square className="w-3 h-3" />;
+    }
+  };
 
   if (!currentTemplate) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center space-y-2">
-          <EyeOff className="w-8 h-8 text-muted-foreground mx-auto" />
-          <p className="text-sm text-muted-foreground">No template selected</p>
-        </div>
+      <div className="p-4 text-center text-muted-foreground">
+        <Layers className="w-8 h-8 mx-auto mb-2" />
+        <p>No template loaded</p>
       </div>
     );
   }
-
-  const sections = currentTemplate.sections;
-  const availableSections = getAvailableSections();
 
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-3 border-b border-border bg-background/50">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="font-semibold text-sm text-foreground">Sections</h2>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="default" className="h-7 w-7 p-0 rounded-full">
-                <Plus className="w-3 h-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-              <div className="p-2">
-                <h3 className="font-medium text-sm mb-2">Add Section</h3>
-                {availableSections.map((section) => (
-                  <DropdownMenuItem
-                    key={section.type}
-                    onClick={() => addSection(section.type)}
-                    className="cursor-pointer rounded-md"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-md flex items-center justify-center mt-0.5">
-                        <Plus className="w-3 h-3 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">{section.label}</div>
-                        {section.description && (
-                          <div className="text-xs text-muted-foreground mt-0.5">
-                            {section.description}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <h2 className="font-semibold text-sm">Sections</h2>
+          <Button
+            size="sm"
+            onClick={handleAddSection}
+            className="h-6 text-xs"
+          >
+            <Plus className="w-3 h-3 mr-1" />
+            Add Section
+          </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <p className="text-xs text-muted-foreground">
-            {sections.length} section{sections.length !== 1 ? 's' : ''}
-          </p>
-          {sections.length > 0 && (
-            <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
-              Template: {currentTemplate?.id}
-            </Badge>
-          )}
-        </div>
+        <p className="text-xs text-muted-foreground">
+          {currentTemplate.sections.length} sections
+        </p>
       </div>
 
       {/* Sections List */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-3">
-          {sections.length === 0 ? (
-            <div className="text-center py-8 space-y-3">
-              <Eye className="w-8 h-8 text-muted-foreground mx-auto" />
-              <div>
-                <p className="text-sm font-medium">No sections yet</p>
-                <p className="text-xs text-muted-foreground">
-                  Add your first section to get started
-                </p>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="sm" variant="outline">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Section
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="center" className="w-56">
-                  {availableSections.map((section) => (
-                    <DropdownMenuItem
-                      key={section.type}
-                      onClick={() => addSection(section.type)}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      <div>
-                        <div className="font-medium">{section.label}</div>
-                        {section.description && (
-                          <div className="text-xs text-muted-foreground">
-                            {section.description}
-                          </div>
-                        )}
+        <div className="p-3 space-y-2">
+          {currentTemplate.sections.map((section, sectionIndex) => {
+            const sectionSchema = getSectionSchema(section.type);
+            const isExpanded = expandedSections.has(section.id);
+            const isSelected = selectedSection === section.id;
+            const isDragOver = dragOverItem?.type === 'section' && dragOverItem.id === section.id;
+            
+            return (
+              <div key={section.id} className="space-y-1">
+                {/* Section Item */}
+                <div
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, { type: 'section', id: section.id })}
+                  onDragOver={(e) => handleDragOver(e, { type: 'section', id: section.id })}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, { type: 'section', id: section.id })}
+                  className={`
+                    relative group cursor-pointer rounded-md border transition-all
+                    ${isSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
+                    ${isDragOver ? 'ring-2 ring-primary ring-opacity-50' : ''}
+                    ${draggedItem?.id === section.id ? 'opacity-50' : ''}
+                  `}
+                >
+                  {/* Drag Overlay Indicators */}
+                  {isDragOver && (
+                    <>
+                      {dragOverItem?.position === 'before' && (
+                        <div className="absolute -top-1 left-0 right-0 h-1 bg-primary rounded-full" />
+                      )}
+                      {dragOverItem?.position === 'after' && (
+                        <div className="absolute -bottom-1 left-0 right-0 h-1 bg-primary rounded-full" />
+                      )}
+                    </>
+                  )}
+
+                  <div className="p-2">
+                    <div className="flex items-center gap-2">
+                      {/* Drag Handle */}
+                      <div className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
+                        <GripVertical className="w-3 h-3" />
                       </div>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          ) : (
-            <DragDropContext
-              onDragEnd={(result: DropResult) => {
-                const { destination, source, draggableId, type } = result;
-                if (!destination) return;
-                if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-                if (type === 'SECTION') {
-                  const newOrder = Array.from(sections.map(s => s.id));
-                  newOrder.splice(source.index, 1);
-                  newOrder.splice(destination.index, 0, draggableId);
-                  reorderSections(newOrder);
-                }
-              }}
-            >
-              <Droppable droppableId="sections" type="SECTION">
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-3">
-                    {sections.map((section, index) => (
-                      <Draggable key={section.id} draggableId={section.id} index={index}>
-                        {(dragProvided) => (
-                          <div ref={dragProvided.innerRef} {...dragProvided.draggableProps} {...dragProvided.dragHandleProps}>
-                            <SectionItem
-                              sectionId={section.id}
-                              index={index}
-                              total={sections.length}
-                            />
+
+                      {/* Section Info */}
+                      <div 
+                        className="flex-1 flex items-center gap-2"
+                        onClick={() => handleSectionSelect(section.id)}
+                      >
+                        <div className="text-muted-foreground">
+                          {getSectionIcon(section.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium truncate">
+                            {sectionSchema?.label || section.type}
                           </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
+                          <div className="text-xs text-muted-foreground">
+                            {section.blocks?.length || 0} blocks
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Section Actions */}
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSectionExpanded(section.id);
+                          }}
+                          className="h-6 w-6 p-0"
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className="w-3 h-3" />
+                          ) : (
+                            <ChevronRight className="w-3 h-3" />
+                          )}
+                        </Button>
+                        
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            duplicateSection(section.id);
+                          }}
+                          className="h-6 w-6 p-0"
+                          title="Duplicate section"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                        
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveSectionUp(section.id);
+                          }}
+                          disabled={sectionIndex === 0}
+                          className="h-6 w-6 p-0"
+                          title="Move up"
+                        >
+                          <MoveUp className="w-3 h-3" />
+                        </Button>
+                        
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveSectionDown(section.id);
+                          }}
+                          disabled={sectionIndex === currentTemplate.sections.length - 1}
+                          className="h-6 w-6 p-0"
+                          title="Move down"
+                        >
+                          <MoveDown className="w-3 h-3" />
+                        </Button>
+                        
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm('Are you sure you want to delete this section?')) {
+                              removeSection(section.id);
+                            }
+                          }}
+                          className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                          title="Delete section"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Blocks List */}
+                {isExpanded && section.blocks && section.blocks.length > 0 && (
+                  <div className="ml-6 space-y-1">
+                    {section.blocks.map((block, blockIndex) => {
+                      const blockSchema = getBlockSchema(block.type);
+                      const isBlockSelected = selectedSection === section.id && selectedBlock === block.id;
+                      const isBlockDragOver = dragOverItem?.type === 'block' && dragOverItem.id === block.id;
+                      
+                      return (
+                        <div
+                          key={block.id}
+                          draggable
+                          onDragStart={(e) => handleDragStart(e, { type: 'block', id: block.id, sectionId: section.id })}
+                          onDragOver={(e) => handleDragOver(e, { type: 'block', id: block.id, sectionId: section.id })}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, { type: 'block', id: block.id, sectionId: section.id })}
+                          className={`
+                            relative group cursor-pointer rounded-md border transition-all
+                            ${isBlockSelected ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}
+                            ${isBlockDragOver ? 'ring-2 ring-primary ring-opacity-50' : ''}
+                            ${draggedItem?.id === block.id ? 'opacity-50' : ''}
+                          `}
+                        >
+                          {/* Drag Overlay Indicators */}
+                          {isBlockDragOver && (
+                            <>
+                              {dragOverItem?.position === 'before' && (
+                                <div className="absolute -top-1 left-0 right-0 h-1 bg-primary rounded-full" />
+                              )}
+                              {dragOverItem?.position === 'after' && (
+                                <div className="absolute -bottom-1 left-0 right-0 h-1 bg-primary rounded-full" />
+                              )}
+                            </>
+                          )}
+
+                          <div className="p-2">
+                            <div className="flex items-center gap-2">
+                              {/* Drag Handle */}
+                              <div className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground">
+                                <GripVertical className="w-2 h-2" />
+                              </div>
+
+                              {/* Block Info */}
+                              <div 
+                                className="flex-1 flex items-center gap-2"
+                                onClick={() => handleBlockSelect(section.id, block.id)}
+                              >
+                                <div className="text-muted-foreground">
+                                  {getBlockIcon(block.type)}
+                                </div>
+                                <div className="text-sm truncate">
+                                  {blockSchema?.label || block.type}
+                                </div>
+                              </div>
+
+                              {/* Block Actions */}
+                              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    duplicateBlock(section.id, block.id);
+                                  }}
+                                  className="h-5 w-5 p-0"
+                                  title="Duplicate block"
+                                >
+                                  <Copy className="w-2 h-2" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveBlockUp(section.id, block.id);
+                                  }}
+                                  disabled={blockIndex === 0}
+                                  className="h-5 w-5 p-0"
+                                  title="Move up"
+                                >
+                                  <MoveUp className="w-2 h-2" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveBlockDown(section.id, block.id);
+                                  }}
+                                  disabled={blockIndex === section.blocks!.length - 1}
+                                  className="h-5 w-5 p-0"
+                                  title="Move down"
+                                >
+                                  <MoveDown className="w-2 h-2" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (confirm('Are you sure you want to delete this block?')) {
+                                      removeBlock(section.id, block.id);
+                                    }
+                                  }}
+                                  className="h-5 w-5 p-0 text-destructive hover:text-destructive"
+                                  title="Delete block"
+                                >
+                                  <Trash2 className="w-2 h-2" />
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Add Block Button */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleAddBlock(section.id)}
+                      className="w-full h-8 text-xs"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add Block
+                    </Button>
                   </div>
                 )}
-              </Droppable>
-            </DragDropContext>
-          )}
+
+                {/* Add Block Button (when section is collapsed) */}
+                {!isExpanded && (
+                  <div className="ml-6">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleAddBlock(section.id)}
+                      className="w-full h-8 text-xs"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Add Block
+                    </Button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </ScrollArea>
+
+      {/* Empty State */}
+      {currentTemplate.sections.length === 0 && (
+        <div className="p-4 text-center text-muted-foreground">
+          <Layers className="w-8 h-8 mx-auto mb-2" />
+          <p className="text-sm">No sections yet</p>
+          <p className="text-xs">Add your first section to get started</p>
+        </div>
+      )}
     </div>
   );
 }

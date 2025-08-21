@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // TEMPORARY: Allow public access for testing
+    // WARNING: This is not secure for production
+    match /{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}
