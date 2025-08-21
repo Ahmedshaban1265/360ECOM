@@ -183,15 +183,6 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         <Footer language={language} />
       </div>
 
-      {/* Responsive utilities overlay */}
-      {deviceType !== 'desktop' && (
-        <div className="responsive-utils">
-          <div>Device: {deviceType}</div>
-          <div>Width: {deviceType === 'mobile' ? '375px' : '768px'}</div>
-          <div>Breakpoint: {deviceType === 'mobile' ? 'sm' : 'md'}</div>
-        </div>
-      )}
-
       {/* Enhanced editing overlay styles */}
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -221,13 +212,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             pointer-events: none;
           }
 
-          .live-website-renderer a {
-            pointer-events: none;
-          }
-
-          .live-website-renderer button {
-            pointer-events: auto;
-          }
+          .live-website-renderer a { pointer-events: none; }
+          .live-website-renderer button { pointer-events: auto; }
 
           /* Enhanced responsive behavior */
           .editor-responsive-mode {
@@ -240,155 +226,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             margin: 0 auto !important;
           }
 
-          .editor-responsive-mode .grid {
-            display: grid !important;
-          }
-
-          /* Mobile-specific responsive utilities */
-          .mobile-viewport .hidden-mobile,
-          .mobile-viewport .md\\:block,
-          .mobile-viewport .lg\\:block {
-            display: none !important;
-          }
-
-          .mobile-viewport .block-mobile,
-          .mobile-viewport .md\\:hidden,
-          .mobile-viewport .lg\\:hidden {
-            display: block !important;
-          }
-
-          /* Tablet-specific responsive utilities */
-          .tablet-viewport .hidden-tablet,
-          .tablet-viewport .lg\\:block {
-            display: none !important;
-          }
-
-          .tablet-viewport .block-tablet,
-          .tablet-viewport .lg\\:hidden {
-            display: block !important;
-          }
-
-          /* Force responsive grid layouts */
-          .mobile-viewport .grid-cols-1,
-          .mobile-viewport .grid-cols-2,
-          .mobile-viewport .grid-cols-3,
-          .mobile-viewport .grid-cols-4 {
-            grid-template-columns: 1fr !important;
-          }
-
-          .tablet-viewport .grid-cols-1 {
-            grid-template-columns: 1fr !important;
-          }
-
-          .tablet-viewport .grid-cols-2,
-          .tablet-viewport .grid-cols-3,
-          .tablet-viewport .grid-cols-4 {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-
-          /* Responsive spacing utilities */
-          .mobile-viewport .p-4,
-          .mobile-viewport .px-4,
-          .mobile-viewport .py-4 {
-            padding: 0.75rem !important;
-          }
-
-          .mobile-viewport .m-4,
-          .mobile-viewport .mx-4,
-          .mobile-viewport .my-4 {
-            margin: 0.5rem !important;
-          }
-
-          .tablet-viewport .p-4,
-          .tablet-viewport .px-4,
-          .tablet-viewport .py-4 {
-            padding: 1rem !important;
-          }
-
-          .tablet-viewport .m-4,
-          .tablet-viewport .mx-4,
-          .tablet-viewport .my-4 {
-            margin: 0.75rem !important;
-          }
-
-          /* Responsive text sizing */
-          .mobile-viewport .text-lg {
-            font-size: 1rem !important;
-          }
-
-          .mobile-viewport .text-xl {
-            font-size: 1.125rem !important;
-          }
-
-          .mobile-viewport .text-2xl {
-            font-size: 1.25rem !important;
-          }
-
-          .mobile-viewport .text-3xl {
-            font-size: 1.5rem !important;
-          }
-
-          .tablet-viewport .text-lg {
-            font-size: 1.125rem !important;
-          }
-
-          .tablet-viewport .text-xl {
-            font-size: 1.25rem !important;
-          }
-
-          .tablet-viewport .text-2xl {
-            font-size: 1.5rem !important;
-          }
-
-          .tablet-viewport .text-3xl {
-            font-size: 1.875rem !important;
-          }
-
-          /* Responsive navigation */
-          .mobile-viewport nav {
-            padding: 0.5rem 0.75rem !important;
-          }
-
-          .tablet-viewport nav {
-            padding: 0.75rem 1rem !important;
-          }
-
-          /* Responsive images */
-          .mobile-viewport img {
-            max-width: 100% !important;
-            height: auto !important;
-          }
-
-          .tablet-viewport img {
-            max-width: 100% !important;
-            height: auto !important;
-          }
-
-          /* Responsive buttons */
-          .mobile-viewport button {
-            padding: 0.5rem 1rem !important;
-            font-size: 0.875rem !important;
-          }
-
-          .tablet-viewport button {
-            padding: 0.75rem 1.5rem !important;
-            font-size: 1rem !important;
-          }
-
-          /* Responsive forms */
-          .mobile-viewport input,
-          .mobile-viewport textarea,
-          .mobile-viewport select {
-            padding: 0.5rem !important;
-            font-size: 0.875rem !important;
-          }
-
-          .tablet-viewport input,
-          .tablet-viewport textarea,
-          .tablet-viewport select {
-            padding: 0.75rem !important;
-            font-size: 1rem !important;
-          }
+          .editor-responsive-mode .grid { display: grid !important; }
         `
       }} />
     </div>

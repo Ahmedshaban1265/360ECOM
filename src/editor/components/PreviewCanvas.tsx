@@ -31,8 +31,6 @@ import {
 // Preview Renderers
 import { ThemeRenderer } from '../renderers/ThemeRenderer';
 import LiveWebsiteRenderer from './LiveWebsiteRenderer';
-import ResponsiveUtilities from './ResponsiveUtilities';
-import ResponsiveTestingPanel from './ResponsiveTestingPanel';
 import { elementDiscoveryService } from '../services/ElementDiscoveryService';
 
 // Real responsive breakpoints from your actual code
@@ -93,10 +91,6 @@ export default function PreviewCanvas() {
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showDeviceInfo, setShowDeviceInfo] = useState(true);
-  const [showResponsiveUtilities, setShowResponsiveUtilities] = useState(true);
-  const [showResponsiveTestingPanel, setShowResponsiveTestingPanel] = useState(false);
-  const [customWidth, setCustomWidth] = useState('');
   const canvasRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -168,21 +162,6 @@ export default function PreviewCanvas() {
       document.exitFullscreen();
       setIsFullscreen(false);
     }
-  };
-
-  // Test custom width for responsive behavior
-  const testCustomWidth = () => {
-    if (customWidth) {
-      const root = document.documentElement;
-      root.style.setProperty('--custom-test-width', customWidth);
-      root.classList.add('custom-width-test');
-    }
-  };
-
-  const resetCustomWidth = () => {
-    const root = document.documentElement;
-    root.classList.remove('custom-width-test');
-    root.style.removeProperty('--custom-test-width');
   };
 
   // Calculate canvas dimensions and styles for different devices
@@ -377,89 +356,6 @@ export default function PreviewCanvas() {
           >
             <Maximize className="w-3 h-3" />
           </Button>
-
-          {/* Device Info Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowDeviceInfo(!showDeviceInfo)}
-            className="h-7 w-7 p-0"
-            title="Toggle Device Info"
-          >
-            <Eye className="w-3 h-3" />
-          </Button>
-
-          {/* Responsive Utilities Toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowResponsiveUtilities(!showResponsiveUtilities)}
-            className="h-7 w-7 p-0"
-            title="Toggle Responsive Utilities"
-          >
-            <Tablet className="w-3 h-3" />
-          </Button>
-
-          {/* Responsive Testing Panel Toggle */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowResponsiveTestingPanel(!showResponsiveTestingPanel)}
-            className="h-7 px-3 text-xs"
-            title="Open Responsive Testing Panel"
-          >
-            Test
-          </Button>
-        </div>
-      </div>
-
-      {/* Device Info Bar */}
-      {showDeviceInfo && deviceType !== 'desktop' && (
-        <div className="px-3 py-2 bg-muted/30 border-b border-border text-xs text-muted-foreground">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span><strong>Device:</strong> {deviceConfig.name}</span>
-              <span><strong>Viewport:</strong> {deviceConfig.viewport}</span>
-              <span><strong>Breakpoint:</strong> {deviceConfig.breakpoint}</span>
-              <span><strong>Real Width:</strong> {deviceConfig.realBreakpoint}px</span>
-              <span><strong>Dimensions:</strong> {deviceConfig.width} × {deviceConfig.height}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs">
-                CSS: @media (max-width: {deviceConfig.realBreakpoint}px)
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Custom Width Testing */}
-      <div className="px-3 py-2 bg-blue-50 dark:bg-blue-950/20 border-b border-blue-200 dark:border-blue-800">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-blue-700 dark:text-blue-300">Test Custom Width:</span>
-          <input
-            type="text"
-            placeholder="e.g., 500px, 50vw, 100%"
-            value={customWidth}
-            onChange={(e) => setCustomWidth(e.target.value)}
-            className="flex-1 px-2 py-1 text-xs border border-blue-200 dark:border-blue-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-          />
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={testCustomWidth}
-            className="h-6 px-2 text-xs"
-          >
-            Test
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={resetCustomWidth}
-            className="h-6 px-2 text-xs"
-          >
-            Reset
-          </Button>
         </div>
       </div>
 
@@ -509,15 +405,6 @@ export default function PreviewCanvas() {
           </div>
         </div>
       </div>
-
-      {/* Responsive Utilities */}
-      {showResponsiveUtilities && <ResponsiveUtilities />}
-
-      {/* Responsive Testing Panel */}
-      <ResponsiveTestingPanel
-        isOpen={showResponsiveTestingPanel}
-        onClose={() => setShowResponsiveTestingPanel(false)}
-      />
 
       {/* Real responsive design styles based on your actual code */}
       <style dangerouslySetInnerHTML={{
@@ -665,41 +552,6 @@ export default function PreviewCanvas() {
             line-height: 5rem !important;
           }
 
-          /* Custom width testing */
-          .custom-width-test .live-website-renderer {
-            width: var(--custom-test-width) !important;
-            max-width: var(--custom-test-width) !important;
-            margin: 0 auto !important;
-            border: 2px dashed #3b82f6 !important;
-          }
-
-          /* Responsive utilities that work in editor */
-          .responsive-utils {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 12px;
-            pointer-events: none;
-          }
-          
-          /* Force responsive behavior in editor */
-          .editor-responsive-mode .mobile-viewport {
-            width: 375px !important;
-            max-width: 375px !important;
-            overflow-x: hidden !important;
-          }
-          
-          .editor-responsive-mode .tablet-viewport {
-            width: 768px !important;
-            max-width: 768px !important;
-            overflow-x: hidden !important;
-          }
-          
           /* Ensure proper scaling */
           .editor-responsive-mode * {
             box-sizing: border-box !important;
