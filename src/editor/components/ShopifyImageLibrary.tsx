@@ -45,6 +45,7 @@ export default function ShopifyImageLibrary({
   const [fileSizeFilter, setFileSizeFilter] = useState('all');
   const [usedInFilter, setUsedInFilter] = useState('all');
   const [isDragOver, setIsDragOver] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropAreaRef = useRef<HTMLDivElement>(null);
