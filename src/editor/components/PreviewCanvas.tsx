@@ -96,36 +96,7 @@ export default function PreviewCanvas() {
 
   const deviceConfig = DEVICE_PRESETS[deviceType];
 
-  // Apply real responsive behavior based on device type
-  useEffect(() => {
-    const root = document.documentElement;
-    
-    // Remove any existing responsive classes
-    root.classList.remove('real-responsive-mobile', 'real-responsive-tablet', 'real-responsive-desktop');
-    
-    // Add the appropriate responsive class
-    switch (deviceType) {
-      case 'mobile':
-        root.classList.add('real-responsive-mobile');
-        break;
-      case 'tablet':
-        root.classList.add('real-responsive-tablet');
-        break;
-      case 'desktop':
-        root.classList.add('real-responsive-desktop');
-        break;
-    }
-
-    // Set CSS custom properties for real breakpoints
-    root.style.setProperty('--current-breakpoint', deviceConfig.realBreakpoint.toString());
-    root.style.setProperty('--current-viewport-width', deviceConfig.width.toString());
-    
-    return () => {
-      root.classList.remove('real-responsive-mobile', 'real-responsive-tablet', 'real-responsive-desktop');
-      root.style.removeProperty('--current-breakpoint');
-      root.style.removeProperty('--current-viewport-width');
-    };
-  }, [deviceType, deviceConfig]);
+  // No global document mutations for preview sizing; handled locally in the canvas
 
   // Handle device type changes
   const handleDeviceChange = (newDevice: string) => {
