@@ -16,7 +16,8 @@ import {
   X
 } from 'lucide-react';
 import { editingService } from '../services/EditingService';
-import ImageSelectionModal, { ImageItem } from './ImageSelectionModal';
+import ImageSelectionModal from './ImageSelectionModal';
+import { ImageItem } from './ShopifyImageLibrary';
 
 interface ElementEditorProps {
   element: HTMLElement | null;
