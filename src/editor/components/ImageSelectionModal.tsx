@@ -4,15 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { uploadMedia } from '@/editor/services/MediaService';
-import ShopifyImageLibrary from './ShopifyImageLibrary';
-
-interface ImageItem {
-  url: string;
-  path: string;
-  name: string;
-  size?: number;
-  uploadedAt?: Date;
-}
+import ShopifyImageLibrary, { ImageItem } from './ShopifyImageLibrary';
 
 interface ImageSelectionModalProps {
   open: boolean;
