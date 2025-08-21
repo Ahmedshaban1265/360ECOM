@@ -288,38 +288,24 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
           <Input
             value={localValue}
             onChange={(e) => handleChange(e.target.value)}
-            placeholder="Image URL or upload"
+            placeholder="Image URL"
             className={!isValid ? 'border-destructive' : ''}
           />
-          <label className="block w-full">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                try {
-                  const progressBar = document.createElement('div');
-                  progressBar.className = 'w-full h-2 bg-muted rounded overflow-hidden';
-                  const inner = document.createElement('div');
-                  inner.className = 'h-full bg-primary transition-all';
-                  progressBar.appendChild(inner);
-                  (e.target.parentElement as HTMLElement).appendChild(progressBar);
-                  const result = await uploadMedia(file, 'theme-media', (pct) => {
-                    inner.style.width = pct + '%';
-                  });
-                  handleChange(result.url);
-                  progressBar.remove();
-                } catch (err) {
-                  console.error('Upload failed', err);
-                }
-              }}
-              className="hidden"
-            />
-            <Button asChild variant="outline" size="sm" className="w-full">
-              <span>Upload Image</span>
-            </Button>
-          </label>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => setShowImageSelection(true)}
+          >
+            Select Image
+          </Button>
+          <ImageSelectionModal
+            open={showImageSelection}
+            onOpenChange={setShowImageSelection}
+            onSelect={(image) => {
+              handleChange(image.url);
+            }}
+          />
           {localValue && (
             <div className="mt-2">
               <img
