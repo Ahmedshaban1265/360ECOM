@@ -62,53 +62,49 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
 });
 DialogContent.displayName = "DialogContent";
 
-function DialogHeader({
-  className,
-  ...props
-}) {
+const DialogHeader = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <div
+      ref={ref}
       data-slot="dialog-header"
       className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
       {...props} />
   );
-}
+});
+DialogHeader.displayName = "DialogHeader";
 
-function DialogFooter({
-  className,
-  ...props
-}) {
+const DialogFooter = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <div
+      ref={ref}
       data-slot="dialog-footer"
       className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
       {...props} />
   );
-}
+});
+DialogFooter.displayName = "DialogFooter";
 
-function DialogTitle({
-  className,
-  ...props
-}) {
+const DialogTitle = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <DialogPrimitive.Title
+      ref={ref}
       data-slot="dialog-title"
       className={cn("text-lg leading-none font-semibold", className)}
       {...props} />
   );
-}
+});
+DialogTitle.displayName = "DialogTitle";
 
-function DialogDescription({
-  className,
-  ...props
-}) {
+const DialogDescription = React.forwardRef(({ className, ...props }, ref) => {
   return (
     <DialogPrimitive.Description
+      ref={ref}
       data-slot="dialog-description"
       className={cn("text-muted-foreground text-sm", className)}
       {...props} />
   );
-}
+});
+DialogDescription.displayName = "DialogDescription";
 
 export {
   Dialog,
