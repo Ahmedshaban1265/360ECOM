@@ -4,32 +4,25 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-function Select({
-  ...props
-}) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />;
-}
+const Select = React.forwardRef(({ ...props }, ref) => {
+  return <SelectPrimitive.Root ref={ref} data-slot="select" {...props} />;
+});
+Select.displayName = "Select";
 
-function SelectGroup({
-  ...props
-}) {
-  return <SelectPrimitive.Group data-slot="select-group" {...props} />;
-}
+const SelectGroup = React.forwardRef(({ ...props }, ref) => {
+  return <SelectPrimitive.Group ref={ref} data-slot="select-group" {...props} />;
+});
+SelectGroup.displayName = "SelectGroup";
 
-function SelectValue({
-  ...props
-}) {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />;
-}
+const SelectValue = React.forwardRef(({ ...props }, ref) => {
+  return <SelectPrimitive.Value ref={ref} data-slot="select-value" {...props} />;
+});
+SelectValue.displayName = "SelectValue";
 
-function SelectTrigger({
-  className,
-  size = "default",
-  children,
-  ...props
-}) {
+const SelectTrigger = React.forwardRef(({ className, size = "default", children, ...props }, ref) => {
   return (
     <SelectPrimitive.Trigger
+      ref={ref}
       data-slot="select-trigger"
       data-size={size}
       className={cn(
@@ -43,7 +36,8 @@ function SelectTrigger({
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
-}
+});
+SelectTrigger.displayName = "SelectTrigger";
 
 function SelectContent({
   className,
