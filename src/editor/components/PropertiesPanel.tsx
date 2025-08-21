@@ -55,6 +55,7 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
   const [localValue, setLocalValue] = useState(value ?? field.default ?? '');
   const [isValid, setIsValid] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showImageSelection, setShowImageSelection] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout>();
 
   // Update local value when prop value changes
