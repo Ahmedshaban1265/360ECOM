@@ -32,6 +32,7 @@ import {
 import { ThemeRenderer } from '../renderers/ThemeRenderer';
 import LiveWebsiteRenderer from './LiveWebsiteRenderer';
 import { elementDiscoveryService } from '../services/ElementDiscoveryService';
+import ResponsiveTestingPanel from './ResponsiveTestingPanel';
 
 // Real responsive breakpoints from your actual code
 const REAL_RESPONSIVE_BREAKPOINTS = {
@@ -91,6 +92,7 @@ export default function PreviewCanvas() {
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResponsivePanelOpen, setIsResponsivePanelOpen] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -327,6 +329,17 @@ export default function PreviewCanvas() {
           >
             <Maximize className="w-3 h-3" />
           </Button>
+
+          {/* Responsive Testing Panel Toggle */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsResponsivePanelOpen(true)}
+            className="h-7 px-2 text-xs"
+            title="Open Responsive Testing Panel"
+          >
+            Test
+          </Button>
         </div>
       </div>
 
@@ -368,9 +381,18 @@ export default function PreviewCanvas() {
               </div>
             ) : (
               <div className="h-full overflow-y-auto">
-                <LiveWebsiteRenderer
-                  onElementClick={handleElementClick}
-                />
+                {/* Apply real responsive wrapper classes for accurate previews */}
+                <div className={
+                  deviceType === 'mobile'
+                    ? 'real-responsive-mobile'
+                    : deviceType === 'tablet'
+                      ? 'real-responsive-tablet'
+                      : 'real-responsive-desktop'
+                }>
+                  <LiveWebsiteRenderer
+                    onElementClick={handleElementClick}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -551,6 +573,12 @@ export default function PreviewCanvas() {
           }
         `
       }} />
+
+      {/* Responsive Testing Panel */}
+      <ResponsiveTestingPanel
+        isOpen={isResponsivePanelOpen}
+        onClose={() => setIsResponsivePanelOpen(false)}
+      />
     </div>
   );
 }

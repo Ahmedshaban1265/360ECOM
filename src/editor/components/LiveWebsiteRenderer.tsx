@@ -86,21 +86,17 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         element.setAttribute('data-editable', 'true');
         
         // Add hover effect
-        element.addEventListener('mouseenter', () => {
+        const mouseEnterHandler = () => {
           element.style.outline = '2px solid #3b82f6';
           element.style.outlineOffset = '2px';
-        });
-        
-        element.addEventListener('mouseleave', () => {
+        };
+        const mouseLeaveHandler = () => {
           element.style.outline = '';
           element.style.outlineOffset = '';
-        });
-
-        // Add click handler
-        element.addEventListener('click', (e) => {
-          // Prevent navigation for anchor tags (and their children) inside the editor
+        };
+        const clickHandler = (e: Event) => {
           const target = e.target as HTMLElement;
-          const anchor = target && target.closest ? target.closest('a') : null;
+          const anchor = target && (target.closest ? target.closest('a') : null);
           if (anchor) {
             e.preventDefault();
           }
@@ -109,7 +105,14 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
           if (onElementClick) {
             onElementClick(element, editableElement.type);
           }
-        });
+        };
+
+        element.addEventListener('mouseenter', mouseEnterHandler);
+        element.addEventListener('mouseleave', mouseLeaveHandler);
+        element.addEventListener('click', clickHandler);
+
+        // Store handlers for cleanup
+        (element as any)._editorHandlers = { mouseEnterHandler, mouseLeaveHandler, clickHandler };
       });
     }, 500);
 
@@ -124,6 +127,13 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         element.removeAttribute('data-editable');
         element.style.outline = '';
         element.style.outlineOffset = '';
+        const handlers = (element as any)._editorHandlers;
+        if (handlers) {
+          element.removeEventListener('mouseenter', handlers.mouseEnterHandler);
+          element.removeEventListener('mouseleave', handlers.mouseLeaveHandler);
+          element.removeEventListener('click', handlers.clickHandler);
+          delete (element as any)._editorHandlers;
+        }
       });
     };
   }, [selectedTemplate, onElementClick]);

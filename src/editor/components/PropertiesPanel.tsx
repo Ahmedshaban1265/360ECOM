@@ -154,15 +154,30 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
     }
   };
 
-  // Color picker component with palette
+  // Color picker component with palette and validation (HEX, RGB, HSL, named)
   const ColorPicker = ({ value, onChange }: { value: string; onChange: (color: string) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [customColor, setCustomColor] = useState(value);
+    const [colorValid, setColorValid] = useState(true);
+
+    const isValidColor = (input: string) => {
+      if (!input) return false;
+      const ctx = document.createElement('canvas').getContext('2d');
+      if (!ctx) return false;
+      ctx.fillStyle = '#000';
+      ctx.fillStyle = input.trim();
+      // Browser will ignore invalid colors and keep previous value
+      return ctx.fillStyle !== '#000' || input.trim().toLowerCase() === '#000' || input.trim().toLowerCase() === 'black';
+    };
 
     const handleColorChange = (color: string) => {
       setCustomColor(color);
-      onChange(color);
-      setIsOpen(false);
+      const ok = isValidColor(color);
+      setColorValid(ok);
+      if (ok) {
+        onChange(color);
+        setIsOpen(false);
+      }
     };
 
     const copyToClipboard = async () => {
@@ -246,6 +261,9 @@ function FieldRenderer({ field, value, onChange }: FieldRendererProps) {
             placeholder="#000000"
             className="flex-1"
           />
+          {!colorValid && (
+            <span className="text-xs text-destructive">Invalid color</span>
+          )}
           
           <Button
             size="sm"

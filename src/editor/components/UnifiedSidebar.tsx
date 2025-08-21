@@ -5,6 +5,7 @@ import SectionsTree from './SectionsTree';
 import PropertiesPanel from './PropertiesPanel';
 import LeftNavTemplates from './LeftNavTemplates';
 import ImageLibrary from './ImageLibrary';
+import { elementDiscoveryService } from '../services/ElementDiscoveryService';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -59,11 +60,26 @@ const SIDEBAR_TABS: SidebarTabConfig[] = [
     id: 'media',
     label: 'Media',
     icon: ImageIcon,
-    component: () => (
-      <div className="h-full">
-        <ImageLibrary onSelect={() => {}} />
-      </div>
-    )
+    component: () => {
+      const selectedElement = useEditorStore.getState().selectedElement as HTMLElement | null;
+      return (
+        <div className="h-full">
+          <ImageLibrary onSelect={(img) => {
+            // If an editable element is selected and is an <img>, update its src directly for instant feedback
+            if (selectedElement) {
+              const editable = elementDiscoveryService.getElementByElement(selectedElement);
+              if (editable && selectedElement instanceof HTMLImageElement) {
+                selectedElement.src = img.url;
+                try {
+                  // Persist via editing service path through discovery service
+                  elementDiscoveryService.applyElementEdit(editable.id, 'src', img.url);
+                } catch {}
+              }
+            }
+          }} />
+        </div>
+      );
+    }
   },
   {
     id: 'pages',
