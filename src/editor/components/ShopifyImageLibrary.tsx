@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Search, Upload, Image as ImageIcon, X, Check, Plus, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface ImageItem {
+export interface ImageItem {
   url: string;
   path: string;
   name: string;
