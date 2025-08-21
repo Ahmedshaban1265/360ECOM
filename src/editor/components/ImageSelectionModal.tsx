@@ -96,6 +96,7 @@ export default function ImageSelectionModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Add Image</DialogTitle>
+          <p className="sr-only">Upload a new image or pick from the image library</p>
         </DialogHeader>
         
         <div className="space-y-4 py-4">

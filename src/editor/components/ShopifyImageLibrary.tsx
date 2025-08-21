@@ -410,6 +410,7 @@ export default function ShopifyImageLibrary({
       <DialogContent className="max-w-6xl max-h-[90vh] p-0">
         <DialogHeader className="p-6 pb-4">
           <DialogTitle className="text-xl">Images</DialogTitle>
+          <p className="sr-only">Browse, upload, and select images from the media library</p>
         </DialogHeader>
         
         <div className="flex-1 overflow-hidden">
@@ -543,7 +544,12 @@ export default function ShopifyImageLibrary({
                   <div className="flex flex-col items-center justify-center h-32 text-center p-4">
                     <AlertCircle className="w-8 h-8 text-destructive mb-2" />
                     <p className="text-sm text-destructive mb-2">Connection Failed</p>
-                    <p className="text-xs text-muted-foreground mb-3">{connectionError}</p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {connectionError}
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      If this persists on a preview domain, ensure Firebase Storage CORS rules allow this origin and App Check (if enabled) trusts this site.
+                    </p>
                     <Button
                       onClick={handleRetry}
                       size="sm"
