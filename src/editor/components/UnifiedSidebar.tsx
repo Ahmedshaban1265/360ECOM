@@ -59,11 +59,7 @@ const SIDEBAR_TABS: SidebarTabConfig[] = [
     id: 'media',
     label: 'Media',
     icon: ImageIcon,
-    component: () => (
-      <div className="h-full">
-        <ImageLibrary onSelect={() => {}} />
-      </div>
-    )
+    component: () => <MediaPanel />
   },
   {
     id: 'pages',
