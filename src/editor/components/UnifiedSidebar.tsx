@@ -29,6 +29,47 @@ import {
   X
 } from 'lucide-react';
 
+// Media Panel Component
+function MediaPanel() {
+  const [showImageLibrary, setShowImageLibrary] = useState(false);
+
+  const handleImageSelect = (images: ImageItem[]) => {
+    // Here you can handle the selected images
+    // For example, copy to clipboard, insert into content, etc.
+    console.log('Selected images:', images);
+    setShowImageLibrary(false);
+  };
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="p-4 border-b">
+        <h3 className="font-medium mb-4">Media Library</h3>
+        <Button
+          onClick={() => setShowImageLibrary(true)}
+          className="w-full"
+        >
+          <ImageIcon className="w-4 h-4 mr-2" />
+          Browse Images
+        </Button>
+      </div>
+
+      <div className="flex-1 p-4">
+        <div className="text-center text-sm text-muted-foreground">
+          <ImageIcon className="w-8 h-8 mx-auto mb-2 opacity-50" />
+          <p>Click "Browse Images" to access your image library</p>
+        </div>
+      </div>
+
+      <ShopifyImageLibrary
+        open={showImageLibrary}
+        onOpenChange={setShowImageLibrary}
+        onSelect={handleImageSelect}
+        multiple={true}
+      />
+    </div>
+  );
+}
+
 interface SidebarTabConfig {
   id: SidebarTab;
   label: string;
