@@ -48,38 +48,106 @@ export default function ShopifyImageLibrary({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropAreaRef = useRef<HTMLDivElement>(null);
 
-  const loadImages = useCallback(async () => {
+  const loadImages = useCallback(async (retryCount = 0) => {
+    const maxRetries = 3;
     setIsLoading(true);
+
     try {
-      const folderRef = ref(storage, root);
-      const res = await listAll(folderRef);
-      
-      const imageItems: ImageItem[] = await Promise.all(
-        res.items
-          .filter(item => {
-            const name = item.name.toLowerCase();
-            return name.endsWith('.jpg') || name.endsWith('.jpeg') || 
-                   name.endsWith('.png') || name.endsWith('.gif') || 
-                   name.endsWith('.webp') || name.endsWith('.svg');
-          })
-          .map(async (itemRef) => {
-            const url = await getDownloadURL(itemRef);
-            return {
-              url,
-              path: itemRef.fullPath,
-              name: itemRef.name,
-              uploadedAt: new Date(parseInt(itemRef.name.split('-')[0]) || Date.now())
-            };
-          })
-      );
-      
+      console.log(`Loading images... (attempt ${retryCount + 1})`);
+
+      // Add timeout for the operation
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Operation timeout')), 30000); // 30 second timeout
+      });
+
+      const loadPromise = async () => {
+        const folderRef = ref(storage, root);
+
+        // Try to list with exponential backoff
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+        if (retryCount > 0) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        const res = await listAll(folderRef);
+
+        // Process images in smaller batches to avoid overwhelming Firebase
+        const batchSize = 10;
+        const imageItems: ImageItem[] = [];
+        const filteredItems = res.items.filter(item => {
+          const name = item.name.toLowerCase();
+          return name.endsWith('.jpg') || name.endsWith('.jpeg') ||
+                 name.endsWith('.png') || name.endsWith('.gif') ||
+                 name.endsWith('.webp') || name.endsWith('.svg');
+        });
+
+        for (let i = 0; i < filteredItems.length; i += batchSize) {
+          const batch = filteredItems.slice(i, i + batchSize);
+          const batchPromises = batch.map(async (itemRef) => {
+            try {
+              const url = await getDownloadURL(itemRef);
+              return {
+                url,
+                path: itemRef.fullPath,
+                name: itemRef.name,
+                uploadedAt: new Date(parseInt(itemRef.name.split('-')[0]) || Date.now())
+              };
+            } catch (urlError) {
+              console.warn(`Failed to get download URL for ${itemRef.name}:`, urlError);
+              return null;
+            }
+          });
+
+          const batchResults = await Promise.all(batchPromises);
+          imageItems.push(...batchResults.filter(item => item !== null) as ImageItem[]);
+
+          // Small delay between batches
+          if (i + batchSize < filteredItems.length) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+
+        return imageItems;
+      };
+
+      const imageItems = await Promise.race([loadPromise(), timeoutPromise]) as ImageItem[];
+
       // Sort by upload date (newest first)
       imageItems.sort((a, b) => (b.uploadedAt?.getTime() || 0) - (a.uploadedAt?.getTime() || 0));
-      
+
       setImages(imageItems);
       setFilteredImages(imageItems);
-    } catch (e) {
-      console.error('Failed to load images', e);
+
+      console.log(`Successfully loaded ${imageItems.length} images`);
+
+    } catch (error: any) {
+      console.error(`Failed to load images (attempt ${retryCount + 1}):`, error);
+
+      // Handle specific Firebase errors
+      if (error?.code === 'storage/retry-limit-exceeded' ||
+          error?.code === 'storage/timeout' ||
+          error?.message === 'Operation timeout') {
+
+        if (retryCount < maxRetries) {
+          console.log(`Retrying... (${retryCount + 1}/${maxRetries})`);
+          // Retry with exponential backoff
+          setTimeout(() => loadImages(retryCount + 1), Math.min(1000 * Math.pow(2, retryCount), 5000));
+          return;
+        } else {
+          console.error('Max retries exceeded. Please check your internet connection and Firebase configuration.');
+          // Set empty array if all retries failed
+          setImages([]);
+          setFilteredImages([]);
+        }
+      } else if (error?.code === 'storage/object-not-found') {
+        console.log('No images folder found, starting with empty library');
+        setImages([]);
+        setFilteredImages([]);
+      } else {
+        console.error('Unexpected error loading images:', error);
+        setImages([]);
+        setFilteredImages([]);
+      }
     } finally {
       setIsLoading(false);
     }
