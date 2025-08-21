@@ -539,7 +539,22 @@ export default function ShopifyImageLibrary({
 
               {/* Images Grid */}
               <ScrollArea className="h-64">
-                {isLoading ? (
+                {connectionError ? (
+                  <div className="flex flex-col items-center justify-center h-32 text-center p-4">
+                    <AlertCircle className="w-8 h-8 text-destructive mb-2" />
+                    <p className="text-sm text-destructive mb-2">Connection Failed</p>
+                    <p className="text-xs text-muted-foreground mb-3">{connectionError}</p>
+                    <Button
+                      onClick={handleRetry}
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      Retry Connection
+                    </Button>
+                  </div>
+                ) : isLoading ? (
                   <div className="flex items-center justify-center h-32">
                     <div className="text-sm text-muted-foreground">Loading images...</div>
                   </div>
