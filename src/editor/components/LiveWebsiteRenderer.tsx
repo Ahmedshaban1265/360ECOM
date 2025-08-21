@@ -98,8 +98,10 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
 
         // Add click handler
         element.addEventListener('click', (e) => {
-          // Prevent navigation for anchor tags inside the editor
-          if (e.target instanceof HTMLAnchorElement) {
+          // Prevent navigation for anchor tags (and their children) inside the editor
+          const target = e.target as HTMLElement;
+          const anchor = target && target.closest ? target.closest('a') : null;
+          if (anchor) {
             e.preventDefault();
           }
           e.stopPropagation();
