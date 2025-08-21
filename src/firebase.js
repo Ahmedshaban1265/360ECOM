@@ -3,6 +3,7 @@ import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getStorage, connectStorageEmulator } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCF7d1iVPi1rSiHRfFOvY_HmIcykZMojbw",
@@ -38,6 +39,27 @@ try {
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Optional: Initialize App Check if site key is provided at build time
+try {
+  if (typeof window !== 'undefined') {
+    const siteKey = import.meta?.env?.VITE_RECAPTCHA_V3_SITE_KEY;
+    const debugToken = import.meta?.env?.VITE_APPCHECK_DEBUG_TOKEN;
+    if (debugToken) {
+      // eslint-disable-next-line no-undef
+      self.FIREBASE_APPCHECK_DEBUG_TOKEN = debugToken;
+    }
+    if (siteKey) {
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(siteKey),
+        isTokenAutoRefreshEnabled: true,
+      });
+      console.log('🛡️ Firebase App Check initialized');
+    }
+  }
+} catch (appCheckError) {
+  console.warn('App Check initialization failed or skipped:', appCheckError);
+}
 
 // Connect to emulators in development
 if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {

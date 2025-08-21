@@ -71,12 +71,19 @@ export default function ImageSelectionModal({
     setView('selection');
   };
 
+  const handleLibraryOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setView('selection');
+      onOpenChange(false);
+    }
+  };
+
   // If showing the library view, render the ShopifyImageLibrary
   if (view === 'library') {
     return (
       <ShopifyImageLibrary
-        open={true}
-        onOpenChange={handleCloseLibrary}
+        open={open}
+        onOpenChange={handleLibraryOpenChange}
         onSelect={handleLibrarySelect}
         multiple={multiple}
       />
@@ -89,6 +96,7 @@ export default function ImageSelectionModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Add Image</DialogTitle>
+          <p className="sr-only">Upload a new image or pick from the image library</p>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
