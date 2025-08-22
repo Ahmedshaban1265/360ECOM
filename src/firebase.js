@@ -39,19 +39,16 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Connect to emulators in development
-if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+// Connect to emulators only when explicitly enabled
+const shouldUseEmulators = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' && (import.meta?.env?.VITE_USE_FIREBASE_EMULATORS === 'true')
+);
+
+if (shouldUseEmulators) {
   try {
-    // Only connect if not already connected
-    if (!auth._delegate._isConnected) {
-      connectAuthEmulator(auth, 'http://localhost:9099');
-    }
-    if (!db._delegate._databaseId.projectId.includes('demo-')) {
-      connectFirestoreEmulator(db, 'localhost', 8080);
-    }
-    if (!storage._delegate._host.includes('localhost')) {
-      connectStorageEmulator(storage, 'localhost', 9199);
-    }
+    connectAuthEmulator(auth, 'http://localhost:9099');
+    connectFirestoreEmulator(db, 'localhost', 8080);
+    connectStorageEmulator(storage, 'localhost', 9199);
     console.log('🔧 Connected to Firebase emulators');
   } catch (emulatorError) {
     console.log('⚠️ Firebase emulators not available:', emulatorError.message);

@@ -544,6 +544,9 @@ export default function ShopifyImageLibrary({
                     <AlertCircle className="w-8 h-8 text-destructive mb-2" />
                     <p className="text-sm text-destructive mb-2">Connection Failed</p>
                     <p className="text-xs text-muted-foreground mb-3">{connectionError}</p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      If you're developing locally and using Firebase emulators, set VITE_USE_FIREBASE_EMULATORS="true" and ensure the emulators are running.
+                    </p>
                     <Button
                       onClick={handleRetry}
                       size="sm"

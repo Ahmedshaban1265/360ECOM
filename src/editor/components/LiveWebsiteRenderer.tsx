@@ -57,14 +57,15 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
 
     const websiteElement = websiteRef.current;
 
-    // Find all editable elements (headings, paragraphs, images, etc.)
+    // Expanded selectors: headings, text, inline, media, containers, controls, and any [data-*] or ARIA role elements
     const editableSelectors = [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'p',
-      'img',
-      'button',
-      '[data-editable]',
-      '.editable'
+      'h1','h2','h3','h4','h5','h6',
+      'p','span','small','strong','em','i','b','u',
+      'a','button','input','label','textarea','select',
+      'img','picture','source','video','figure','figcaption',
+      'div','section','article','header','footer','nav','aside','main',
+      '[data-editable]','[data-editor]','[contenteditable="true"]',
+      '[role]'
     ];
 
     const elements = websiteElement.querySelectorAll(editableSelectors.join(', ')) as NodeListOf<HTMLElement>;
@@ -72,7 +73,10 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
 
     // Add editing overlay and click handlers
     editableElementsArray.forEach((element, index) => {
-      // Generate unique ID based on element content and position
+      // Skip elements used by editor UI itself
+      if (element.closest('.live-website-renderer') === null) return;
+
+      // Generate unique ID based on element tag and index
       const elementId = `${pageId}-${element.tagName.toLowerCase()}-${index}`;
       element.setAttribute('data-editor-id', elementId);
       element.setAttribute('data-editor-type', element.tagName.toLowerCase());
@@ -87,7 +91,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       const handleMouseEnter = () => {
         element.style.outline = '2px dashed #3b82f6';
         element.style.outlineOffset = '2px';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+        element.style.backgroundColor = 'rgba(59, 130, 246, 0.08)';
       };
 
       const handleMouseLeave = () => {
@@ -107,7 +111,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         
         // Highlight selected element
         element.style.outline = '2px solid #3b82f6';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+        element.style.backgroundColor = 'rgba(59, 130, 246, 0.12)';
         
         // Call the click handler
         if (onElementClick) {
@@ -148,8 +152,6 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
           element.removeEventListener('click', listeners.click);
           delete (element as any)._editorEventListeners;
         }
-        
-        // Reset styles
         element.style.outline = 'none';
         element.style.backgroundColor = 'transparent';
         element.style.cursor = 'default';
@@ -166,9 +168,6 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       backgroundColor: 'hsl(var(--background))',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     };
-
-    // For mobile and tablet, we don't need additional styling here
-    // as the frame is handled by the PreviewCanvas component
     return baseStyles;
   };
 
@@ -217,34 +216,18 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             height: 100%;
             overflow: hidden;
           }
-
-          .live-website-renderer [data-editor-id]:hover {
-            position: relative;
-          }
-
+          .live-website-renderer [data-editor-id]:hover { position: relative; }
           .live-website-renderer [data-editor-id]:hover::after {
             content: attr(data-editor-type);
             position: absolute;
-            top: -25px;
-            left: 0;
-            background: #3b82f6;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 500;
-            text-transform: uppercase;
-            z-index: 1000;
-            pointer-events: none;
+            top: -25px; left: 0;
+            background: #3b82f6; color: #fff;
+            padding: 2px 6px; border-radius: 4px;
+            font-size: 10px; font-weight: 500; text-transform: uppercase;
+            z-index: 1000; pointer-events: none;
           }
-
-          .live-website-renderer a {
-            pointer-events: none;
-          }
-
-          .live-website-renderer button {
-            pointer-events: auto;
-          }
+          .live-website-renderer a { pointer-events: none; }
+          .live-website-renderer button, .live-website-renderer input, .live-website-renderer select, .live-website-renderer textarea { pointer-events: auto; }
         `
       }} />
     </div>
