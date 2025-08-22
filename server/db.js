@@ -25,6 +25,14 @@ CREATE TABLE IF NOT EXISTS templates (
 	json TEXT NOT NULL,
 	updated_at INTEGER DEFAULT (strftime('%s','now'))
 );
+
+CREATE TABLE IF NOT EXISTS users (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	username TEXT UNIQUE NOT NULL,
+	password_hash TEXT NOT NULL,
+	role TEXT DEFAULT 'admin',
+	created_at INTEGER DEFAULT (strftime('%s','now'))
+);
 `)
 
 export const MediaRepo = {
@@ -47,5 +55,14 @@ export const TemplateRepo = {
 	save(id, json) {
 		const str = JSON.stringify(json)
 		db.prepare('INSERT INTO templates (id, json, updated_at) VALUES (?, ?, strftime(\'%s\',\'now\')) ON CONFLICT(id) DO UPDATE SET json=excluded.json, updated_at=strftime(\'%s\',\'now\')').run(id, str)
+	}
+}
+
+export const UserRepo = {
+	findByUsername(username) {
+		return db.prepare('SELECT * FROM users WHERE username = ?').get(username)
+	},
+	create(username, password_hash) {
+		return db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, password_hash)
 	}
 }

@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext'; 
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/firebase"; 
 
 export default function AdminLogin() {
   const [credentials, setCredentials] = useState({
@@ -18,31 +16,21 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const { login } = useAuth(); 
   
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError('');
+    try {
+      await login(credentials.email, credentials.password);
+      navigate('/admin/editor');
+    } catch (err) {
+      console.error(err);
+      setError('Invalid email or password');
+    }
 
-  try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      credentials.email,
-      credentials.password
-    );
-
-
-    login();
-    navigate('/admin/editor');
-
-  } catch (err) {
-    console.error(err);
-    setError('Invalid email or password');
-  }
-
-  setIsLoading(false);
-};
-
+    setIsLoading(false);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
