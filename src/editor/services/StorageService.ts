@@ -1,16 +1,18 @@
 import { StorageDriver, TemplateDocument, ThemeTokens } from '../types';
 import { LocalStorageDriver } from './LocalStorageDriver';
 import { FirestoreDriver } from './FirestoreDriver';
+import { HttpDriver } from './HttpDriver';
 
 export class StorageService {
   private driver: StorageDriver;
 
   constructor(driver?: StorageDriver) {
-    // Default to LocalStorage for development; Firestore can be set explicitly
-    this.driver = driver || new LocalStorageDriver();
+    // Prefer HTTP backend if configured; else LocalStorage for development
+    const hasApi = typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.VITE_API_BASE;
+    this.driver = driver || (hasApi ? new HttpDriver() : new LocalStorageDriver());
   }
 
-  // Switch storage driver (e.g., from LocalStorage to Firebase)
+  // Switch storage driver (e.g., from LocalStorage to HTTP/Firebase)
   setDriver(driver: StorageDriver): void {
     this.driver = driver;
   }
