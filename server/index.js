@@ -4,6 +4,7 @@ import multer from 'multer'
 import fse from 'fs-extra'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { MediaRepo, TemplateRepo } from './db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -24,20 +25,8 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 
 
 app.get('/api/media', async (req, res) => {
 	try {
-		const items = []
-		const walk = async (dir, prefix = '') => {
-			const entries = await fse.readdir(dir, { withFileTypes: true })
-			for (const ent of entries) {
-				const rel = path.join(prefix, ent.name)
-				const abs = path.join(dir, ent.name)
-				if (ent.isDirectory()) {
-					await walk(abs, rel)
-				} else {
-					items.push({ path: rel, url: `/media/${rel}` })
-				}
-			}
-		}
-		await walk(mediaRoot)
+		const rows = MediaRepo.list()
+		const items = rows.map(r => ({ path: r.path, url: `/media/${r.path}` }))
 		res.json({ items })
 	} catch (e) {
 		console.error(e)
@@ -55,6 +44,7 @@ app.post('/api/media', upload.single('file'), async (req, res) => {
 		const dest = path.join(destDir, name)
 		await fse.writeFile(dest, req.file.buffer)
 		const rel = path.relative(mediaRoot, dest)
+		MediaRepo.upsert(rel, req.file.mimetype, req.file.size)
 		res.json({ path: rel, url: `/media/${rel}` })
 	} catch (e) {
 		console.error(e)
@@ -67,6 +57,7 @@ app.delete('/api/media/*', async (req, res) => {
 		const rel = req.params[0]
 		const abs = path.join(mediaRoot, rel)
 		await fse.remove(abs)
+		MediaRepo.remove(rel)
 		res.json({ ok: true })
 	} catch (e) {
 		console.error(e)
@@ -81,9 +72,8 @@ app.use('/media', express.static(mediaRoot))
 app.get('/api/templates/:id', async (req, res) => {
 	try {
 		const id = req.params.id
-		const p = path.join(templatesRoot, `${id}.json`)
-		if (!(await fse.pathExists(p))) return res.status(404).json({ error: 'Not found' })
-		const data = await fse.readJson(p)
+		const data = TemplateRepo.get(id)
+		if (!data) return res.status(404).json({ error: 'Not found' })
 		res.json(data)
 	} catch (e) {
 		console.error(e)
@@ -94,8 +84,7 @@ app.get('/api/templates/:id', async (req, res) => {
 app.put('/api/templates/:id', async (req, res) => {
 	try {
 		const id = req.params.id
-		const p = path.join(templatesRoot, `${id}.json`)
-		await fse.writeJson(p, req.body, { spaces: 2 })
+		TemplateRepo.save(id, req.body)
 		res.json({ ok: true })
 	} catch (e) {
 		console.error(e)
