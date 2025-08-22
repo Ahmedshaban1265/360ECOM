@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,6 +31,7 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [imageSource, setImageSource] = useState('');
   const [imageAlt, setImageAlt] = useState('');
   const [linkHref, setLinkHref] = useState('');
+  const [cssClasses, setCssClasses] = useState('');
   const [backgroundColor, setBackgroundColor] = useState('');
   const [textColor, setTextColor] = useState('');
   const [fontSize, setFontSize] = useState('');
@@ -43,6 +44,11 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
   const [display, setDisplay] = useState('');
+  const [justifyContent, setJustifyContent] = useState('');
+  const [alignItems, setAlignItems] = useState('');
+  const [gap, setGap] = useState('');
+  const [gridTemplateColumns, setGridTemplateColumns] = useState('');
+  const [gridGap, setGridGap] = useState('');
   const [showImageSelection, setShowImageSelection] = useState(false);
   
   const [elementData, setElementData] = useState<{
@@ -50,6 +56,16 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     type: string;
     pageId: string;
   } | null>(null);
+
+  // Compute a small subset of computed styles for quick inspection
+  const computedStylePreview = useMemo(() => {
+    if (!element) return [] as { key: string; value: string }[];
+    const cs = window.getComputedStyle(element);
+    const keys = [
+      'color','backgroundColor','fontSize','fontWeight','lineHeight','display','position','margin','padding','border','borderRadius','boxShadow','width','height'
+    ];
+    return keys.map(k => ({ key: k, value: (cs as any)[k] as string }));
+  }, [element]);
 
   // Load element data when element changes
   useEffect(() => {
@@ -63,6 +79,7 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
 
     // Load current values
     setTextContent(element.textContent || '');
+    setCssClasses(element.className || '');
     
     if (element instanceof HTMLImageElement) {
       setImageSource(element.src || '');
@@ -87,6 +104,11 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     setWidth(computedStyle.width || element.style.width || '');
     setHeight(computedStyle.height || element.style.height || '');
     setDisplay(computedStyle.display || element.style.display || '');
+    setJustifyContent(computedStyle.justifyContent || element.style.justifyContent || '');
+    setAlignItems(computedStyle.alignItems || element.style.alignItems || '');
+    setGap(computedStyle.gap || (element.style as any).gap || '');
+    setGridTemplateColumns(computedStyle.gridTemplateColumns || (element.style as any).gridTemplateColumns || '');
+    setGridGap((computedStyle as any).gridGap || (element.style as any).gridGap || '');
   }, [element]);
 
   const handleSave = () => {
@@ -150,6 +172,19 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       }
     }
 
+    // Save class changes
+    if (cssClasses !== element.className) {
+      editingService.saveElementEdit(
+        pageId,
+        id,
+        type,
+        'className',
+        cssClasses,
+        element.className || ''
+      );
+      element.className = cssClasses;
+    }
+
     // Save style changes
     const saveStyle = (prop: string, value: string, current: string) => {
       if (value && value !== current) {
@@ -170,6 +205,11 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     saveStyle('width', width, element.style.width);
     saveStyle('height', height, element.style.height);
     saveStyle('display', display, element.style.display);
+    saveStyle('justifyContent', justifyContent, (element.style as any).justifyContent);
+    saveStyle('alignItems', alignItems, (element.style as any).alignItems);
+    saveStyle('gap', gap, (element.style as any).gap);
+    saveStyle('gridTemplateColumns', gridTemplateColumns, (element.style as any).gridTemplateColumns);
+    saveStyle('gridGap', gridGap, (element.style as any).gridGap);
 
     onSave();
   };
@@ -220,9 +260,10 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       </CardHeader>
       <CardContent className="space-y-4">
         <Tabs defaultValue="content">
-          <TabsList className="grid grid-cols-2 w-full">
+          <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger value="content" className="text-xs">Content</TabsTrigger>
             <TabsTrigger value="styles" className="text-xs">Styles</TabsTrigger>
+            <TabsTrigger value="computed" className="text-xs">Computed</TabsTrigger>
           </TabsList>
 
           <TabsContent value="content" className="space-y-4 mt-3">
@@ -250,6 +291,17 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 )}
               </div>
             )}
+
+            {/* CSS Classes */}
+            <div className="space-y-2">
+              <Label className="text-xs">CSS Classes</Label>
+              <Input
+                value={cssClasses}
+                onChange={(e) => setCssClasses(e.target.value)}
+                placeholder="e.g. text-lg font-semibold"
+                className="text-xs"
+              />
+            </div>
 
             {type === 'img' && (
               <>
@@ -322,7 +374,7 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
               </div>
               <div className="space-y-1">
                 <Label className="text-xs">Display</Label>
-                <Input value={display} onChange={(e) => setDisplay(e.target.value)} placeholder="block, inline, flex" className="text-xs" />
+                <Input value={display} onChange={(e) => setDisplay(e.target.value)} placeholder="block, inline, flex, grid" className="text-xs" />
               </div>
             </div>
 
@@ -335,6 +387,32 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 <Label className="text-xs">Height</Label>
                 <Input value={height} onChange={(e) => setHeight(e.target.value)} placeholder="e.g. auto, 200px" className="text-xs" />
               </div>
+            </div>
+
+            {/* Flexbox layout controls */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <Label className="text-xs">Justify Content</Label>
+                <Input value={justifyContent} onChange={(e) => setJustifyContent(e.target.value)} placeholder="flex-start, center, space-between" className="text-xs" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Align Items</Label>
+                <Input value={alignItems} onChange={(e) => setAlignItems(e.target.value)} placeholder="stretch, center, flex-start" className="text-xs" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Gap</Label>
+              <Input value={gap} onChange={(e) => setGap(e.target.value)} placeholder="e.g. 8px, 1rem" className="text-xs" />
+            </div>
+
+            {/* Grid layout controls */}
+            <div className="space-y-1">
+              <Label className="text-xs">Grid Template Columns</Label>
+              <Input value={gridTemplateColumns} onChange={(e) => setGridTemplateColumns(e.target.value)} placeholder="e.g. repeat(3, 1fr)" className="text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Grid Gap</Label>
+              <Input value={gridGap} onChange={(e) => setGridGap(e.target.value)} placeholder="e.g. 12px" className="text-xs" />
             </div>
 
             <div className="space-y-1">
@@ -361,6 +439,18 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
             <div className="space-y-1">
               <Label className="text-xs">Shadow</Label>
               <Input value={boxShadow} onChange={(e) => setBoxShadow(e.target.value)} placeholder="e.g. 0 1px 2px rgba(0,0,0,.1)" className="text-xs" />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="computed" className="space-y-2 mt-3">
+            <div className="text-xs text-muted-foreground">Computed Styles (read-only)</div>
+            <div className="max-h-48 overflow-auto border rounded p-2">
+              {computedStylePreview.map(({ key, value }) => (
+                <div key={key} className="flex justify-between gap-2 py-0.5">
+                  <span className="text-xs text-muted-foreground">{key}</span>
+                  <span className="text-xs text-foreground truncate">{value}</span>
+                </div>
+              ))}
             </div>
           </TabsContent>
         </Tabs>

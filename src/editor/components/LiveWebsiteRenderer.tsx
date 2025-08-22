@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelectedTemplate, useDeviceType } from '../store/editorStore';
 import { editingService } from '../services/EditingService';
+import { useTheme } from '@/context/ThemeContext';
 
 // Import actual website pages
 import HomePage from '@/pages/HomePage';
@@ -42,8 +43,8 @@ const PAGE_COMPONENTS = {
 export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRendererProps) {
   const selectedTemplate = useSelectedTemplate();
   const deviceType = useDeviceType();
+  const { theme, setTheme } = useTheme();
   const [language, setLanguage] = useState('en');
-  const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
   const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
 
@@ -182,6 +183,9 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         return 'desktop-viewport';
     }
   };
+
+  const isDark = theme === 'dark';
+  const setIsDark = (val: boolean) => setTheme(val ? 'dark' : 'light');
 
   return (
     <div
