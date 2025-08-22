@@ -120,6 +120,12 @@ class EditingService {
 
     const elementEdits = pageEdits.edits.filter(edit => edit.id === elementId);
     
+    const responsive: Record<'desktop' | 'tablet' | 'mobile', Record<string, string>> = {
+      desktop: {},
+      tablet: {},
+      mobile: {}
+    };
+
     elementEdits.forEach(edit => {
       try {
         switch (edit.property) {
@@ -147,8 +153,22 @@ class EditingService {
           default:
             // Handle CSS properties
             if (edit.property.startsWith('style.')) {
-              const cssProperty = edit.property.replace('style.', '');
-              (element.style as any)[cssProperty] = edit.value;
+              // Responsive overrides: style.desktop.prop, style.tablet.prop, style.mobile.prop
+              if (edit.property.startsWith('style.desktop.')) {
+                const cssProperty = edit.property.replace('style.desktop.', '');
+                responsive.desktop[cssProperty] = edit.value;
+              } else if (edit.property.startsWith('style.tablet.')) {
+                const cssProperty = edit.property.replace('style.tablet.', '');
+                responsive.tablet[cssProperty] = edit.value;
+              } else if (edit.property.startsWith('style.mobile.')) {
+                const cssProperty = edit.property.replace('style.mobile.', '');
+                responsive.mobile[cssProperty] = edit.value;
+              } else {
+                const cssProperty = edit.property.replace('style.', '');
+                (element.style as any)[cssProperty] = edit.value;
+              }
+            } else if (edit.property === 'className') {
+              element.className = edit.value;
             }
             break;
         }
@@ -156,6 +176,33 @@ class EditingService {
         console.error('Failed to apply edit:', edit, error);
       }
     });
+
+    // Inject responsive styles via scoped rules
+    const hasResponsive = Object.keys(responsive.desktop).length || Object.keys(responsive.tablet).length || Object.keys(responsive.mobile).length;
+    const styleId = `editor-style-${elementId}`;
+    let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
+    if (hasResponsive) {
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = styleId;
+        document.head.appendChild(styleEl);
+      }
+      const rules: string[] = [];
+      const toCss = (obj: Record<string, string>) => Object.entries(obj).map(([k, v]) => `${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}: ${v};`).join(' ');
+      if (Object.keys(responsive.desktop).length) {
+        rules.push(`.desktop-viewport [data-editor-id="${elementId}"] { ${toCss(responsive.desktop)} }`);
+      }
+      if (Object.keys(responsive.tablet).length) {
+        rules.push(`.tablet-viewport [data-editor-id="${elementId}"] { ${toCss(responsive.tablet)} }`);
+      }
+      if (Object.keys(responsive.mobile).length) {
+        rules.push(`.mobile-viewport [data-editor-id="${elementId}"] { ${toCss(responsive.mobile)} }`);
+      }
+      styleEl.textContent = rules.join('\n');
+    } else if (styleEl) {
+      // Remove stale style tag if no responsive edits remain
+      styleEl.remove();
+    }
   }
 
   /**

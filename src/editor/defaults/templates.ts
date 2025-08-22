@@ -3,7 +3,7 @@ import { extractPageContent, getRealPagesList } from '../utils/pageExtractor';
 
 export const DEFAULT_THEME_TOKENS: ThemeTokens = {
   colors: {
-    primary: '#60a5fa',
+    primary: '#2563eb',
     secondary: '#a78bfa',
     accent: '#fbbf24',
     background: '#0f172a',

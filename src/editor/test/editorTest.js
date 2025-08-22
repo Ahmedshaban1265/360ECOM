@@ -100,9 +100,8 @@ export function runEditorTests() {
   }
 }
 
-// Auto-run tests in development
-if (process.env.NODE_ENV === 'development') {
-  // Add small delay to ensure modules are loaded
+// Auto-run tests in development (Vite)
+if (import.meta?.env?.DEV) {
   setTimeout(() => {
     runEditorTests();
   }, 1000);

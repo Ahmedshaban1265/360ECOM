@@ -1,48 +1,52 @@
 // src/context/AuthContext.jsx
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect, useContext, useCallback } from 'react';
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3001/api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    checkAuthStatus();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchMe = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+      const data = await res.json();
+      setUser(data.user);
+      setIsAuthenticated(!!data.user);
+    } catch {
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const checkAuthStatus = () => {
-    const isAuth = localStorage.getItem('isAdminAuthenticated') === 'true';
-    const loginTime = localStorage.getItem('adminLoginTime');
+  useEffect(() => {
+    fetchMe();
+  }, [fetchMe]);
 
-    if (isAuth && loginTime) {
-      const currentTime = Date.now();
-      const sessionDuration = 24 * 60 * 60 * 1000;
-
-      if (currentTime - parseInt(loginTime, 10) < sessionDuration) {
-        setIsAuthenticated(true);
-      } else {
-        logout();
-      }
-    }
-    setIsLoading(false);
+  const login = async (username, password) => {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password })
+    });
+    if (!res.ok) throw new Error('Login failed');
+    await fetchMe();
   };
 
-  const login = () => {
-    localStorage.setItem('isAdminAuthenticated', 'true');
-    localStorage.setItem('adminLoginTime', Date.now().toString());
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('isAdminAuthenticated');
-    localStorage.removeItem('adminLoginTime');
+  const logout = async () => {
+    await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+    setUser(null);
     setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, isLoading, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
