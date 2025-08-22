@@ -6,8 +6,8 @@ export class StorageService {
   private driver: StorageDriver;
 
   constructor(driver?: StorageDriver) {
-    // Default to Firestore if available, otherwise fall back to localStorage
-    this.driver = driver || new FirestoreDriver();
+    // Default to LocalStorage for development; Firestore can be set explicitly
+    this.driver = driver || new LocalStorageDriver();
   }
 
   // Switch storage driver (e.g., from LocalStorage to Firebase)
