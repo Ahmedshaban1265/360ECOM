@@ -396,109 +396,137 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
               >Remove All Classes</Button>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <Label className="text-xs">Background</Label>
-                <Input type="color" value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} className="h-8" />
-                {backgroundColor && (
-                  <div className="flex items-center gap-2 text-xs">
-                    <span>{ensureHex(backgroundColor) || backgroundColor}</span>
-                    <Button size="sm" variant="outline" className="h-6 px-2"
-                      onClick={() => navigator.clipboard.writeText(ensureHex(backgroundColor) || backgroundColor)}
-                    >Copy HEX</Button>
-                  </div>
-                )}
-                {backgroundColor && (
-                  <div className="flex items-center gap-2">
-                    {['0.1','0.2','0.3'].map((a) => (
-                      <button key={'l'+a} className="h-6 text-[10px] px-2 rounded border"
-                        style={{ backgroundColor: lighten(backgroundColor, parseFloat(a)), color: bestTextColor(lighten(backgroundColor, parseFloat(a))) }}
-                        onClick={() => setBackgroundColor(lighten(backgroundColor, parseFloat(a)))}
-                      >Lighten {Math.round(parseFloat(a)*100)}%</button>
-                    ))}
-                  </div>
-                )}
-                {backgroundColor && (
-                  <div className="flex items-center gap-2">
-                    {['0.1','0.2','0.3'].map((a) => (
-                      <button key={'d'+a} className="h-6 text-[10px] px-2 rounded border"
-                        style={{ backgroundColor: darken(backgroundColor, parseFloat(a)), color: bestTextColor(darken(backgroundColor, parseFloat(a))) }}
-                        onClick={() => setBackgroundColor(darken(backgroundColor, parseFloat(a)))}
-                      >Darken {Math.round(parseFloat(a)*100)}%</button>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Text Color</Label>
-                <Input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="h-8" />
-                {textColor && (
-                  <div className="flex items-center gap-2 text-xs">
-                    <span>{ensureHex(textColor) || textColor}</span>
-                    <Button size="sm" variant="outline" className="h-6 px-2"
-                      onClick={() => navigator.clipboard.writeText(ensureHex(textColor) || textColor)}
-                    >Copy HEX</Button>
-                  </div>
-                )}
-                {(textColor || backgroundColor) && (
-                  <div className="text-[10px] text-muted-foreground">
-                    Contrast: {(() => {
-                      const c = contrastRatio(textColor || '#000', backgroundColor || '#fff');
-                      return c ? c.toFixed(2) + ' : 1' : 'n/a';
-                    })()} (Aim for ≥ 4.5)
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Responsive sub-tabs */}
+            <Tabs defaultValue="desktop">
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="desktop" className="text-xs">Desktop</TabsTrigger>
+                <TabsTrigger value="tablet" className="text-xs">Tablet</TabsTrigger>
+                <TabsTrigger value="mobile" className="text-xs">Mobile</TabsTrigger>
+              </TabsList>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <Label className="text-xs">Font Size</Label>
-                <Input value={fontSize} onChange={(e) => setFontSize(e.target.value)} placeholder="16px, 1rem" className="text-xs" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Display</Label>
-                <Input value={display} onChange={(e) => setDisplay(e.target.value)} placeholder="block, inline, flex, grid" className="text-xs" />
-              </div>
-            </div>
+              <TabsContent value="desktop" className="space-y-4 pt-3">
+                {/* Desktop (base) writes to style.* */}
+                {/* Background & Text Colors with suggestions */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Background</Label>
+                    <Input type="color" value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} className="h-8" />
+                    {backgroundColor && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span>{ensureHex(backgroundColor) || backgroundColor}</span>
+                        <Button size="sm" variant="outline" className="h-6 px-2"
+                          onClick={() => navigator.clipboard.writeText(ensureHex(backgroundColor) || backgroundColor)}
+                        >Copy HEX</Button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Text Color</Label>
+                    <Input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="h-8" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Display</Label>
+                    <Input value={display} onChange={(e) => setDisplay(e.target.value)} placeholder="block, inline, flex, grid" className="text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Font Size</Label>
+                    <Input value={fontSize} onChange={(e) => setFontSize(e.target.value)} placeholder="16px, 1rem" className="text-xs" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Width</Label>
+                    <Input value={width} onChange={(e) => setWidth(e.target.value)} placeholder="e.g. 100%, 320px" className="text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Height</Label>
+                    <Input value={height} onChange={(e) => setHeight(e.target.value)} placeholder="e.g. auto, 200px" className="text-xs" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Justify Content</Label>
+                    <Input value={justifyContent} onChange={(e) => setJustifyContent(e.target.value)} placeholder="flex-start, center, space-between" className="text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Align Items</Label>
+                    <Input value={alignItems} onChange={(e) => setAlignItems(e.target.value)} placeholder="stretch, center, flex-start" className="text-xs" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Gap</Label>
+                  <Input value={gap} onChange={(e) => setGap(e.target.value)} placeholder="e.g. 8px, 1rem" className="text-xs" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Grid Template Columns</Label>
+                  <Input value={gridTemplateColumns} onChange={(e) => setGridTemplateColumns(e.target.value)} placeholder="e.g. repeat(3, 1fr)" className="text-xs" />
+                </div>
+              </TabsContent>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <Label className="text-xs">Width</Label>
-                <Input value={width} onChange={(e) => setWidth(e.target.value)} placeholder="e.g. 100%, 320px" className="text-xs" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Height</Label>
-                <Input value={height} onChange={(e) => setHeight(e.target.value)} placeholder="e.g. auto, 200px" className="text-xs" />
-              </div>
-            </div>
+              <TabsContent value="tablet" className="space-y-3 pt-3">
+                {/* Tablet writes to style.tablet.* */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Display (Tablet)</Label>
+                    <Input value={display} onChange={(e) => {
+                      if (!element || !elementData) return;
+                      editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'style.tablet.display', e.target.value, display);
+                      setDisplay(e.target.value);
+                    }} placeholder="block, flex, grid" className="text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Width (Tablet)</Label>
+                    <Input value={width} onChange={(e) => {
+                      if (!element || !elementData) return;
+                      editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'style.tablet.width', e.target.value, width);
+                      setWidth(e.target.value);
+                    }} placeholder="e.g. 100%, 640px" className="text-xs" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Grid Columns (Tablet)</Label>
+                  <Input value={gridTemplateColumns} onChange={(e) => {
+                    if (!element || !elementData) return;
+                    editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'style.tablet.gridTemplateColumns', e.target.value, gridTemplateColumns);
+                    setGridTemplateColumns(e.target.value);
+                  }} placeholder="e.g. repeat(2, 1fr)" className="text-xs" />
+                </div>
+              </TabsContent>
 
-            {/* Flexbox layout controls */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <Label className="text-xs">Justify Content</Label>
-                <Input value={justifyContent} onChange={(e) => setJustifyContent(e.target.value)} placeholder="flex-start, center, space-between" className="text-xs" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Align Items</Label>
-                <Input value={alignItems} onChange={(e) => setAlignItems(e.target.value)} placeholder="stretch, center, flex-start" className="text-xs" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Gap</Label>
-              <Input value={gap} onChange={(e) => setGap(e.target.value)} placeholder="e.g. 8px, 1rem" className="text-xs" />
-            </div>
+              <TabsContent value="mobile" className="space-y-3 pt-3">
+                {/* Mobile writes to style.mobile.* */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Display (Mobile)</Label>
+                    <Input value={display} onChange={(e) => {
+                      if (!element || !elementData) return;
+                      editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'style.mobile.display', e.target.value, display);
+                      setDisplay(e.target.value);
+                    }} placeholder="block, flex, grid" className="text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">Width (Mobile)</Label>
+                    <Input value={width} onChange={(e) => {
+                      if (!element || !elementData) return;
+                      editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'style.mobile.width', e.target.value, width);
+                      setWidth(e.target.value);
+                    }} placeholder="e.g. 100%, 320px" className="text-xs" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Grid Columns (Mobile)</Label>
+                  <Input value={gridTemplateColumns} onChange={(e) => {
+                    if (!element || !elementData) return;
+                    editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'style.mobile.gridTemplateColumns', e.target.value, gridTemplateColumns);
+                    setGridTemplateColumns(e.target.value);
+                  }} placeholder="e.g. 1fr" className="text-xs" />
+                </div>
+              </TabsContent>
+            </Tabs>
 
-            {/* Grid layout controls */}
-            <div className="space-y-1">
-              <Label className="text-xs">Grid Template Columns</Label>
-              <Input value={gridTemplateColumns} onChange={(e) => setGridTemplateColumns(e.target.value)} placeholder="e.g. repeat(3, 1fr)" className="text-xs" />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Grid Gap</Label>
-              <Input value={gridGap} onChange={(e) => setGridGap(e.target.value)} placeholder="e.g. 12px" className="text-xs" />
-            </div>
-
+            {/* Keep the rest of base style controls (padding, margin, border, etc.) below */}
             <div className="space-y-1">
               <Label className="text-xs">Padding</Label>
               <Input value={padding} onChange={(e) => setPadding(e.target.value)} placeholder="e.g. 1rem 2rem" className="text-xs" />
