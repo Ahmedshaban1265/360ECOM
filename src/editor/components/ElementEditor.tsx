@@ -19,6 +19,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { editingService } from '../services/EditingService';
 import ImageSelectionModal from './ImageSelectionModal';
 import { ImageItem } from './ShopifyImageLibrary';
+import { ensureHex, lighten, darken, bestTextColor, contrastRatio } from '../utils/colorUtils';
 
 interface ElementEditorProps {
   element: HTMLElement | null;
@@ -301,6 +302,17 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                 placeholder="e.g. text-lg font-semibold"
                 className="text-xs"
               />
+              {/* Tailwind suggestions (basic inline helper) */}
+              <div className="flex flex-wrap gap-1">
+                {['text-sm','text-base','text-lg','font-semibold','font-bold','p-2','p-4','m-2','rounded','rounded-lg','shadow','shadow-lg','bg-primary','text-primary'].map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    className="text-[10px] px-2 py-1 border rounded hover:bg-muted"
+                    onClick={() => setCssClasses(prev => (prev ? `${prev} ${s}` : s))}
+                  >{s}</button>
+                ))}
+              </div>
             </div>
 
             {type === 'img' && (
@@ -356,14 +368,86 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
           </TabsContent>
 
           <TabsContent value="styles" className="space-y-4 mt-3">
+            {/* Quick actions */}
+            <div className="flex items-center gap-2 text-xs">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-6"
+                onClick={() => {
+                  if (!element || !elementData) return;
+                  const prev = element.getAttribute('style') || '';
+                  editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'style', '', prev);
+                  element.removeAttribute('style');
+                  setBackgroundColor(''); setTextColor(''); setFontSize(''); setPadding(''); setMargin(''); setBackground(''); setBorder(''); setBorderRadius(''); setBoxShadow(''); setWidth(''); setHeight(''); setDisplay(''); setJustifyContent(''); setAlignItems(''); setGap(''); setGridTemplateColumns(''); setGridGap('');
+                }}
+              >Reset Inline Styles</Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-6"
+                onClick={() => {
+                  if (!element || !elementData) return;
+                  const prev = element.className || '';
+                  editingService.saveElementEdit(elementData.pageId, elementData.id, elementData.type, 'className', '', prev);
+                  element.className = '';
+                  setCssClasses('');
+                }}
+              >Remove All Classes</Button>
+            </div>
+
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-xs">Background</Label>
                 <Input type="color" value={backgroundColor} onChange={(e) => setBackgroundColor(e.target.value)} className="h-8" />
+                {backgroundColor && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <span>{ensureHex(backgroundColor) || backgroundColor}</span>
+                    <Button size="sm" variant="outline" className="h-6 px-2"
+                      onClick={() => navigator.clipboard.writeText(ensureHex(backgroundColor) || backgroundColor)}
+                    >Copy HEX</Button>
+                  </div>
+                )}
+                {backgroundColor && (
+                  <div className="flex items-center gap-2">
+                    {['0.1','0.2','0.3'].map((a) => (
+                      <button key={'l'+a} className="h-6 text-[10px] px-2 rounded border"
+                        style={{ backgroundColor: lighten(backgroundColor, parseFloat(a)), color: bestTextColor(lighten(backgroundColor, parseFloat(a))) }}
+                        onClick={() => setBackgroundColor(lighten(backgroundColor, parseFloat(a)))}
+                      >Lighten {Math.round(parseFloat(a)*100)}%</button>
+                    ))}
+                  </div>
+                )}
+                {backgroundColor && (
+                  <div className="flex items-center gap-2">
+                    {['0.1','0.2','0.3'].map((a) => (
+                      <button key={'d'+a} className="h-6 text-[10px] px-2 rounded border"
+                        style={{ backgroundColor: darken(backgroundColor, parseFloat(a)), color: bestTextColor(darken(backgroundColor, parseFloat(a))) }}
+                        onClick={() => setBackgroundColor(darken(backgroundColor, parseFloat(a)))}
+                      >Darken {Math.round(parseFloat(a)*100)}%</button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="space-y-1">
                 <Label className="text-xs">Text Color</Label>
                 <Input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="h-8" />
+                {textColor && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <span>{ensureHex(textColor) || textColor}</span>
+                    <Button size="sm" variant="outline" className="h-6 px-2"
+                      onClick={() => navigator.clipboard.writeText(ensureHex(textColor) || textColor)}
+                    >Copy HEX</Button>
+                  </div>
+                )}
+                {(textColor || backgroundColor) && (
+                  <div className="text-[10px] text-muted-foreground">
+                    Contrast: {(() => {
+                      const c = contrastRatio(textColor || '#000', backgroundColor || '#fff');
+                      return c ? c.toFixed(2) + ' : 1' : 'n/a';
+                    })()} (Aim for ≥ 4.5)
+                  </div>
+                )}
               </div>
             </div>
 
