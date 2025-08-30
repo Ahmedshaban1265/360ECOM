@@ -2,7 +2,6 @@
 export type Locale = 'en' | 'ar';
 export type DeviceType = 'desktop' | 'tablet' | 'mobile';
 export type SidebarTab = 'sections' | 'properties' | 'templates' | 'pages' | 'media';
-export type InteractionMode = 'edit' | 'navigate';
 
 // Theme Tokens
 export interface ThemeTokens {
@@ -104,10 +103,6 @@ export interface EditorState {
   // Sidebar state
   isSidebarOpen: boolean;
   activeTab: SidebarTab | null;
-
-  // Editor interactions and preview appearance
-  interactionMode: InteractionMode;
-  previewDarkMode: boolean;
 }
 
 // Storage Service Interface

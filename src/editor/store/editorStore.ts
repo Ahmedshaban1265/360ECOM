@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { EditorState, TemplateDocument, SectionInstance, BlockInstance, DeviceType, Locale, HistoryEntry, InteractionMode } from '../types';
+import { EditorState, TemplateDocument, SectionInstance, BlockInstance, DeviceType, Locale, HistoryEntry } from '../types';
 import { storageService } from '../services/StorageService';
 import { DEFAULT_THEME_TOKENS } from '../defaults/templates';
 
@@ -92,9 +92,6 @@ export const useEditorStore = create<EditorStore>()(
       isDarkMode: true,
       isRTL: false,
       locale: 'en',
-      // New interaction and preview theme defaults
-      interactionMode: 'edit',
-      previewDarkMode: true,
       historyIndex: -1,
       history: [],
       isDirty: false,
@@ -234,19 +231,7 @@ export const useEditorStore = create<EditorStore>()(
         set({ deviceType: device });
       },
 
-      // Interaction mode and preview theme controls
-      setInteractionMode: (mode: InteractionMode) => {
-        set({ interactionMode: mode });
-      },
-
-      toggleInteractionMode: () => {
-        const { interactionMode } = get();
-        set({ interactionMode: interactionMode === 'edit' ? 'navigate' : 'edit' });
-      },
-
-      setPreviewDarkMode: (isDark: boolean) => {
-        set({ previewDarkMode: isDark });
-      },
+      // Interaction/preview controls removed for initial state
 
       setDarkMode: (isDark: boolean) => {
         const { currentTemplate } = get();

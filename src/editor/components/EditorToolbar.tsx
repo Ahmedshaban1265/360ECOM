@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/context/ThemeContext';
-import { useEditorStore, useInteractionMode, usePreviewDarkMode } from '../store/editorStore';
+import { useEditorStore } from '../store/editorStore';
 import { DeviceType } from '../types';
 import TemplateDropdown from './TemplateDropdown';
 
@@ -78,8 +78,6 @@ export default function EditorToolbar() {
   const isDirty = useEditorStore(state => state.isDirty);
   const historyIndex = useEditorStore(state => state.historyIndex);
   const history = useEditorStore(state => state.history);
-  const interactionMode = useInteractionMode();
-  const previewDarkMode = usePreviewDarkMode();
 
   // Use theme context as single source of truth for dark mode
   const isDarkMode = theme === 'dark';
@@ -88,8 +86,6 @@ export default function EditorToolbar() {
   const setDeviceType = useEditorStore(state => state.setDeviceType);
   const setRTL = useEditorStore(state => state.setRTL);
   const setLocale = useEditorStore(state => state.setLocale);
-  const toggleInteractionMode = useEditorStore(state => state.toggleInteractionMode);
-  const setPreviewDarkMode = useEditorStore(state => state.setPreviewDarkMode);
   const saveTemplate = useEditorStore(state => state.saveTemplate);
   const publishTemplate = useEditorStore(state => state.publishTemplate);
   const resetToPublished = useEditorStore(state => state.resetToPublished);
@@ -268,26 +264,7 @@ export default function EditorToolbar() {
 
         {/* Right Side - Actions */}
         <div className="flex items-center gap-2">
-          {/* Interaction Mode */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={interactionMode === 'edit' ? 'default' : 'ghost'}
-                size="sm"
-                onClick={toggleInteractionMode}
-                className="h-8 px-2 gap-2"
-                title="V to toggle"
-              >
-                {interactionMode === 'edit' ? (
-                  <Pencil className="w-4 h-4" />
-                ) : (
-                  <MousePointerClick className="w-4 h-4" />
-                )}
-                <span className="text-xs hidden md:inline">{interactionMode === 'edit' ? 'Edit' : 'Navigate'}</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Toggle edit/navigate (press V). Cmd/Ctrl+Click to force navigate</TooltipContent>
-          </Tooltip>
+          {/* Interaction Mode - removed to revert to initial UI */}
 
           {/* Undo/Redo */}
           <div className="flex items-center gap-1">
@@ -354,20 +331,7 @@ export default function EditorToolbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Preview Theme Toggle (applies only to preview) */}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPreviewDarkMode(!previewDarkMode)}
-                className="h-8 w-8 p-0"
-              >
-                {previewDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Toggle preview {previewDarkMode ? 'light' : 'dark'} mode</TooltipContent>
-          </Tooltip>
+          {/* Preview Theme Toggle - removed to revert to initial UI */}
 
           {/* Editor UI Theme Toggle (applies to editor chrome) */}
           <Tooltip>

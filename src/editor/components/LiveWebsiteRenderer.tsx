@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSelectedTemplate, useDeviceType, useEditorStore, useInteractionMode, usePreviewDarkMode } from '../store/editorStore';
+import { useSelectedTemplate, useDeviceType, useEditorStore } from '../store/editorStore';
 import { editingService } from '../services/EditingService';
 
 // Import actual website pages
@@ -42,10 +42,7 @@ const PAGE_COMPONENTS = {
 export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRendererProps) {
   const selectedTemplate = useSelectedTemplate();
   const deviceType = useDeviceType();
-  const interactionMode = useInteractionMode();
-  const previewDarkMode = usePreviewDarkMode();
   const setSelectedTemplate = useEditorStore(state => state.setSelectedTemplate);
-  const setPreviewDarkMode = useEditorStore(state => state.setPreviewDarkMode);
   const [language, setLanguage] = useState('en');
   const websiteRef = useRef<HTMLDivElement>(null);
   const [trackedElements, setTrackedElements] = useState<HTMLElement[]>([]);
@@ -54,7 +51,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const pageId = selectedTemplate || 'home';
   const PageComponent = PAGE_COMPONENTS[pageId as keyof typeof PAGE_COMPONENTS] || HomePage;
 
-  // Apply editing overlays and click/navigation handling for all elements
+  // Apply editing overlays and click handling for all elements (always edit mode)
   useEffect(() => {
     if (!websiteRef.current) return;
 
@@ -87,8 +84,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         const anchor = (element instanceof HTMLAnchorElement ? element : element.closest('a')) as HTMLAnchorElement | null;
         const forceNavigate = e.metaKey || e.ctrlKey;
 
-        // In edit mode, prevent bubbling so ancestors are not selected
-        if (interactionMode === 'edit' && !forceNavigate) {
+        // Prevent bubbling so ancestors are not selected
+        if (!forceNavigate) {
           e.preventDefault();
           e.stopPropagation();
         }
@@ -98,7 +95,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
           const isExternal = /^(https?:)?\/\//.test(hrefAttr);
           const isInternalRoute = hrefAttr.startsWith('/') && !hrefAttr.startsWith('//');
 
-          if (interactionMode === 'navigate' || forceNavigate) {
+          if (forceNavigate) {
             e.preventDefault();
             e.stopPropagation();
             if (isExternal) {
@@ -111,13 +108,13 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
               return;
             }
           } else {
-            // In edit mode, prevent navigation and open editor
+            // Prevent navigation and open editor
             e.preventDefault();
             e.stopPropagation();
           }
         }
 
-        if (interactionMode === 'edit' && !forceNavigate) {
+        if (!forceNavigate) {
           // Remove existing selection
           elements.forEach(el => el.classList.remove('editor-selected'));
           element.classList.add('editor-selected');
@@ -153,7 +150,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         element.classList.remove('editor-selected');
       });
     };
-  }, [selectedTemplate, interactionMode, onElementClick]);
+  }, [selectedTemplate, onElementClick]);
 
   // Device-specific styling
   const getDeviceStyles = () => {
@@ -185,7 +182,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   return (
     <div
       ref={websiteRef}
-      className={`live-website-renderer ${getResponsiveClass()} ${previewDarkMode ? 'dark' : 'light'}`}
+      className={`live-website-renderer ${getResponsiveClass()}`}
       style={getDeviceStyles()}
     >
       {/* Render the actual website with navigation and footer */}
@@ -194,8 +191,6 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         <Navigation
           language={language}
           setLanguage={setLanguage}
-          isDark={previewDarkMode}
-          setIsDark={setPreviewDarkMode}
         />
 
         {/* Main Page Content */}
