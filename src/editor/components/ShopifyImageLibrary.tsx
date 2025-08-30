@@ -119,6 +119,7 @@ export default function ShopifyImageLibrary({
 
       setImages(imageItems);
       setFilteredImages(imageItems);
+      setConnectionError(null);
 
       console.log(`Successfully loaded ${imageItems.length} images`);
 

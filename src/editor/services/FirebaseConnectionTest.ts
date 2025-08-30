@@ -12,7 +12,7 @@ export class FirebaseConnectionTest {
       
       // Set a shorter timeout for testing
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Connection timeout')), 10000);
+        setTimeout(() => reject(new Error('Connection timeout')), 20000);
       });
       
       const testPromise = listAll(rootRef);
@@ -34,7 +34,9 @@ export class FirebaseConnectionTest {
       } else if (error?.code === 'storage/project-not-found') {
         errorMessage = 'Firebase project not found. Check your project configuration.';
       } else if (error?.message === 'Connection timeout') {
-        errorMessage = 'Connection timeout. Check your internet connection.';
+        errorMessage = 'Connection timeout. Check your internet connection or Firebase Storage rules.';
+      } else if (error?.code === 'storage/unauthenticated') {
+        errorMessage = 'Unauthenticated. Ensure the user is signed in or rules allow read/write.';
       } else if (error?.code === 'storage/unknown') {
         errorMessage = 'Unknown storage error. Check Firebase configuration.';
       } else {
