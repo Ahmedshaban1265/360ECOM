@@ -159,6 +159,11 @@ export default function ShopifyImageLibrary({
   useEffect(() => {
     if (open) {
       setConnectionError(null);
+      const skipTest = import.meta.env?.VITE_SKIP_STORAGE_TEST === 'true';
+      if (skipTest) {
+        loadImages();
+        return;
+      }
       // Test connection first, then load images
       FirebaseConnectionTest.testStorageConnection()
         .then(result => {
