@@ -45,6 +45,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const interactionMode = useInteractionMode();
   const previewDarkMode = usePreviewDarkMode();
   const setSelectedTemplate = useEditorStore(state => state.setSelectedTemplate);
+  const setPreviewDarkMode = useEditorStore(state => state.setPreviewDarkMode);
   const [language, setLanguage] = useState('en');
   const websiteRef = useRef<HTMLDivElement>(null);
   const [trackedElements, setTrackedElements] = useState<HTMLElement[]>([]);
@@ -187,8 +188,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         <Navigation
           language={language}
           setLanguage={setLanguage}
-          isDark={isDark}
-          setIsDark={setIsDark}
+          isDark={previewDarkMode}
+          setIsDark={setPreviewDarkMode}
         />
 
         {/* Main Page Content */}
