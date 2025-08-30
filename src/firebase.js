@@ -39,8 +39,15 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Connect to emulators in development
+// Connect to emulators in development (opt-in via env or localStorage)
 if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  let useEmulators = false;
+  try {
+    useEmulators = (localStorage.getItem('useFirebaseEmulators') === 'true') ||
+      (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true');
+  } catch (_) {}
+
+  if (useEmulators) {
   try {
     // Only connect if not already connected
     if (!auth._delegate._isConnected) {
@@ -55,6 +62,9 @@ if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
     console.log('🔧 Connected to Firebase emulators');
   } catch (emulatorError) {
     console.log('⚠️ Firebase emulators not available:', emulatorError.message);
+  }
+  } else {
+    console.log('ℹ️ Skipping Firebase emulators (set localStorage.useFirebaseEmulators = "true" to enable).');
   }
 }
 
