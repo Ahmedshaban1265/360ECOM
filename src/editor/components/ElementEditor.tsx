@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Save, 
   Undo, 
@@ -75,8 +76,21 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
 
     // Load CSS values (use computed styles to reflect real styles)
     const computedStyle = window.getComputedStyle(element);
-    setBackgroundColor(computedStyle.backgroundColor || element.style.backgroundColor || '');
-    setTextColor(computedStyle.color || element.style.color || '');
+    const toHexColor = (value: string) => {
+      if (!value) return '';
+      const rgbMatch = value.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+      if (rgbMatch) {
+        const r = Math.max(0, Math.min(255, parseInt(rgbMatch[1], 10)));
+        const g = Math.max(0, Math.min(255, parseInt(rgbMatch[2], 10)));
+        const b = Math.max(0, Math.min(255, parseInt(rgbMatch[3], 10)));
+        const toHex = (n: number) => n.toString(16).padStart(2, '0');
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      }
+      // already hex or named color; pass through for now
+      return value;
+    };
+    setBackgroundColor(toHexColor(computedStyle.backgroundColor || element.style.backgroundColor || ''));
+    setTextColor(toHexColor(computedStyle.color || element.style.color || ''));
     setFontSize(computedStyle.fontSize || element.style.fontSize || '');
     setPadding(computedStyle.padding || element.style.padding || '');
     setMargin(computedStyle.margin || element.style.margin || '');
@@ -308,198 +322,203 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Text Content Editor (for all non-media elements) */}
-        {!(type === 'img') && (
-          <div className="space-y-2">
-            <Label className="text-xs flex items-center gap-1">
-              <Type className="h-3 w-3" />
-              Text Content
-            </Label>
-            <Textarea
-              value={textContent}
-              onChange={(e) => setTextContent(e.target.value)}
-              placeholder="Enter text content..."
-              className="text-xs"
-              rows={3}
-            />
-          </div>
-        )}
+        <Tabs defaultValue="content" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="content" className="text-xs">Content</TabsTrigger>
+            <TabsTrigger value="styles" className="text-xs">Styles</TabsTrigger>
+            <TabsTrigger value="attributes" className="text-xs">Attributes</TabsTrigger>
+          </TabsList>
 
-        {/* Image Editor */}
-        {type === 'img' && (
-          <>
-            <div className="space-y-2">
-              <Label className="text-xs flex items-center gap-1">
-                <Image className="h-3 w-3" />
-                Image Source
-              </Label>
-              <Input
-                value={imageSource}
-                onChange={(e) => setImageSource(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="text-xs"
-              />
-              <Button size="sm" variant="outline" className="text-xs w-full" onClick={() => setShowImageSelection(true)}>
-                Select Image
-              </Button>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs">Alt Text</Label>
-              <Input
-                value={imageAlt}
-                onChange={(e) => setImageAlt(e.target.value)}
-                placeholder="Image description..."
-                className="text-xs"
-              />
-            </div>
-            <ImageSelectionModal
-              open={showImageSelection}
-              onOpenChange={setShowImageSelection}
-              onSelect={(image) => {
-                setImageSource(image.url);
-              }}
-            />
-          </>
-        )}
-
-        {/* Link Editor */}
-        {type === 'a' && (
-          <div className="space-y-2">
-            <Label className="text-xs flex items-center gap-1">
-              <Link className="h-3 w-3" />
-              Link URL
-            </Label>
-            <Input
-              value={linkHref}
-              onChange={(e) => setLinkHref(e.target.value)}
-              placeholder="https://example.com"
-              className="text-xs"
-            />
-          </div>
-        )}
-
-        {/* Attributes Editor */}
-        <Separator />
-        <div className="space-y-2">
-          <Label className="text-xs">Attributes</Label>
-          <div className="space-y-2">
-            {attributes.map((attr, idx) => (
-              <div key={idx} className="grid grid-cols-5 gap-2">
-                <Input
-                  value={attr.name}
-                  onChange={(e) => {
-                    const next = [...attributes];
-                    next[idx] = { ...attr, name: e.target.value };
-                    setAttributes(next);
-                  }}
-                  placeholder="name (e.g. id, class, data-foo)"
-                  className="col-span-2 text-xs"
-                />
-                <Input
-                  value={attr.value}
-                  onChange={(e) => {
-                    const next = [...attributes];
-                    next[idx] = { ...attr, value: e.target.value };
-                    setAttributes(next);
-                  }}
-                  placeholder="value"
-                  className="col-span-3 text-xs"
+          <TabsContent value="content" className="space-y-4 mt-4">
+            {!(type === 'img') && (
+              <div className="space-y-2">
+                <Label className="text-xs flex items-center gap-1">
+                  <Type className="h-3 w-3" />
+                  Text Content
+                </Label>
+                <Textarea
+                  value={textContent}
+                  onChange={(e) => setTextContent(e.target.value)}
+                  placeholder="Enter text content..."
+                  className="text-xs"
+                  rows={3}
                 />
               </div>
-            ))}
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs"
-                onClick={() => setAttributes([...attributes, { name: '', value: '' }])}
-              >
-                Add attribute
-              </Button>
-              {attributes.length > 0 && (
-                <Button
-                  size="sm"
-                  variant="ghost"
+            )}
+
+            {type === 'img' && (
+              <>
+                <div className="space-y-2">
+                  <Label className="text-xs flex items-center gap-1">
+                    <Image className="h-3 w-3" />
+                    Image Source
+                  </Label>
+                  <Input
+                    value={imageSource}
+                    onChange={(e) => setImageSource(e.target.value)}
+                    placeholder="https://example.com/image.jpg"
+                    className="text-xs"
+                  />
+                  <Button size="sm" variant="outline" className="text-xs w-full" onClick={() => setShowImageSelection(true)}>
+                    Select Image
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs">Alt Text</Label>
+                  <Input
+                    value={imageAlt}
+                    onChange={(e) => setImageAlt(e.target.value)}
+                    placeholder="Image description..."
+                    className="text-xs"
+                  />
+                </div>
+                <ImageSelectionModal
+                  open={showImageSelection}
+                  onOpenChange={setShowImageSelection}
+                  onSelect={(image) => {
+                    setImageSource(image.url);
+                  }}
+                />
+              </>
+            )}
+
+            {type === 'a' && (
+              <div className="space-y-2">
+                <Label className="text-xs flex items-center gap-1">
+                  <Link className="h-3 w-3" />
+                  Link URL
+                </Label>
+                <Input
+                  value={linkHref}
+                  onChange={(e) => setLinkHref(e.target.value)}
+                  placeholder="https://example.com"
                   className="text-xs"
-                  onClick={() => setAttributes(attributes.filter(a => a.name))}
-                >
-                  Clean empty
-                </Button>
-              )}
+                />
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="styles" className="space-y-4 mt-4">
+            <div className="space-y-3">
+              <Label className="text-xs flex items-center gap-1">
+                <Palette className="h-3 w-3" />
+                Styling
+              </Label>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Background</Label>
+                  <Input
+                    type="color"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="h-8"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Text Color</Label>
+                  <Input
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="h-8"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Font Size</Label>
+                <Input
+                  value={fontSize}
+                  onChange={(e) => setFontSize(e.target.value)}
+                  placeholder="16px, 1rem, etc."
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Padding</Label>
+                <Input
+                  value={padding}
+                  onChange={(e) => setPadding(e.target.value)}
+                  placeholder="e.g. 1rem 2rem"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Margin</Label>
+                <Input
+                  value={margin}
+                  onChange={(e) => setMargin(e.target.value)}
+                  placeholder="e.g. 0 auto"
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs">Background (CSS)</Label>
+                <Input
+                  value={background}
+                  onChange={(e) => setBackground(e.target.value)}
+                  placeholder="e.g. #fff or url(...) center/cover"
+                  className="text-xs"
+                />
+              </div>
             </div>
-          </div>
-        </div>
+          </TabsContent>
 
-        <Separator />
-
-        {/* Styling Options */}
-        <div className="space-y-3">
-          <Label className="text-xs flex items-center gap-1">
-            <Palette className="h-3 w-3" />
-            Styling
-          </Label>
-          
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <Label className="text-xs">Background</Label>
-              <Input
-                type="color"
-                value={backgroundColor}
-                onChange={(e) => setBackgroundColor(e.target.value)}
-                className="h-8"
-              />
+          <TabsContent value="attributes" className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label className="text-xs">Attributes</Label>
+              <div className="space-y-2">
+                {attributes.map((attr, idx) => (
+                  <div key={idx} className="grid grid-cols-5 gap-2">
+                    <Input
+                      value={attr.name}
+                      onChange={(e) => {
+                        const next = [...attributes];
+                        next[idx] = { ...attr, name: e.target.value };
+                        setAttributes(next);
+                      }}
+                      placeholder="name (e.g. id, class, data-foo)"
+                      className="col-span-2 text-xs"
+                    />
+                    <Input
+                      value={attr.value}
+                      onChange={(e) => {
+                        const next = [...attributes];
+                        next[idx] = { ...attr, value: e.target.value };
+                        setAttributes(next);
+                      }}
+                      placeholder="value"
+                      className="col-span-3 text-xs"
+                    />
+                  </div>
+                ))}
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                    onClick={() => setAttributes([...attributes, { name: '', value: '' }])}
+                  >
+                    Add attribute
+                  </Button>
+                  {attributes.length > 0 && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-xs"
+                      onClick={() => setAttributes(attributes.filter(a => a.name))}
+                    >
+                      Clean empty
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs">Text Color</Label>
-              <Input
-                type="color"
-                value={textColor}
-                onChange={(e) => setTextColor(e.target.value)}
-                className="h-8"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-xs">Font Size</Label>
-            <Input
-              value={fontSize}
-              onChange={(e) => setFontSize(e.target.value)}
-              placeholder="16px, 1rem, etc."
-              className="text-xs"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-xs">Padding</Label>
-            <Input
-              value={padding}
-              onChange={(e) => setPadding(e.target.value)}
-              placeholder="e.g. 1rem 2rem"
-              className="text-xs"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-xs">Margin</Label>
-            <Input
-              value={margin}
-              onChange={(e) => setMargin(e.target.value)}
-              placeholder="e.g. 0 auto"
-              className="text-xs"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <Label className="text-xs">Background (CSS)</Label>
-            <Input
-              value={background}
-              onChange={(e) => setBackground(e.target.value)}
-              placeholder="e.g. #fff or url(...) center/cover"
-              className="text-xs"
-            />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
 
         <Separator />
 

@@ -116,8 +116,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
           elements.forEach(el => el.classList.remove('editor-selected'));
           element.classList.add('editor-selected');
           const elementType = element.getAttribute('data-editor-type') || tag;
-          onElementClick?.(element, elementType);
           (element as any)._editorData = { id: elementId, type: elementType, pageId };
+          onElementClick?.(element, elementType);
         }
       };
 
