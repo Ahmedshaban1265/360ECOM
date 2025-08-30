@@ -2,13 +2,25 @@ import { useEffect } from 'react';
 import { subscribeToLiveEdits, ElementEdit } from '@/editor/services/EditsFirestoreService';
 
 function applyEditToElement(edit: ElementEdit) {
-  // Try exact match by data-editor-id first
-  const selector = `[data-editor-id="${edit.id}"]`;
-  let element = document.querySelector(selector) as HTMLElement | null;
+  let element: HTMLElement | null = null;
 
-  if (!element) {
-    // Fallback: reproduce the same enumeration logic used by the Editor
-    // to map index consistently across the combined selector list
+  // Preferred: CSS path if provided
+  if (edit.path) {
+    try {
+      element = document.querySelector(edit.path) as HTMLElement | null;
+    } catch {
+      element = null;
+    }
+  }
+
+  // Legacy: data-editor-id selector
+  if (!element && edit.id) {
+    const selector = `[data-editor-id="${edit.id}"]`;
+    element = document.querySelector(selector) as HTMLElement | null;
+  }
+
+  // Last resort: enumeration heuristic (may be unstable)
+  if (!element && edit.id) {
     const parts = edit.id.split('-');
     const index = parts.length >= 3 ? Number(parts[2]) : NaN;
     if (!Number.isNaN(index)) {
@@ -51,6 +63,21 @@ function applyEditToElement(edit: ElementEdit) {
         }
         return;
       default:
+        // Attributes support
+        if (edit.property.startsWith('attr.')) {
+          const attrName = edit.property.replace('attr.', '');
+          if (attrName === 'className') {
+            (element as HTMLElement).className = edit.value;
+          } else if (attrName === 'id') {
+            (element as HTMLElement).id = edit.value;
+          } else if (edit.value) {
+            element.setAttribute(attrName, edit.value);
+          } else {
+            element.removeAttribute(attrName);
+          }
+          return;
+        }
+        // Styles support
         if (edit.property.startsWith('style.')) {
           const cssProperty = edit.property.replace('style.', '');
           (element.style as any)[cssProperty] = edit.value;

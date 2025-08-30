@@ -96,7 +96,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       }
 
       // Compute and attach metadata
-      const path = buildCssPathFromRoot(root, el);
+      const path = buildCssPathFromRoot(document.body, el);
       const type = el.tagName.toLowerCase();
       const idAttr = (el as HTMLElement).getAttribute('data-editor-id') || undefined;
       (el as any)._editorData = {

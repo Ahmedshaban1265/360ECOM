@@ -2,11 +2,12 @@ import { db } from '@/firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 
 export interface ElementEdit {
-  id: string;           // element id (e.g., pageId-tag-index)
-  elementType: string;  // h1, p, img, a, etc.
-  property: string;     // textContent, innerHTML, src, alt, href, style.xxx
-  value: string;        // new value
-  timestamp: number;    // ms
+  id?: string;           // legacy element id (e.g., pageId-tag-index)
+  path?: string;         // preferred: CSS path to element
+  elementType: string;   // h1, p, img, a, etc.
+  property: string;      // textContent, innerHTML, src, alt, href, style.xxx, attr.*
+  value: string;         // new value
+  timestamp: number;     // ms
 }
 
 export interface PageEditsDoc {

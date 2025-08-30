@@ -127,7 +127,16 @@ export default function EditorToolbar() {
       const pageId = useEditorStore.getState().selectedTemplate || 'home';
       const pageEdits = editingService.getPageEdits(pageId);
       if (pageEdits && Array.isArray(pageEdits.edits) && pageEdits.edits.length > 0) {
-        await publishElementEdits(pageId, pageEdits.edits);
+        // Publish only the fields required by the live site subscriber
+        const simplified = pageEdits.edits.map((e: any) => ({
+          id: e.id,
+          path: e.path,
+          elementType: e.elementType,
+          property: e.property,
+          value: e.value,
+          timestamp: e.timestamp,
+        }));
+        await publishElementEdits(pageId, simplified as any);
       }
       // Show success feedback
       const successEl = document.createElement('div');
