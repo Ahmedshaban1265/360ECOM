@@ -11,9 +11,9 @@ export function ThemeProvider({ children, ...props }) {
   const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
-    // Check for saved theme preference or default to dark
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    setTheme(savedTheme);
+    // Always start editor in dark mode by default; honor saved preference only if present
+    const savedTheme = localStorage.getItem('theme');
+    setTheme(savedTheme || 'dark');
   }, []);
 
   useEffect(() => {

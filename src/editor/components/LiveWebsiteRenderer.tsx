@@ -44,7 +44,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const selectedTemplate = useSelectedTemplate();
   const deviceType = useDeviceType();
   const [language, setLanguage] = useState('en');
-  const [isDark, setIsDark] = useState(false);
+  // Preview website dark mode default: true
+  const [isDark, setIsDark] = useState(true);
   const websiteRef = useRef<HTMLDivElement>(null);
   const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
   const selectedElRef = useRef<HTMLElement | null>(null);
@@ -82,9 +83,15 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
     };
 
     const handleClick = (evt: MouseEvent) => {
-      // Prevent navigation but allow button interactions to be captured logically
-      evt.preventDefault();
-      evt.stopPropagation();
+      // Allow real navigation for anchors
+      const anchor = (evt.target as HTMLElement)?.closest('a');
+      if (anchor && anchor.getAttribute('href')) {
+        // Let the browser navigate. Still capture selection visuals below if needed.
+      } else {
+        // Prevent non-anchor default behaviors from interfering with selection
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
       const target = evt.target as Element | null;
       const el = findSelectableElement(target, root);
       if (!el) return;

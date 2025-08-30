@@ -37,11 +37,28 @@ export function subscribeToLiveEdits(pageId: string, apply: (edit: ElementEdit) 
 
 export async function publishElementEdits(pageId: string, edits: ElementEdit[]) {
   const ref = doc(db, PUBLISHED_COLLECTION, pageId);
-  const docData: any = {
-    edits,
+
+  // Sanitize edits: remove undefined fields, coerce types, and drop empty entries
+  const sanitizedEdits = (Array.isArray(edits) ? edits : []).map((e) => {
+    const out: any = {};
+    if (e.id !== undefined) out.id = String(e.id);
+    if (e.path !== undefined && e.path !== '') out.path = String(e.path);
+    if (e.elementType !== undefined) out.elementType = String(e.elementType);
+    if (e.property !== undefined) out.property = String(e.property);
+    if (e.value !== undefined) out.value = String(e.value);
+    // timestamp: default to now if missing/invalid
+    out.timestamp = typeof e.timestamp === 'number' && !Number.isNaN(e.timestamp)
+      ? e.timestamp
+      : Date.now();
+    return out;
+  }).filter((e) => e.elementType && e.property && (e.path || e.id));
+
+  const docData: Record<string, any> = {
+    edits: sanitizedEdits,
     lastModified: Date.now(),
     version: 1
   };
+
   await setDoc(ref, docData, { merge: true });
 }
 

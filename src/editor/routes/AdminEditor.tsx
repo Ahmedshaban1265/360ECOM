@@ -36,11 +36,8 @@ export default function AdminEditor() {
   const [initError, setInitError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
 
-  // One-way sync: theme context -> editor store (prevents infinite loops)
-  useEffect(() => {
-    const shouldBeDark = theme === 'dark';
-    setDarkMode(shouldBeDark);
-  }, [theme, setDarkMode]);
+  // Remove coupling between editor UI theme and preview theme
+  // The preview dark mode is controlled by template/theme tokens or the preview navbar toggle only.
 
   // Authentication guard
   useEffect(() => {

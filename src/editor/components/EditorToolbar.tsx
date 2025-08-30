@@ -77,7 +77,7 @@ export default function EditorToolbar() {
   const historyIndex = useEditorStore(state => state.historyIndex);
   const history = useEditorStore(state => state.history);
 
-  // Use theme context as single source of truth for dark mode
+  // Editor UI theme only (no coupling to editorStore dark mode)
   const isDarkMode = theme === 'dark';
 
   // Action functions
@@ -327,7 +327,7 @@ export default function EditorToolbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Theme Toggle */}
+          {/* Editor Theme Toggle (affects editor UI only) */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -339,7 +339,7 @@ export default function EditorToolbar() {
                 {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Toggle {isDarkMode ? 'light' : 'dark'} mode</TooltipContent>
+            <TooltipContent>Toggle editor {isDarkMode ? 'light' : 'dark'} mode</TooltipContent>
           </Tooltip>
 
           {/* Import/Export */}
