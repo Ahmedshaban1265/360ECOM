@@ -132,7 +132,7 @@ export default function EditorToolbar() {
       // Also publish element-level edits for the current page
       const pageId = useEditorStore.getState().selectedTemplate || 'home';
       const pageEdits = editingService.getPageEdits(pageId);
-      if (pageEdits && Array.isArray(pageEdits.edits) && pageEdits.edits.length > 0) {
+      if (pageEdits && Array.isArray(pageEdits.edits)) {
         await publishElementEdits(pageId, pageEdits.edits);
       }
       // Show success feedback
