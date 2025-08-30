@@ -7,15 +7,15 @@ export class FirebaseConnectionTest {
     try {
       console.log('Testing Firebase Storage connection...');
       
-      // Test basic connection by listing root
-      const rootRef = ref(storage, '');
+      // Test connection by listing the media root (allowed by rules without auth)
+      const mediaRef = ref(storage, 'theme-media');
       
-      // Set a shorter timeout for testing
+      // Reasonable timeout for slow networks
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Connection timeout')), 10000);
+        setTimeout(() => reject(new Error('Connection timeout')), 20000);
       });
       
-      const testPromise = listAll(rootRef);
+      const testPromise = listAll(mediaRef);
       
       await Promise.race([testPromise, timeoutPromise]);
       
@@ -33,6 +33,10 @@ export class FirebaseConnectionTest {
         errorMessage = 'Unauthorized access. Check Firebase Storage rules and authentication.';
       } else if (error?.code === 'storage/project-not-found') {
         errorMessage = 'Firebase project not found. Check your project configuration.';
+      } else if (error?.code === 'storage/object-not-found') {
+        // Folder doesn't exist yet, but connection is fine
+        console.log('⚠️ theme-media folder not found yet; treating as connected.');
+        return { success: true };
       } else if (error?.message === 'Connection timeout') {
         errorMessage = 'Connection timeout. Check your internet connection.';
       } else if (error?.code === 'storage/unknown') {
