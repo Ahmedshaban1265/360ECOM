@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { storage } from '@/firebase';
 import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
+import { saveMediaReference } from '@/editor/services/MediaService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -79,6 +80,20 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
       }, (err) => {
         console.error(err);
       }, async () => {
+        try {
+          const url = await getDownloadURL(task.snapshot.ref);
+          await saveMediaReference({
+            url,
+            path: task.snapshot.ref.fullPath,
+            name,
+            originalName: file.name,
+            size: file.size,
+            folder: currentPrefix,
+            uploadedAt: Date.now()
+          });
+        } catch (e) {
+          console.warn('Failed to save media reference', e);
+        }
         await loadList();
         setIsUploading(false);
       });

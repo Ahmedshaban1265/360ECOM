@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { storage } from '@/firebase';
 import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
+import { saveMediaReference } from '@/editor/services/MediaService';
 import { FirebaseConnectionTest } from '../services/FirebaseConnectionTest';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -301,6 +302,18 @@ export default function ShopifyImageLibrary({
       });
 
       if (successfulUploads.length > 0) {
+        // Persist each successful upload to Firestore for later reuse
+        try {
+          await Promise.all(successfulUploads.map(img => saveMediaReference({
+            url: img.url,
+            path: img.path,
+            name: img.name,
+            uploadedAt: img.uploadedAt?.getTime() || Date.now(),
+            folder: root
+          })));
+        } catch (e) {
+          console.warn('Failed to persist some media references', e);
+        }
         // Add new images to the beginning of the list
         const updatedImages = [...successfulUploads, ...images];
         setImages(updatedImages);

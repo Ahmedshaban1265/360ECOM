@@ -4,7 +4,7 @@ import { EditorState, TemplateDocument, SectionInstance, BlockInstance, DeviceTy
 import { storageService } from '../services/StorageService';
 import { DEFAULT_THEME_TOKENS } from '../defaults/templates';
 
-export type SidebarTab = 'sections' | 'properties' | 'templates' | 'pages';
+export type SidebarTab = 'sections' | 'properties' | 'templates' | 'media' | 'pages';
 
 interface EditorActions {
   // Template operations
