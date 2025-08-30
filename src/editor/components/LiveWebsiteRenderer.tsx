@@ -87,6 +87,12 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
         const anchor = (element instanceof HTMLAnchorElement ? element : element.closest('a')) as HTMLAnchorElement | null;
         const forceNavigate = e.metaKey || e.ctrlKey;
 
+        // In edit mode, prevent bubbling so ancestors are not selected
+        if (interactionMode === 'edit' && !forceNavigate) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
         if (isLink && anchor) {
           const hrefAttr = anchor.getAttribute('href') || '';
           const isExternal = /^(https?:)?\/\//.test(hrefAttr);

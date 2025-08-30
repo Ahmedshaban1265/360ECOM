@@ -377,6 +377,9 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
                   onOpenChange={setShowImageSelection}
                   onSelect={(image) => {
                     setImageSource(image.url);
+                    if (!imageAlt) {
+                      setImageAlt(image.name || '');
+                    }
                   }}
                 />
               </>
