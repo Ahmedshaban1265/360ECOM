@@ -144,13 +144,24 @@ class EditingService {
               element.href = edit.value;
             }
             break;
-          default:
+          default: {
+            // Attribute edits prefixed with attr.
+            if (edit.property.startsWith('attr.')) {
+              const attrName = edit.property.replace('attr.', '');
+              if (edit.value === '') {
+                element.removeAttribute(attrName);
+              } else {
+                element.setAttribute(attrName, edit.value);
+              }
+              break;
+            }
             // Handle CSS properties
             if (edit.property.startsWith('style.')) {
               const cssProperty = edit.property.replace('style.', '');
               (element.style as any)[cssProperty] = edit.value;
             }
             break;
+          }
         }
       } catch (error) {
         console.error('Failed to apply edit:', edit, error);

@@ -36,6 +36,22 @@ export default function AdminEditor() {
   const [initError, setInitError] = useState<string | null>(null);
   const hasInitialized = useRef(false);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in inputs/textareas/contenteditable
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+      if (e.key.toLowerCase() === 'v') {
+        useEditorStore.getState().toggleInteractionMode();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // One-way sync: theme context -> editor store (prevents infinite loops)
   useEffect(() => {
     const shouldBeDark = theme === 'dark';

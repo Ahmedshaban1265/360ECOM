@@ -30,6 +30,7 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [imageSource, setImageSource] = useState('');
   const [imageAlt, setImageAlt] = useState('');
   const [linkHref, setLinkHref] = useState('');
+  const [attributes, setAttributes] = useState<Array<{ name: string; value: string }>>([]);
   const [backgroundColor, setBackgroundColor] = useState('');
   const [textColor, setTextColor] = useState('');
   const [fontSize, setFontSize] = useState('');
@@ -56,6 +57,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
 
     // Load current values
     setTextContent(element.textContent || '');
+
+    // Load attributes (excluding internal editor attrs)
+    const attrs = Array.from(element.attributes)
+      .filter(attr => !attr.name.startsWith('data-editor-'))
+      .map(attr => ({ name: attr.name, value: attr.value }));
+    setAttributes(attrs);
     
     if (element instanceof HTMLImageElement) {
       setImageSource(element.src || '');
@@ -133,6 +140,47 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       );
       element.href = linkHref;
     }
+
+    // Save attribute changes (generic)
+    const existingAttrs = new Map<string, string>();
+    Array.from(element.attributes).forEach(attr => {
+      if (!attr.name.startsWith('data-editor-')) {
+        existingAttrs.set(attr.name, attr.value);
+      }
+    });
+    attributes.forEach(({ name, value }) => {
+      const prev = existingAttrs.get(name) || '';
+      if (value !== prev) {
+        editingService.saveElementEdit(
+          pageId,
+          id,
+          type,
+          `attr.${name}`,
+          value,
+          prev
+        );
+        try {
+          if (value === '') {
+            element.removeAttribute(name);
+          } else {
+            element.setAttribute(name, value);
+          }
+        } catch {}
+      }
+      existingAttrs.delete(name);
+    });
+    // Removed attributes
+    existingAttrs.forEach((prev, name) => {
+      editingService.saveElementEdit(
+        pageId,
+        id,
+        type,
+        `attr.${name}`,
+        '',
+        prev
+      );
+      element.removeAttribute(name);
+    });
 
     // Save style changes
     if (backgroundColor && backgroundColor !== element.style.backgroundColor) {
@@ -260,29 +308,20 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Text Content Editor */}
-        {(type === 'h1' || type === 'h2' || type === 'h3' || type === 'h4' || type === 'h5' || type === 'h6' || type === 'p' || type === 'button') && (
+        {/* Text Content Editor (for all non-media elements) */}
+        {!(type === 'img') && (
           <div className="space-y-2">
             <Label className="text-xs flex items-center gap-1">
               <Type className="h-3 w-3" />
               Text Content
             </Label>
-            {type === 'p' ? (
-              <Textarea
-                value={textContent}
-                onChange={(e) => setTextContent(e.target.value)}
-                placeholder="Enter text content..."
-                className="text-xs"
-                rows={3}
-              />
-            ) : (
-              <Input
-                value={textContent}
-                onChange={(e) => setTextContent(e.target.value)}
-                placeholder="Enter text content..."
-                className="text-xs"
-              />
-            )}
+            <Textarea
+              value={textContent}
+              onChange={(e) => setTextContent(e.target.value)}
+              placeholder="Enter text content..."
+              className="text-xs"
+              rows={3}
+            />
           </div>
         )}
 
@@ -338,6 +377,58 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
             />
           </div>
         )}
+
+        {/* Attributes Editor */}
+        <Separator />
+        <div className="space-y-2">
+          <Label className="text-xs">Attributes</Label>
+          <div className="space-y-2">
+            {attributes.map((attr, idx) => (
+              <div key={idx} className="grid grid-cols-5 gap-2">
+                <Input
+                  value={attr.name}
+                  onChange={(e) => {
+                    const next = [...attributes];
+                    next[idx] = { ...attr, name: e.target.value };
+                    setAttributes(next);
+                  }}
+                  placeholder="name (e.g. id, class, data-foo)"
+                  className="col-span-2 text-xs"
+                />
+                <Input
+                  value={attr.value}
+                  onChange={(e) => {
+                    const next = [...attributes];
+                    next[idx] = { ...attr, value: e.target.value };
+                    setAttributes(next);
+                  }}
+                  placeholder="value"
+                  className="col-span-3 text-xs"
+                />
+              </div>
+            ))}
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-xs"
+                onClick={() => setAttributes([...attributes, { name: '', value: '' }])}
+              >
+                Add attribute
+              </Button>
+              {attributes.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs"
+                  onClick={() => setAttributes(attributes.filter(a => a.name))}
+                >
+                  Clean empty
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
 
         <Separator />
 

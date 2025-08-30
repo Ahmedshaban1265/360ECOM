@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSelectedTemplate, useDeviceType } from '../store/editorStore';
+import { useSelectedTemplate, useDeviceType, useEditorStore, useInteractionMode, usePreviewDarkMode } from '../store/editorStore';
 import { editingService } from '../services/EditingService';
 
 // Import actual website pages
@@ -42,85 +42,81 @@ const PAGE_COMPONENTS = {
 export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRendererProps) {
   const selectedTemplate = useSelectedTemplate();
   const deviceType = useDeviceType();
+  const interactionMode = useInteractionMode();
+  const previewDarkMode = usePreviewDarkMode();
+  const setSelectedTemplate = useEditorStore(state => state.setSelectedTemplate);
   const [language, setLanguage] = useState('en');
-  const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
-  const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
+  const [trackedElements, setTrackedElements] = useState<HTMLElement[]>([]);
 
   // Get the current page component
   const pageId = selectedTemplate || 'home';
   const PageComponent = PAGE_COMPONENTS[pageId as keyof typeof PAGE_COMPONENTS] || HomePage;
 
-  // Apply editing overlays and make elements clickable
+  // Apply editing overlays and click/navigation handling for all elements
   useEffect(() => {
     if (!websiteRef.current) return;
 
-    const websiteElement = websiteRef.current;
+    const root = websiteRef.current;
 
-    // Find all editable elements (headings, paragraphs, images, etc.)
-    const editableSelectors = [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'p',
-      'img',
-      'button',
-      '[data-editable]',
-      '.editable'
-    ];
+    // Select all potential elements except unsafe/irrelevant ones
+    const nodeList = root.querySelectorAll('*') as NodeListOf<HTMLElement>;
+    const elements = Array.from(nodeList).filter(el => !['HTML','HEAD','BODY','SCRIPT','STYLE','LINK','META'].includes(el.tagName));
 
-    const elements = websiteElement.querySelectorAll(editableSelectors.join(', ')) as NodeListOf<HTMLElement>;
-    const editableElementsArray = Array.from(elements);
-
-    // Add editing overlay and click handlers
-    editableElementsArray.forEach((element, index) => {
-      // Generate unique ID based on element content and position
-      const elementId = `${pageId}-${element.tagName.toLowerCase()}-${index}`;
+    elements.forEach((element, index) => {
+      // Assign stable id/type
+      const tag = element.tagName.toLowerCase();
+      const elementId = element.getAttribute('data-editor-id') || `${pageId}-${tag}-${index}`;
       element.setAttribute('data-editor-id', elementId);
-      element.setAttribute('data-editor-type', element.tagName.toLowerCase());
+      element.setAttribute('data-editor-type', tag);
 
-      // Apply saved edits to this element
+      // Apply saved edits
       editingService.applyElementEdits(element, elementId, pageId);
-      
-      // Add hover effect
-      element.style.cursor = 'pointer';
-      element.style.transition = 'all 0.2s ease';
-      
+
+      // Hover styles via class
       const handleMouseEnter = () => {
-        element.style.outline = '2px dashed #3b82f6';
-        element.style.outlineOffset = '2px';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+        element.classList.add('editor-hover');
       };
-
       const handleMouseLeave = () => {
-        element.style.outline = 'none';
-        element.style.backgroundColor = 'transparent';
+        element.classList.remove('editor-hover');
       };
 
-      const handleClick = (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Remove previous selections
-        editableElementsArray.forEach(el => {
-          el.style.outline = 'none';
-          el.style.backgroundColor = 'transparent';
-        });
-        
-        // Highlight selected element
-        element.style.outline = '2px solid #3b82f6';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-        
-        // Call the click handler
-        if (onElementClick) {
-          const elementType = element.getAttribute('data-editor-type') || 'unknown';
-          const elementId = element.getAttribute('data-editor-id') || `unknown-${index}`;
-          onElementClick(element, elementType);
+      const handleClick = (e: MouseEvent) => {
+        const isLink = element instanceof HTMLAnchorElement || element.closest('a');
+        const anchor = (element instanceof HTMLAnchorElement ? element : element.closest('a')) as HTMLAnchorElement | null;
+        const forceNavigate = e.metaKey || e.ctrlKey;
 
-          // Store reference to selected element for editing
-          (element as any)._editorData = {
-            id: elementId,
-            type: elementType,
-            pageId: pageId
-          };
+        if (isLink && anchor) {
+          const hrefAttr = anchor.getAttribute('href') || '';
+          const isExternal = /^(https?:)?\/\//.test(hrefAttr);
+          const isInternalRoute = hrefAttr.startsWith('/') && !hrefAttr.startsWith('//');
+
+          if (interactionMode === 'navigate' || forceNavigate) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (isExternal) {
+              window.open(hrefAttr, '_blank');
+              return;
+            }
+            if (isInternalRoute) {
+              const page = hrefAttr === '/' ? 'home' : hrefAttr.replace(/^\//, '');
+              setSelectedTemplate(page);
+              return;
+            }
+          } else {
+            // In edit mode, prevent navigation and open editor
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }
+
+        if (interactionMode === 'edit' && !forceNavigate) {
+          // Remove existing selection
+          elements.forEach(el => el.classList.remove('editor-selected'));
+          element.classList.add('editor-selected');
+          const elementType = element.getAttribute('data-editor-type') || tag;
+          onElementClick?.(element, elementType);
+          (element as any)._editorData = { id: elementId, type: elementType, pageId };
         }
       };
 
@@ -128,7 +124,6 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       element.addEventListener('mouseleave', handleMouseLeave);
       element.addEventListener('click', handleClick);
 
-      // Store event listeners for cleanup
       (element as any)._editorEventListeners = {
         mouseenter: handleMouseEnter,
         mouseleave: handleMouseLeave,
@@ -136,11 +131,10 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
       };
     });
 
-    setEditableElements(editableElementsArray);
+    setTrackedElements(elements);
 
-    // Cleanup function
     return () => {
-      editableElementsArray.forEach(element => {
+      elements.forEach(element => {
         const listeners = (element as any)._editorEventListeners;
         if (listeners) {
           element.removeEventListener('mouseenter', listeners.mouseenter);
@@ -148,14 +142,11 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
           element.removeEventListener('click', listeners.click);
           delete (element as any)._editorEventListeners;
         }
-        
-        // Reset styles
-        element.style.outline = 'none';
-        element.style.backgroundColor = 'transparent';
-        element.style.cursor = 'default';
+        element.classList.remove('editor-hover');
+        element.classList.remove('editor-selected');
       });
     };
-  }, [selectedTemplate, onElementClick]);
+  }, [selectedTemplate, interactionMode, onElementClick]);
 
   // Device-specific styling
   const getDeviceStyles = () => {
@@ -187,7 +178,7 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   return (
     <div
       ref={websiteRef}
-      className={`live-website-renderer ${getResponsiveClass()}`}
+      className={`live-website-renderer ${getResponsiveClass()} ${previewDarkMode ? 'dark' : 'light'}`}
       style={getDeviceStyles()}
     >
       {/* Render the actual website with navigation and footer */}
@@ -218,14 +209,13 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             overflow: hidden;
           }
 
-          .live-website-renderer [data-editor-id]:hover {
-            position: relative;
-          }
-
-          .live-website-renderer [data-editor-id]:hover::after {
+          .live-website-renderer [data-editor-id] { transition: outline-color 120ms ease, background-color 120ms ease; }
+          .live-website-renderer .editor-hover { outline: 2px dashed #3b82f6; outline-offset: 2px; background-color: rgba(59,130,246,0.06); }
+          .live-website-renderer .editor-selected { outline: 2px solid #3b82f6; outline-offset: 2px; background-color: rgba(59,130,246,0.08); }
+          .live-website-renderer [data-editor-id].editor-hover::after {
             content: attr(data-editor-type);
             position: absolute;
-            top: -25px;
+            top: -20px;
             left: 0;
             background: #3b82f6;
             color: white;
@@ -236,14 +226,6 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             text-transform: uppercase;
             z-index: 1000;
             pointer-events: none;
-          }
-
-          .live-website-renderer a {
-            pointer-events: none;
-          }
-
-          .live-website-renderer button {
-            pointer-events: auto;
           }
         `
       }} />
