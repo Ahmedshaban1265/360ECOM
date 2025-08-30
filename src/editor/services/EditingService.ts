@@ -4,7 +4,10 @@
  */
 
 export interface ElementEdit {
-  id: string;
+  // Backward compat: id retained for older edits
+  id?: string;
+  // New: CSS path from editor root to element
+  path?: string;
   elementType: string;
   property: string;
   value: string;
@@ -21,11 +24,11 @@ export interface PageEdits {
 export interface WebsiteEdits {
   pages: Record<string, PageEdits>;
   globalEdits: ElementEdit[];
-  version: number;
+  version: number; // 1 = id-based, 2 = path-based
 }
 
 class EditingService {
-  private static readonly STORAGE_KEY = 'website_edits_v1';
+  private static readonly STORAGE_KEY = 'website_edits_v2';
   
   /**
    * Get all website edits from localStorage
@@ -43,7 +46,7 @@ class EditingService {
     return {
       pages: {},
       globalEdits: [],
-      version: 1
+      version: 2
     };
   }
 
@@ -71,16 +74,18 @@ class EditingService {
    */
   saveElementEdit(
     pageId: string,
-    elementId: string,
+    elementPath: string,
     elementType: string,
     property: string,
     value: string,
-    originalValue: string
+    originalValue: string,
+    elementIdFallback?: string
   ): void {
     const websiteEdits = this.getWebsiteEdits();
     
     const edit: ElementEdit = {
-      id: elementId,
+      id: elementIdFallback,
+      path: elementPath,
       elementType,
       property,
       value,
@@ -100,9 +105,12 @@ class EditingService {
     const pageEdits = websiteEdits.pages[pageId];
     
     // Remove existing edit for same element and property
-    pageEdits.edits = pageEdits.edits.filter(
-      e => !(e.id === elementId && e.property === property)
-    );
+    pageEdits.edits = pageEdits.edits.filter(e => {
+      const sameProperty = e.property === property;
+      const samePath = e.path && edit.path ? e.path === edit.path : false;
+      const sameId = e.id && edit.id ? e.id === edit.id : false;
+      return !(sameProperty && (samePath || sameId));
+    });
     
     // Add new edit
     pageEdits.edits.push(edit);
@@ -115,47 +123,83 @@ class EditingService {
    * Apply saved edits to an element
    */
   applyElementEdits(element: HTMLElement, elementId: string, pageId: string): void {
+    // Backward-compat helper: keep API but delegate to generic applier
+    const pageEdits = this.getPageEdits(pageId);
+    if (!pageEdits) return;
+    const elementEdits = pageEdits.edits.filter(edit => edit.id === elementId);
+    elementEdits.forEach(edit => this.applySingleEditToElement(element, edit));
+  }
+
+  /** Apply all saved edits for page to the given root container using path or id fallback */
+  applyAllEditsToRoot(root: HTMLElement, pageId: string): void {
     const pageEdits = this.getPageEdits(pageId);
     if (!pageEdits) return;
 
-    const elementEdits = pageEdits.edits.filter(edit => edit.id === elementId);
-    
-    elementEdits.forEach(edit => {
-      try {
-        switch (edit.property) {
-          case 'textContent':
-            element.textContent = edit.value;
-            break;
-          case 'innerHTML':
-            element.innerHTML = edit.value;
-            break;
-          case 'src':
-            if (element instanceof HTMLImageElement) {
-              element.src = edit.value;
-            }
-            break;
-          case 'alt':
-            if (element instanceof HTMLImageElement) {
-              element.alt = edit.value;
-            }
-            break;
-          case 'href':
-            if (element instanceof HTMLAnchorElement) {
-              element.href = edit.value;
-            }
-            break;
-          default:
-            // Handle CSS properties
-            if (edit.property.startsWith('style.')) {
-              const cssProperty = edit.property.replace('style.', '');
-              (element.style as any)[cssProperty] = edit.value;
-            }
-            break;
+    pageEdits.edits.forEach(edit => {
+      let element: HTMLElement | null = null;
+      if (edit.path) {
+        try {
+          element = root.querySelector(edit.path) as HTMLElement | null;
+        } catch {
+          element = null;
         }
-      } catch (error) {
-        console.error('Failed to apply edit:', edit, error);
+      }
+      if (!element && edit.id) {
+        element = root.querySelector(`[data-editor-id="${edit.id}"]`) as HTMLElement | null;
+      }
+      if (element) {
+        this.applySingleEditToElement(element, edit);
       }
     });
+  }
+
+  private applySingleEditToElement(element: HTMLElement, edit: ElementEdit): void {
+    try {
+      switch (edit.property) {
+        case 'textContent':
+          element.textContent = edit.value;
+          return;
+        case 'innerHTML':
+          element.innerHTML = edit.value;
+          return;
+        case 'src':
+          if (element instanceof HTMLImageElement) {
+            element.src = edit.value;
+          }
+          return;
+        case 'alt':
+          if (element instanceof HTMLImageElement) {
+            element.alt = edit.value;
+          }
+          return;
+        case 'href':
+          if (element instanceof HTMLAnchorElement) {
+            element.href = edit.value;
+          }
+          return;
+        default:
+          // Attributes
+          if (edit.property.startsWith('attr.')) {
+            const attrName = edit.property.replace('attr.', '');
+            if (attrName === 'className') {
+              (element as HTMLElement).className = edit.value;
+            } else if (attrName === 'id') {
+              (element as HTMLElement).id = edit.value;
+            } else {
+              element.setAttribute(attrName, edit.value);
+            }
+            return;
+          }
+          // CSS properties
+          if (edit.property.startsWith('style.')) {
+            const cssProperty = edit.property.replace('style.', '');
+            (element.style as any)[cssProperty] = edit.value;
+            return;
+          }
+      }
+    } catch (error) {
+      console.error('Failed to apply edit:', edit, error);
+    }
   }
 
   /**
@@ -172,6 +216,23 @@ class EditingService {
       pageEdits.lastModified = Date.now();
       this.saveWebsiteEdits(websiteEdits);
     }
+  }
+
+  /**
+   * Clear all edits for a specific element (by path if available, falling back to id)
+   */
+  clearElementEdits(pageId: string, elementPath?: string, elementIdFallback?: string): void {
+    const websiteEdits = this.getWebsiteEdits();
+    const pageEdits = websiteEdits.pages[pageId];
+    if (!pageEdits) return;
+
+    pageEdits.edits = pageEdits.edits.filter(edit => {
+      const matchesPath = elementPath && edit.path === elementPath;
+      const matchesId = elementIdFallback && edit.id === elementIdFallback;
+      return !(matchesPath || matchesId);
+    });
+    pageEdits.lastModified = Date.now();
+    this.saveWebsiteEdits(websiteEdits);
   }
 
   /**

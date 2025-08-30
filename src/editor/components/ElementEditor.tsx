@@ -37,9 +37,15 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const [margin, setMargin] = useState('');
   const [background, setBackground] = useState('');
   const [showImageSelection, setShowImageSelection] = useState(false);
+  const [classNameValue, setClassNameValue] = useState('');
+  const [idValue, setIdValue] = useState('');
+  const [customAttrName, setCustomAttrName] = useState('');
+  const [customAttrValue, setCustomAttrValue] = useState('');
+  const [isContentEditable, setIsContentEditable] = useState(false);
   
   const [elementData, setElementData] = useState<{
-    id: string;
+    id?: string;
+    path?: string;
     type: string;
     pageId: string;
   } | null>(null);
@@ -66,6 +72,10 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       setLinkHref(element.href || '');
     }
 
+    // Attributes
+    setClassNameValue((element as HTMLElement).className || '');
+    setIdValue((element as HTMLElement).id || '');
+
     // Load CSS values (use computed styles to reflect real styles)
     const computedStyle = window.getComputedStyle(element);
     setBackgroundColor(computedStyle.backgroundColor || element.style.backgroundColor || '');
@@ -79,17 +89,19 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const handleSave = () => {
     if (!element || !elementData) return;
 
-    const { id, type, pageId } = elementData;
+    const { id, path, type, pageId } = elementData;
+    const key = path ?? id ?? '';
 
     // Save text content changes
     if (textContent !== element.textContent) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'textContent',
         textContent,
-        element.textContent || ''
+        element.textContent || '',
+        id
       );
       element.textContent = textContent;
     }
@@ -99,11 +111,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       if (imageSource !== element.src) {
         editingService.saveElementEdit(
           pageId,
-          id,
+          path || '',
           type,
           'src',
           imageSource,
-          element.src
+          element.src,
+          id
         );
         element.src = imageSource;
       }
@@ -111,11 +124,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
       if (imageAlt !== element.alt) {
         editingService.saveElementEdit(
           pageId,
-          id,
+          path || '',
           type,
           'alt',
           imageAlt,
-          element.alt
+          element.alt,
+          id
         );
         element.alt = imageAlt;
       }
@@ -125,11 +139,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     if (element instanceof HTMLAnchorElement && linkHref !== element.href) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'href',
         linkHref,
-        element.href
+        element.href,
+        id
       );
       element.href = linkHref;
     }
@@ -138,11 +153,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     if (backgroundColor && backgroundColor !== element.style.backgroundColor) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'style.backgroundColor',
         backgroundColor,
-        element.style.backgroundColor
+        element.style.backgroundColor,
+        id
       );
       element.style.backgroundColor = backgroundColor;
     }
@@ -150,11 +166,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     if (textColor && textColor !== element.style.color) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'style.color',
         textColor,
-        element.style.color
+        element.style.color,
+        id
       );
       element.style.color = textColor;
     }
@@ -162,11 +179,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     if (fontSize && fontSize !== element.style.fontSize) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'style.fontSize',
         fontSize,
-        element.style.fontSize
+        element.style.fontSize,
+        id
       );
       element.style.fontSize = fontSize;
     }
@@ -174,11 +192,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     if (padding && padding !== element.style.padding) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'style.padding',
         padding,
-        element.style.padding
+        element.style.padding,
+        id
       );
       element.style.padding = padding;
     }
@@ -186,11 +205,12 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     if (margin && margin !== element.style.margin) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'style.margin',
         margin,
-        element.style.margin
+        element.style.margin,
+        id
       );
       element.style.margin = margin;
     }
@@ -198,14 +218,65 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
     if (background && background !== element.style.background) {
       editingService.saveElementEdit(
         pageId,
-        id,
+        path || '',
         type,
         'style.background',
         background,
-        element.style.background
+        element.style.background,
+        id
       );
       element.style.background = background;
     }
+
+    // Attributes
+    if (classNameValue !== (element as HTMLElement).className) {
+      editingService.saveElementEdit(
+        pageId,
+        path || '',
+        type,
+        'attr.className',
+        classNameValue,
+        (element as HTMLElement).className,
+        id
+      );
+      (element as HTMLElement).className = classNameValue;
+    }
+
+    if (idValue !== (element as HTMLElement).id) {
+      editingService.saveElementEdit(
+        pageId,
+        path || '',
+        type,
+        'attr.id',
+        idValue,
+        (element as HTMLElement).id,
+        id
+      );
+      (element as HTMLElement).id = idValue;
+    }
+
+    if (customAttrName) {
+      const prev = element.getAttribute(customAttrName) || '';
+      if (customAttrValue !== prev) {
+        editingService.saveElementEdit(
+          pageId,
+          path || '',
+          type,
+          `attr.${customAttrName}`,
+          customAttrValue,
+          prev,
+          id
+        );
+        if (customAttrValue) {
+          element.setAttribute(customAttrName, customAttrValue);
+        } else {
+          element.removeAttribute(customAttrName);
+        }
+      }
+    }
+
+    // contentEditable inline support (apply textContent on blur is already handled by textContent)
+    (element as HTMLElement).contentEditable = isContentEditable ? 'true' : 'inherit';
 
     onSave();
   };
@@ -213,10 +284,10 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
   const handleUndo = () => {
     if (!elementData) return;
     
-    const { id, pageId } = elementData;
+    const { id, path, pageId } = elementData;
     
-    // Clear all edits for this element
-    editingService.clearPageEdits(pageId);
+    // Clear edits for this element only
+    editingService.clearElementEdits(pageId, path, id);
     
     // Reload the page to reset the element
     window.location.reload();
@@ -246,7 +317,7 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
           <div className="flex items-center gap-2">
             <CardTitle className="text-sm">Edit {type.toUpperCase()}</CardTitle>
             <Badge variant="outline" className="text-xs">
-              {elementData.id}
+              {elementData.path || elementData.id}
             </Badge>
           </div>
           <Button
@@ -340,6 +411,39 @@ export default function ElementEditor({ element, onClose, onSave }: ElementEdito
         )}
 
         <Separator />
+
+        {/* Attributes */}
+        <div className="space-y-2">
+          <Label className="text-xs">Attributes</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-[10px]">className</Label>
+              <Input value={classNameValue} onChange={(e) => setClassNameValue(e.target.value)} className="text-xs" />
+            </div>
+            <div>
+              <Label className="text-[10px]">id</Label>
+              <Input value={idValue} onChange={(e) => setIdValue(e.target.value)} className="text-xs" />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-[10px]">custom attr</Label>
+              <Input value={customAttrName} onChange={(e) => setCustomAttrName(e.target.value)} placeholder="data-* or aria-*" className="text-xs" />
+            </div>
+            <div>
+              <Label className="text-[10px]">value</Label>
+              <Input value={customAttrValue} onChange={(e) => setCustomAttrValue(e.target.value)} className="text-xs" />
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Inline edit toggle */}
+        <div className="flex items-center justify-between">
+          <Label className="text-xs">Enable inline editing</Label>
+          <Input type="checkbox" checked={isContentEditable} onChange={(e) => setIsContentEditable(e.target.checked)} className="w-4 h-4" />
+        </div>
 
         {/* Styling Options */}
         <div className="space-y-3">

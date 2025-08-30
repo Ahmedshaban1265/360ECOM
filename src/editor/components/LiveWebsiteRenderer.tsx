@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSelectedTemplate, useDeviceType } from '../store/editorStore';
 import { editingService } from '../services/EditingService';
+import { buildCssPathFromRoot, findSelectableElement } from '../utils/domPath';
 
 // Import actual website pages
 import HomePage from '@/pages/HomePage';
@@ -46,116 +47,90 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
   const [isDark, setIsDark] = useState(false);
   const websiteRef = useRef<HTMLDivElement>(null);
   const [editableElements, setEditableElements] = useState<HTMLElement[]>([]);
+  const selectedElRef = useRef<HTMLElement | null>(null);
 
   // Get the current page component
   const pageId = selectedTemplate || 'home';
   const PageComponent = PAGE_COMPONENTS[pageId as keyof typeof PAGE_COMPONENTS] || HomePage;
 
-  // Apply editing overlays and make elements clickable
+  // Apply saved edits to entire root and attach delegated listeners for selection
   useEffect(() => {
-    if (!websiteRef.current) return;
+    const root = websiteRef.current;
+    if (!root) return;
 
-    const websiteElement = websiteRef.current;
+    // Apply all saved edits using path-based targeting
+    editingService.applyAllEditsToRoot(root, pageId);
 
-    // Find all editable elements (headings, paragraphs, images, etc.)
-    const editableSelectors = [
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'p',
-      'img',
-      'button',
-      '[data-editable]',
-      '.editable'
-    ];
-
-    const elements = websiteElement.querySelectorAll(editableSelectors.join(', ')) as NodeListOf<HTMLElement>;
-    const editableElementsArray = Array.from(elements);
-
-    // Add editing overlay and click handlers
-    editableElementsArray.forEach((element, index) => {
-      // Generate unique ID based on element content and position
-      const elementId = `${pageId}-${element.tagName.toLowerCase()}-${index}`;
-      element.setAttribute('data-editor-id', elementId);
-      element.setAttribute('data-editor-type', element.tagName.toLowerCase());
-
-      // Apply saved edits to this element
-      editingService.applyElementEdits(element, elementId, pageId);
-      
-      // Add hover effect
-      element.style.cursor = 'pointer';
-      element.style.transition = 'all 0.2s ease';
-      
-      const handleMouseEnter = () => {
-        element.style.outline = '2px dashed #3b82f6';
-        element.style.outlineOffset = '2px';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-      };
-
-      const handleMouseLeave = () => {
-        element.style.outline = 'none';
-        element.style.backgroundColor = 'transparent';
-      };
-
-      const handleClick = (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Remove previous selections
-        editableElementsArray.forEach(el => {
-          el.style.outline = 'none';
-          el.style.backgroundColor = 'transparent';
-        });
-        
-        // Highlight selected element
-        element.style.outline = '2px solid #3b82f6';
-        element.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-        
-        // Call the click handler
-        if (onElementClick) {
-          const elementType = element.getAttribute('data-editor-type') || 'unknown';
-          const elementId = element.getAttribute('data-editor-id') || `unknown-${index}`;
-          onElementClick(element, elementType);
-
-          // Store reference to selected element for editing
-          (element as any)._editorData = {
-            id: elementId,
-            type: elementType,
-            pageId: pageId
-          };
-        }
-      };
-
-      element.addEventListener('mouseenter', handleMouseEnter);
-      element.addEventListener('mouseleave', handleMouseLeave);
-      element.addEventListener('click', handleClick);
-
-      // Store event listeners for cleanup
-      (element as any)._editorEventListeners = {
-        mouseenter: handleMouseEnter,
-        mouseleave: handleMouseLeave,
-        click: handleClick
-      };
-    });
-
-    setEditableElements(editableElementsArray);
-
-    // Cleanup function
-    return () => {
-      editableElementsArray.forEach(element => {
-        const listeners = (element as any)._editorEventListeners;
-        if (listeners) {
-          element.removeEventListener('mouseenter', listeners.mouseenter);
-          element.removeEventListener('mouseleave', listeners.mouseleave);
-          element.removeEventListener('click', listeners.click);
-          delete (element as any)._editorEventListeners;
-        }
-        
-        // Reset styles
-        element.style.outline = 'none';
-        element.style.backgroundColor = 'transparent';
-        element.style.cursor = 'default';
-      });
+    // Delegated hover/selection handlers
+    const handleMouseOver = (evt: MouseEvent) => {
+      const target = evt.target as Element | null;
+      const el = findSelectableElement(target, root);
+      if (!el) return;
+      el.style.cursor = 'pointer';
+      el.style.transition = 'all 0.12s ease';
+      el.style.outline = '2px dashed #3b82f6';
+      el.style.outlineOffset = '2px';
     };
-  }, [selectedTemplate, onElementClick]);
+
+    const handleMouseOut = (evt: MouseEvent) => {
+      const target = evt.target as HTMLElement | null;
+      if (!target) return;
+      // Avoid clearing outline for the currently selected element
+      if (selectedElRef.current && target === selectedElRef.current) return;
+      target.style.outline = 'none';
+      target.style.outlineOffset = '0px';
+    };
+
+    const handleClick = (evt: MouseEvent) => {
+      // Prevent navigation but allow button interactions to be captured logically
+      evt.preventDefault();
+      evt.stopPropagation();
+      const target = evt.target as Element | null;
+      const el = findSelectableElement(target, root);
+      if (!el) return;
+
+      // Clear previous selection styles
+      if (selectedElRef.current && selectedElRef.current !== el) {
+        selectedElRef.current.style.outline = 'none';
+        selectedElRef.current.style.backgroundColor = 'transparent';
+      }
+
+      // Compute and attach metadata
+      const path = buildCssPathFromRoot(root, el);
+      const type = el.tagName.toLowerCase();
+      const idAttr = (el as HTMLElement).getAttribute('data-editor-id') || undefined;
+      (el as any)._editorData = {
+        path,
+        type,
+        pageId,
+        id: idAttr
+      };
+
+      // Visual selection
+      el.style.outline = '2px solid #3b82f6';
+      el.style.backgroundColor = 'rgba(59, 130, 246, 0.08)';
+      selectedElRef.current = el as HTMLElement;
+
+      if (onElementClick) {
+        onElementClick(el as HTMLElement, type);
+      }
+    };
+
+    root.addEventListener('mouseover', handleMouseOver, true);
+    root.addEventListener('mouseout', handleMouseOut, true);
+    root.addEventListener('click', handleClick, true);
+
+    return () => {
+      root.removeEventListener('mouseover', handleMouseOver, true);
+      root.removeEventListener('mouseout', handleMouseOut, true);
+      root.removeEventListener('click', handleClick, true);
+      if (selectedElRef.current) {
+        selectedElRef.current.style.outline = 'none';
+        selectedElRef.current.style.backgroundColor = 'transparent';
+        selectedElRef.current = null;
+      }
+    };
+  }, [selectedTemplate, onElementClick, pageId]);
 
   // Device-specific styling
   const getDeviceStyles = () => {
@@ -217,34 +192,8 @@ export default function LiveWebsiteRenderer({ onElementClick }: LiveWebsiteRende
             height: 100%;
             overflow: hidden;
           }
-
-          .live-website-renderer [data-editor-id]:hover {
-            position: relative;
-          }
-
-          .live-website-renderer [data-editor-id]:hover::after {
-            content: attr(data-editor-type);
-            position: absolute;
-            top: -25px;
-            left: 0;
-            background: #3b82f6;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 500;
-            text-transform: uppercase;
-            z-index: 1000;
-            pointer-events: none;
-          }
-
-          .live-website-renderer a {
-            pointer-events: none;
-          }
-
-          .live-website-renderer button {
-            pointer-events: auto;
-          }
+          
+          .live-website-renderer a { text-decoration: inherit; }
         `
       }} />
     </div>
