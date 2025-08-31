@@ -1,6 +1,5 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from 'react';
-import { loginApi, verifyTokenApi } from '@/services/authApi';
 
 const AuthContext = createContext();
 
@@ -13,30 +12,32 @@ export const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const checkAuthStatus = async () => {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        setIsAuthenticated(false);
-      } else {
-        await verifyTokenApi();
+  const checkAuthStatus = () => {
+    const isAuth = localStorage.getItem('isAdminAuthenticated') === 'true';
+    const loginTime = localStorage.getItem('adminLoginTime');
+
+    if (isAuth && loginTime) {
+      const currentTime = Date.now();
+      const sessionDuration = 24 * 60 * 60 * 1000;
+
+      if (currentTime - parseInt(loginTime, 10) < sessionDuration) {
         setIsAuthenticated(true);
+      } else {
+        logout();
       }
-    } catch {
-      setIsAuthenticated(false);
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
-  const login = async (email, password) => {
-    const { token } = await loginApi(email, password);
-    localStorage.setItem('authToken', token);
+  const login = () => {
+    localStorage.setItem('isAdminAuthenticated', 'true');
+    localStorage.setItem('adminLoginTime', Date.now().toString());
     setIsAuthenticated(true);
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('isAdminAuthenticated');
+    localStorage.removeItem('adminLoginTime');
     setIsAuthenticated(false);
   };
 

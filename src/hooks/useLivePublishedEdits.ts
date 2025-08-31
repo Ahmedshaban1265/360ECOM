@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import { ElementEdit } from '@/editor/services/EditsFirestoreService';
-import { subscribeToLiveEditsHttp } from '@/editor/services/ApiEditsService';
+import { subscribeToLiveEdits, ElementEdit } from '@/editor/services/EditsFirestoreService';
 
 function applyEditToElement(edit: ElementEdit) {
   // Try exact match by data-editor-id first
@@ -65,7 +64,7 @@ function applyEditToElement(edit: ElementEdit) {
 export default function useLivePublishedEdits(pageId: string) {
   useEffect(() => {
     if (!pageId) return;
-    const unsub = subscribeToLiveEditsHttp(pageId, applyEditToElement);
+    const unsub = subscribeToLiveEdits(pageId, applyEditToElement);
     return () => unsub();
   }, [pageId]);
 }
