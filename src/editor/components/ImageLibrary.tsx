@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { apiDelete, apiGet, apiPost } from '@/lib/api';
+import { storage } from '@/firebase';
+import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -45,8 +46,12 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const loadList = async () => {
     setIsLoading(true);
     try {
-      setFolders([]);
-      const items: ImageItem[] = await apiGet('/api/media/list');
+      const folderRef = ref(storage, currentPrefix);
+      const res = await listAll(folderRef);
+      setFolders(res.prefixes.map((p) => p.name));
+      const items: ImageItem[] = await Promise.all(
+        res.items.map(async (itemRef) => ({ url: await getDownloadURL(itemRef), path: itemRef.fullPath }))
+      );
       setImages(items);
     } catch (e) {
       console.error('Failed to load images', e);
@@ -63,12 +68,20 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const onUpload = async (file: File) => {
     setIsUploading(true);
     try {
-      const form = new FormData();
-      form.append('file', file);
-      await apiPost('/api/media/upload', form);
-      if (progressRef.current) progressRef.current.style.width = '100%';
-      await loadList();
-      setIsUploading(false);
+      const ext = file.name.split('.').pop() || 'bin';
+      const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const prefix = currentPrefix.endsWith('/') ? currentPrefix : `${currentPrefix}/`;
+      const fileRef = ref(storage, `${prefix}${name}`);
+      const task = uploadBytesResumable(fileRef, file);
+      task.on('state_changed', (snap) => {
+        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+        if (progressRef.current) progressRef.current.style.width = pct + '%';
+      }, (err) => {
+        console.error(err);
+      }, async () => {
+        await loadList();
+        setIsUploading(false);
+      });
     } catch (e) {
       console.error('Upload failed', e);
       setIsUploading(false);
@@ -96,7 +109,7 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const removeImage = async (path: string) => {
     if (!confirm('Delete this image?')) return;
     try {
-      await apiDelete('/api/media', { path });
+      await deleteObject(ref(storage, path));
       await loadList();
     } catch (e) {
       console.error('Delete failed', e);

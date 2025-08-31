@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { apiDelete, apiGet, apiPost } from '@/lib/api';
+import { storage } from '@/firebase';
+import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
+import { FirebaseConnectionTest } from '../services/FirebaseConnectionTest';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -61,8 +63,53 @@ export default function ShopifyImageLibrary({
       });
 
       const loadPromise = async () => {
-        const items: ImageItem[] = await apiGet('/api/media/list');
-        return items.map((it) => ({ ...it, uploadedAt: new Date() }));
+        const folderRef = ref(storage, root);
+
+        // Try to list with exponential backoff
+        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+        if (retryCount > 0) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+
+        const res = await listAll(folderRef);
+
+        // Process images in smaller batches to avoid overwhelming Firebase
+        const batchSize = 10;
+        const imageItems: ImageItem[] = [];
+        const filteredItems = res.items.filter(item => {
+          const name = item.name.toLowerCase();
+          return name.endsWith('.jpg') || name.endsWith('.jpeg') ||
+                 name.endsWith('.png') || name.endsWith('.gif') ||
+                 name.endsWith('.webp') || name.endsWith('.svg');
+        });
+
+        for (let i = 0; i < filteredItems.length; i += batchSize) {
+          const batch = filteredItems.slice(i, i + batchSize);
+          const batchPromises = batch.map(async (itemRef) => {
+            try {
+              const url = await getDownloadURL(itemRef);
+              return {
+                url,
+                path: itemRef.fullPath,
+                name: itemRef.name,
+                uploadedAt: new Date(parseInt(itemRef.name.split('-')[0]) || Date.now())
+              };
+            } catch (urlError) {
+              console.warn(`Failed to get download URL for ${itemRef.name}:`, urlError);
+              return null;
+            }
+          });
+
+          const batchResults = await Promise.all(batchPromises);
+          imageItems.push(...batchResults.filter(item => item !== null) as ImageItem[]);
+
+          // Small delay between batches
+          if (i + batchSize < filteredItems.length) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+
+        return imageItems;
       };
 
       const imageItems = await Promise.race([loadPromise(), timeoutPromise]) as ImageItem[];
@@ -78,8 +125,10 @@ export default function ShopifyImageLibrary({
     } catch (error: any) {
       console.error(`Failed to load images (attempt ${retryCount + 1}):`, error);
 
-      // Retry logic
-      if (error?.message === 'Operation timeout') {
+      // Handle specific Firebase errors
+      if (error?.code === 'storage/retry-limit-exceeded' ||
+          error?.code === 'storage/timeout' ||
+          error?.message === 'Operation timeout') {
 
         if (retryCount < maxRetries) {
           console.log(`Retrying... (${retryCount + 1}/${maxRetries})`);
@@ -92,6 +141,10 @@ export default function ShopifyImageLibrary({
           setImages([]);
           setFilteredImages([]);
         }
+      } else if (error?.code === 'storage/object-not-found') {
+        console.log('No images folder found, starting with empty library');
+        setImages([]);
+        setFilteredImages([]);
       } else {
         console.error('Unexpected error loading images:', error);
         setImages([]);
@@ -105,8 +158,27 @@ export default function ShopifyImageLibrary({
   useEffect(() => {
     if (open) {
       setConnectionError(null);
-      // Load images
-      loadImages();
+      // Test connection first, then load images
+      FirebaseConnectionTest.testStorageConnection()
+        .then(result => {
+          if (result.success) {
+            loadImages();
+          } else {
+            console.error('Firebase Storage connection failed:', result.error);
+            setConnectionError(result.error || 'Connection failed');
+            setIsLoading(false);
+            // Set empty state with error info
+            setImages([]);
+            setFilteredImages([]);
+          }
+        })
+        .catch(error => {
+          console.error('Connection test failed:', error);
+          setConnectionError('Failed to connect to Firebase Storage');
+          setIsLoading(false);
+          setImages([]);
+          setFilteredImages([]);
+        });
     }
   }, [open, loadImages]);
 
@@ -168,15 +240,50 @@ export default function ShopifyImageLibrary({
       console.log(`Uploading ${validFiles.length} files...`);
 
       const uploadPromises = validFiles.map(async (file, index) => {
-        const form = new FormData();
-        form.append('file', file);
-        const result = await apiPost('/api/media/upload', form);
-        setUploadProgress(prev => {
-          const fileProgress = 100 / validFiles.length;
-          const baseProgress = (index / validFiles.length) * 100;
-          return baseProgress + fileProgress;
+        const ext = file.name.split('.').pop() || 'bin';
+        const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const fileRef = ref(storage, `${root}/${name}`);
+
+        return new Promise<ImageItem>((resolve, reject) => {
+          const task = uploadBytesResumable(fileRef, file);
+
+          // Set timeout for upload
+          const timeout = setTimeout(() => {
+            task.cancel();
+            reject(new Error(`Upload timeout for ${file.name}`));
+          }, 60000); // 60 second timeout per file
+
+          task.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              // Update progress for the whole batch
+              setUploadProgress(prev => {
+                const fileProgress = progress / validFiles.length;
+                const baseProgress = (index / validFiles.length) * 100;
+                return baseProgress + fileProgress;
+              });
+            },
+            (error) => {
+              clearTimeout(timeout);
+              console.error(`Upload failed for ${file.name}:`, error);
+              reject(error);
+            },
+            async () => {
+              clearTimeout(timeout);
+              try {
+                const url = await getDownloadURL(task.snapshot.ref);
+                resolve({
+                  url,
+                  path: task.snapshot.ref.fullPath,
+                  name,
+                  uploadedAt: new Date()
+                });
+              } catch (urlError) {
+                reject(urlError);
+              }
+            }
+          );
         });
-        return { url: result.url, path: result.path, name: result.name, uploadedAt: new Date() } as ImageItem;
       });
 
       const results = await Promise.allSettled(uploadPromises);
@@ -214,7 +321,16 @@ export default function ShopifyImageLibrary({
 
     } catch (error: any) {
       console.error('Upload failed:', error);
-      console.error('Upload error:', error?.message || error);
+      // Handle specific Firebase Storage errors
+      if (error?.code === 'storage/retry-limit-exceeded') {
+        console.error('Upload retry limit exceeded. Please try again later.');
+      } else if (error?.code === 'storage/unauthorized') {
+        console.error('Upload unauthorized. Please check Firebase Storage rules.');
+      } else if (error?.code === 'storage/canceled') {
+        console.error('Upload was canceled.');
+      } else {
+        console.error('Upload error:', error?.message || error);
+      }
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -274,7 +390,19 @@ export default function ShopifyImageLibrary({
   const handleRetry = () => {
     setConnectionError(null);
     setIsLoading(true);
-    loadImages().catch(() => setIsLoading(false));
+    FirebaseConnectionTest.testStorageConnection()
+      .then(result => {
+        if (result.success) {
+          loadImages();
+        } else {
+          setConnectionError(result.error || 'Connection failed');
+          setIsLoading(false);
+        }
+      })
+      .catch(error => {
+        setConnectionError('Failed to connect to Firebase Storage');
+        setIsLoading(false);
+      });
   };
 
   return (
