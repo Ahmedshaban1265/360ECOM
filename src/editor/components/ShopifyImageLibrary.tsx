@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { storage } from '@/firebase';
 import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
+import { collection, getDocs, orderBy, query, limit as qLimit } from 'firebase/firestore';
+import { db } from '@/firebase';
 import { saveMediaReference } from '@/editor/services/MediaService';
 import { FirebaseConnectionTest } from '../services/FirebaseConnectionTest';
 import { Button } from '@/components/ui/button';
@@ -51,110 +53,30 @@ export default function ShopifyImageLibrary({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropAreaRef = useRef<HTMLDivElement>(null);
 
-  const loadImages = useCallback(async (retryCount = 0) => {
-    const maxRetries = 3;
+  const loadImages = useCallback(async () => {
     setIsLoading(true);
-
     try {
-      console.log(`Loading images... (attempt ${retryCount + 1})`);
-
-      // Add timeout for the operation
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Operation timeout')), 30000); // 30 second timeout
+      const q = query(collection(db, 'media_library_v1'), orderBy('uploadedAt', 'desc'), qLimit(200));
+      const snapshot = await getDocs(q);
+      const items: ImageItem[] = snapshot.docs.map((d) => {
+        const data = d.data() as any;
+        return {
+          url: data.url,
+          path: data.path,
+          name: data.name,
+          uploadedAt: data.uploadedAt ? new Date(data.uploadedAt) : undefined
+        };
       });
-
-      const loadPromise = async () => {
-        const folderRef = ref(storage, root);
-
-        // Try to list with exponential backoff
-        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-        if (retryCount > 0) {
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-
-        const res = await listAll(folderRef);
-
-        // Process images in smaller batches to avoid overwhelming Firebase
-        const batchSize = 10;
-        const imageItems: ImageItem[] = [];
-        const filteredItems = res.items.filter(item => {
-          const name = item.name.toLowerCase();
-          return name.endsWith('.jpg') || name.endsWith('.jpeg') ||
-                 name.endsWith('.png') || name.endsWith('.gif') ||
-                 name.endsWith('.webp') || name.endsWith('.svg');
-        });
-
-        for (let i = 0; i < filteredItems.length; i += batchSize) {
-          const batch = filteredItems.slice(i, i + batchSize);
-          const batchPromises = batch.map(async (itemRef) => {
-            try {
-              const url = await getDownloadURL(itemRef);
-              return {
-                url,
-                path: itemRef.fullPath,
-                name: itemRef.name,
-                uploadedAt: new Date(parseInt(itemRef.name.split('-')[0]) || Date.now())
-              };
-            } catch (urlError) {
-              console.warn(`Failed to get download URL for ${itemRef.name}:`, urlError);
-              return null;
-            }
-          });
-
-          const batchResults = await Promise.all(batchPromises);
-          imageItems.push(...batchResults.filter(item => item !== null) as ImageItem[]);
-
-          // Small delay between batches
-          if (i + batchSize < filteredItems.length) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-        }
-
-        return imageItems;
-      };
-
-      const imageItems = await Promise.race([loadPromise(), timeoutPromise]) as ImageItem[];
-
-      // Sort by upload date (newest first)
-      imageItems.sort((a, b) => (b.uploadedAt?.getTime() || 0) - (a.uploadedAt?.getTime() || 0));
-
-      setImages(imageItems);
-      setFilteredImages(imageItems);
-
-      console.log(`Successfully loaded ${imageItems.length} images`);
-
-    } catch (error: any) {
-      console.error(`Failed to load images (attempt ${retryCount + 1}):`, error);
-
-      // Handle specific Firebase errors
-      if (error?.code === 'storage/retry-limit-exceeded' ||
-          error?.code === 'storage/timeout' ||
-          error?.message === 'Operation timeout') {
-
-        if (retryCount < maxRetries) {
-          console.log(`Retrying... (${retryCount + 1}/${maxRetries})`);
-          // Retry with exponential backoff
-          setTimeout(() => loadImages(retryCount + 1), Math.min(1000 * Math.pow(2, retryCount), 5000));
-          return;
-        } else {
-          console.error('Max retries exceeded. Please check your internet connection and Firebase configuration.');
-          // Set empty array if all retries failed
-          setImages([]);
-          setFilteredImages([]);
-        }
-      } else if (error?.code === 'storage/object-not-found') {
-        console.log('No images folder found, starting with empty library');
-        setImages([]);
-        setFilteredImages([]);
-      } else {
-        console.error('Unexpected error loading images:', error);
-        setImages([]);
-        setFilteredImages([]);
-      }
+      setImages(items);
+      setFilteredImages(items);
+    } catch (e) {
+      console.error('Failed to load images from Firestore', e);
+      setImages([]);
+      setFilteredImages([]);
     } finally {
       setIsLoading(false);
     }
-  }, [root]);
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -246,50 +168,26 @@ export default function ShopifyImageLibrary({
       console.log(`Uploading ${validFiles.length} files...`);
 
       const uploadPromises = validFiles.map(async (file, index) => {
-        const ext = file.name.split('.').pop() || 'bin';
-        const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const fileRef = ref(storage, `${root}/${name}`);
-
-        return new Promise<ImageItem>((resolve, reject) => {
-          const task = uploadBytesResumable(fileRef, file);
-
-          // Set timeout for upload
-          const timeout = setTimeout(() => {
-            task.cancel();
-            reject(new Error(`Upload timeout for ${file.name}`));
-          }, 60000); // 60 second timeout per file
-
-          task.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              // Update progress for the whole batch
-              setUploadProgress(prev => {
-                const fileProgress = progress / validFiles.length;
-                const baseProgress = (index / validFiles.length) * 100;
-                return baseProgress + fileProgress;
-              });
-            },
-            (error) => {
-              clearTimeout(timeout);
-              console.error(`Upload failed for ${file.name}:`, error);
-              reject(error);
-            },
-            async () => {
-              clearTimeout(timeout);
-              try {
-                const url = await getDownloadURL(task.snapshot.ref);
-                resolve({
-                  url,
-                  path: task.snapshot.ref.fullPath,
-                  name,
-                  uploadedAt: new Date()
-                });
-              } catch (urlError) {
-                reject(urlError);
-              }
-            }
-          );
-        });
+        try {
+          // Use backend function via MediaService fallback-aware API
+          const { uploadMedia } = await import('@/editor/services/MediaService');
+          const result = await uploadMedia(file, root, (progressPct) => {
+            setUploadProgress(prev => {
+              const fileProgress = (progressPct) / validFiles.length;
+              const baseProgress = (index / validFiles.length) * 100;
+              return baseProgress + fileProgress;
+            });
+          });
+          return {
+            url: result.url,
+            path: result.path,
+            name: result.name || file.name,
+            uploadedAt: new Date(result.uploadedAt || Date.now())
+          } as ImageItem;
+        } catch (err) {
+          console.error(`Upload failed for ${file.name}:`, err);
+          throw err;
+        }
       });
 
       const results = await Promise.allSettled(uploadPromises);

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { storage } from '@/firebase';
+import { storage, db } from '@/firebase';
 import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
+import { collection, getDocs, orderBy, query, limit as qLimit } from 'firebase/firestore';
 import { saveMediaReference } from '@/editor/services/MediaService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,15 +48,16 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const loadList = async () => {
     setIsLoading(true);
     try {
-      const folderRef = ref(storage, currentPrefix);
-      const res = await listAll(folderRef);
-      setFolders(res.prefixes.map((p) => p.name));
-      const items: ImageItem[] = await Promise.all(
-        res.items.map(async (itemRef) => ({ url: await getDownloadURL(itemRef), path: itemRef.fullPath }))
-      );
+      const q = query(collection(db, 'media_library_v1'), orderBy('uploadedAt', 'desc'), qLimit(200));
+      const snapshot = await getDocs(q);
+      const items: ImageItem[] = snapshot.docs.map((d) => {
+        const data = d.data() as any;
+        return { url: data.url, path: data.path };
+      });
       setImages(items);
+      setFolders([]);
     } catch (e) {
-      console.error('Failed to load images', e);
+      console.error('Failed to load images from Firestore', e);
     } finally {
       setIsLoading(false);
     }
@@ -69,34 +71,12 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const onUpload = async (file: File) => {
     setIsUploading(true);
     try {
-      const ext = file.name.split('.').pop() || 'bin';
-      const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const prefix = currentPrefix.endsWith('/') ? currentPrefix : `${currentPrefix}/`;
-      const fileRef = ref(storage, `${prefix}${name}`);
-      const task = uploadBytesResumable(fileRef, file);
-      task.on('state_changed', (snap) => {
-        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
+      const { uploadMedia } = await import('@/editor/services/MediaService');
+      await uploadMedia(file, currentPrefix, (pct) => {
         if (progressRef.current) progressRef.current.style.width = pct + '%';
-      }, (err) => {
-        console.error(err);
-      }, async () => {
-        try {
-          const url = await getDownloadURL(task.snapshot.ref);
-          await saveMediaReference({
-            url,
-            path: task.snapshot.ref.fullPath,
-            name,
-            originalName: file.name,
-            size: file.size,
-            folder: currentPrefix,
-            uploadedAt: Date.now()
-          });
-        } catch (e) {
-          console.warn('Failed to save media reference', e);
-        }
-        await loadList();
-        setIsUploading(false);
       });
+      await loadList();
+      setIsUploading(false);
     } catch (e) {
       console.error('Upload failed', e);
       setIsUploading(false);

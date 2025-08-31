@@ -36,8 +36,48 @@ export async function saveMediaReference(record: Omit<MediaRecord, 'id'> & { id?
   }, { merge: true });
 }
 
-export function uploadMedia(file: File, folder: string, onProgress?: (pct: number) => void): Promise<UploadResult> {
+async function readFileAsBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64 = result.split(',')[1] || '';
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadViaFunction(file: File, folder: string): Promise<UploadResult> {
+  const fileExt = file.name.split('.').pop() || 'bin';
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+  const base64 = await readFileAsBase64(file);
+  const res = await fetch('/.netlify/functions/upload-media', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileName, fileData: base64, folder, originalName: file.name, contentType: file.type || undefined })
+  });
+  if (!res.ok) {
+    throw new Error(`Upload function failed: ${res.status}`);
+  }
+  const data = await res.json();
+  return { url: data.url, path: data.path, name: data.name, uploadedAt: data.uploadedAt };
+}
+
+export function uploadMedia(file: File, folder: string, onProgress?: (pct: number) => void): Promise<UploadResult> {
+  return new Promise(async (resolve, reject) => {
+    const preferFunction = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+    if (preferFunction) {
+      try {
+        const result = await uploadViaFunction(file, folder);
+        resolve(result);
+        return;
+      } catch (e) {
+        console.warn('Upload via function failed, falling back to direct storage upload', e);
+      }
+    }
+
     try {
       const fileExt = file.name.split('.').pop() || 'bin';
       const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
@@ -52,7 +92,6 @@ export function uploadMedia(file: File, folder: string, onProgress?: (pct: numbe
         }
       }, (err) => reject(err), async () => {
         const url = await getDownloadURL(task.snapshot.ref);
-        // Persist media reference in Firestore for reuse elsewhere
         try {
           await saveMediaReference({
             url,
@@ -64,7 +103,6 @@ export function uploadMedia(file: File, folder: string, onProgress?: (pct: numbe
             uploadedAt: Date.now()
           });
         } catch (e) {
-          // Non-fatal: log and continue
           console.warn('Failed to save media reference', e);
         }
         resolve({ url, path: fullPath, name: fileName, uploadedAt: Date.now() });
