@@ -22,7 +22,7 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip';
 import { editingService } from '../services/EditingService';
-import { publishElementEdits } from '../services/EditsFirestoreService';
+import { publishElementEditsApi as publishElementEdits } from '../services/ApiEditsService';
 
 // Icons
 import {

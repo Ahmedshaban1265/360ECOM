@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { onSnapshot, doc } from 'firebase/firestore';
-import { db } from '@/firebase';
+import React, { useEffect, useState } from 'react';
+import { apiGet } from '@/lib/api';
 import { TemplateDocument, ThemeTokens, DeviceType } from '../types';
 import ThemeRenderer from '../renderers/ThemeRenderer';
 
@@ -16,22 +15,21 @@ function usePublishedTemplate(templateId: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setError(null);
-    const ref = doc(db, 'theme_published_v1', templateId);
-    const unsub = onSnapshot(
-      ref,
-      (snap) => {
-        setTemplate((snap.exists() ? (snap.data() as TemplateDocument) : null));
-        setLoading(false);
-      },
-      (err) => {
-        console.error('Failed to subscribe to published template', err);
-        setError('Failed to load published content');
-        setLoading(false);
+    async function fetchOnce() {
+      try {
+        const data = await apiGet(`/api/templates/${templateId}/published`);
+        if (!cancelled) setTemplate(data);
+      } catch (e) {
+        if (!cancelled) setError('Failed to load published content');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    );
-    return () => unsub();
+    }
+    fetchOnce();
+    return () => { cancelled = true; };
   }, [templateId]);
 
   return { template, loading, error } as const;
