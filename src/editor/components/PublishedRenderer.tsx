@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { onSnapshot, doc } from 'firebase/firestore';
-import { db } from '@/firebase';
 import { TemplateDocument, ThemeTokens, DeviceType } from '../types';
 import ThemeRenderer from '../renderers/ThemeRenderer';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 interface PublishedRendererProps {
   templateId: string;
@@ -16,22 +15,23 @@ function usePublishedTemplate(templateId: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isCancelled = false;
     setLoading(true);
     setError(null);
-    const ref = doc(db, 'theme_published_v1', templateId);
-    const unsub = onSnapshot(
-      ref,
-      (snap) => {
-        setTemplate((snap.exists() ? (snap.data() as TemplateDocument) : null));
-        setLoading(false);
-      },
-      (err) => {
-        console.error('Failed to subscribe to published template', err);
-        setError('Failed to load published content');
-        setLoading(false);
+    const load = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/templates/${templateId}/published`);
+        const data = res.ok ? await res.json() : null;
+        if (!isCancelled) setTemplate(data);
+      } catch (err) {
+        if (!isCancelled) setError('Failed to load published content');
+      } finally {
+        if (!isCancelled) setLoading(false);
       }
-    );
-    return () => unsub();
+    };
+    load();
+    const interval = setInterval(load, 10000);
+    return () => { isCancelled = true; clearInterval(interval); };
   }, [templateId]);
 
   return { template, loading, error } as const;

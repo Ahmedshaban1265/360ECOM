@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { storage } from '@/firebase';
-import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -46,13 +45,12 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const loadList = async () => {
     setIsLoading(true);
     try {
-      const folderRef = ref(storage, currentPrefix);
-      const res = await listAll(folderRef);
-      setFolders(res.prefixes.map((p) => p.name));
-      const items: ImageItem[] = await Promise.all(
-        res.items.map(async (itemRef) => ({ url: await getDownloadURL(itemRef), path: itemRef.fullPath }))
-      );
-      setImages(items);
+      // Backend local storage does not maintain folders; emulate with prefix in name
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${API_URL}/api/media`, { headers: token ? { Authorization: `Bearer ${token}` } : undefined as any });
+      const files: { name: string; url: string }[] = res.ok ? await res.json() : [];
+      setFolders([]);
+      setImages(files.map(f => ({ url: f.url, path: f.name })));
     } catch (e) {
       console.error('Failed to load images', e);
     } finally {
@@ -68,20 +66,14 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const onUpload = async (file: File) => {
     setIsUploading(true);
     try {
-      const ext = file.name.split('.').pop() || 'bin';
-      const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-      const prefix = currentPrefix.endsWith('/') ? currentPrefix : `${currentPrefix}/`;
-      const fileRef = ref(storage, `${prefix}${name}`);
-      const task = uploadBytesResumable(fileRef, file);
-      task.on('state_changed', (snap) => {
-        const pct = Math.round((snap.bytesTransferred / snap.totalBytes) * 100);
-        if (progressRef.current) progressRef.current.style.width = pct + '%';
-      }, (err) => {
-        console.error(err);
-      }, async () => {
-        await loadList();
-        setIsUploading(false);
-      });
+      const token = localStorage.getItem('authToken');
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch(`${API_URL}/api/media/upload`, { method: 'POST', headers: token ? { Authorization: `Bearer ${token}` } : undefined as any, body: form });
+      if (!res.ok) throw new Error('Upload failed');
+      if (progressRef.current) progressRef.current.style.width = '100%';
+      await loadList();
+      setIsUploading(false);
     } catch (e) {
       console.error('Upload failed', e);
       setIsUploading(false);
@@ -91,11 +83,7 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const createFolder = async (name: string) => {
     if (!name) return;
     try {
-      // Create a placeholder file to materialize the folder
-      const prefix = currentPrefix.endsWith('/') ? currentPrefix : `${currentPrefix}/`;
-      const keepRef = ref(storage, `${prefix}${name}/.keep`);
-      const blob = new Blob([new Uint8Array()], { type: 'application/octet-stream' });
-      await uploadBytesResumable(keepRef, blob);
+      // No-op for backend local storage, optionally could create subpath semantics
       await loadList();
     } catch (e) {
       console.error('Create folder failed', e);
@@ -109,7 +97,8 @@ export default function ImageLibrary({ root = 'theme-media', onSelect }: ImageLi
   const removeImage = async (path: string) => {
     if (!confirm('Delete this image?')) return;
     try {
-      await deleteObject(ref(storage, path));
+      const token = localStorage.getItem('authToken');
+      await fetch(`${API_URL}/api/media/${encodeURIComponent(path)}`, { method: 'DELETE', headers: token ? { Authorization: `Bearer ${token}` } : undefined as any });
       await loadList();
     } catch (e) {
       console.error('Delete failed', e);

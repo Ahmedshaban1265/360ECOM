@@ -1,5 +1,4 @@
-import { storage } from '@/firebase';
-import { ref, listAll, connectStorageEmulator } from 'firebase/storage';
+// Deprecated Firebase connection test; not used with REST backend
 
 export class FirebaseConnectionTest {
   
