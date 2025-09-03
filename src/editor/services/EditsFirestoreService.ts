@@ -1,5 +1,4 @@
-import { db } from '@/firebase';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+// Deprecated Firebase edits service; live edits now handled via REST polling in PublishedRenderer
 
 export interface ElementEdit {
   id: string;           // element id (e.g., pageId-tag-index)

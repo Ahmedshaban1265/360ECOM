@@ -1,5 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
+// Deprecated Firebase driver retained for reference; replaced by RestDriver
 import { StorageDriver, TemplateDocument, ThemeTokens } from '../types';
 
 /**

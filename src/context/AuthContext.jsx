@@ -1,6 +1,8 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -13,31 +15,27 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuthStatus = () => {
-    const isAuth = localStorage.getItem('isAdminAuthenticated') === 'true';
-    const loginTime = localStorage.getItem('adminLoginTime');
-
-    if (isAuth && loginTime) {
-      const currentTime = Date.now();
-      const sessionDuration = 24 * 60 * 60 * 1000;
-
-      if (currentTime - parseInt(loginTime, 10) < sessionDuration) {
-        setIsAuthenticated(true);
-      } else {
-        logout();
-      }
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setIsAuthenticated(true);
     }
     setIsLoading(false);
   };
 
-  const login = () => {
-    localStorage.setItem('isAdminAuthenticated', 'true');
-    localStorage.setItem('adminLoginTime', Date.now().toString());
+  const login = async (email, password) => {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!res.ok) throw new Error('Invalid credentials');
+    const data = await res.json();
+    localStorage.setItem('authToken', data.token);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
-    localStorage.removeItem('isAdminAuthenticated');
-    localStorage.removeItem('adminLoginTime');
+    localStorage.removeItem('authToken');
     setIsAuthenticated(false);
   };
 

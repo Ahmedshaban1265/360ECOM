@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { storage } from '@/firebase';
-import { listAll, ref, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 import { FirebaseConnectionTest } from '../services/FirebaseConnectionTest';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -63,53 +62,11 @@ export default function ShopifyImageLibrary({
       });
 
       const loadPromise = async () => {
-        const folderRef = ref(storage, root);
-
-        // Try to list with exponential backoff
-        const delay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-        if (retryCount > 0) {
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-
-        const res = await listAll(folderRef);
-
-        // Process images in smaller batches to avoid overwhelming Firebase
-        const batchSize = 10;
-        const imageItems: ImageItem[] = [];
-        const filteredItems = res.items.filter(item => {
-          const name = item.name.toLowerCase();
-          return name.endsWith('.jpg') || name.endsWith('.jpeg') ||
-                 name.endsWith('.png') || name.endsWith('.gif') ||
-                 name.endsWith('.webp') || name.endsWith('.svg');
-        });
-
-        for (let i = 0; i < filteredItems.length; i += batchSize) {
-          const batch = filteredItems.slice(i, i + batchSize);
-          const batchPromises = batch.map(async (itemRef) => {
-            try {
-              const url = await getDownloadURL(itemRef);
-              return {
-                url,
-                path: itemRef.fullPath,
-                name: itemRef.name,
-                uploadedAt: new Date(parseInt(itemRef.name.split('-')[0]) || Date.now())
-              };
-            } catch (urlError) {
-              console.warn(`Failed to get download URL for ${itemRef.name}:`, urlError);
-              return null;
-            }
-          });
-
-          const batchResults = await Promise.all(batchPromises);
-          imageItems.push(...batchResults.filter(item => item !== null) as ImageItem[]);
-
-          // Small delay between batches
-          if (i + batchSize < filteredItems.length) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
-        }
-
-        return imageItems;
+        const token = localStorage.getItem('authToken');
+        const res = await fetch(`${API_URL}/api/media`, { headers: token ? { Authorization: `Bearer ${token}` } : undefined as any });
+        if (!res.ok) return [] as ImageItem[];
+        const files: { name: string; url: string }[] = await res.json();
+        return files.map(f => ({ url: f.url, path: f.name, name: f.name, uploadedAt: new Date() }));
       };
 
       const imageItems = await Promise.race([loadPromise(), timeoutPromise]) as ImageItem[];
@@ -125,10 +82,8 @@ export default function ShopifyImageLibrary({
     } catch (error: any) {
       console.error(`Failed to load images (attempt ${retryCount + 1}):`, error);
 
-      // Handle specific Firebase errors
-      if (error?.code === 'storage/retry-limit-exceeded' ||
-          error?.code === 'storage/timeout' ||
-          error?.message === 'Operation timeout') {
+      // Handle retryable errors generically
+      if (error?.message?.includes('timeout')) {
 
         if (retryCount < maxRetries) {
           console.log(`Retrying... (${retryCount + 1}/${maxRetries})`);
@@ -141,7 +96,7 @@ export default function ShopifyImageLibrary({
           setImages([]);
           setFilteredImages([]);
         }
-      } else if (error?.code === 'storage/object-not-found') {
+      } else if (error?.code === 'not-found') {
         console.log('No images folder found, starting with empty library');
         setImages([]);
         setFilteredImages([]);
@@ -239,51 +194,16 @@ export default function ShopifyImageLibrary({
 
       console.log(`Uploading ${validFiles.length} files...`);
 
+      const token = localStorage.getItem('authToken');
       const uploadPromises = validFiles.map(async (file, index) => {
-        const ext = file.name.split('.').pop() || 'bin';
-        const name = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const fileRef = ref(storage, `${root}/${name}`);
-
-        return new Promise<ImageItem>((resolve, reject) => {
-          const task = uploadBytesResumable(fileRef, file);
-
-          // Set timeout for upload
-          const timeout = setTimeout(() => {
-            task.cancel();
-            reject(new Error(`Upload timeout for ${file.name}`));
-          }, 60000); // 60 second timeout per file
-
-          task.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              // Update progress for the whole batch
-              setUploadProgress(prev => {
-                const fileProgress = progress / validFiles.length;
-                const baseProgress = (index / validFiles.length) * 100;
-                return baseProgress + fileProgress;
-              });
-            },
-            (error) => {
-              clearTimeout(timeout);
-              console.error(`Upload failed for ${file.name}:`, error);
-              reject(error);
-            },
-            async () => {
-              clearTimeout(timeout);
-              try {
-                const url = await getDownloadURL(task.snapshot.ref);
-                resolve({
-                  url,
-                  path: task.snapshot.ref.fullPath,
-                  name,
-                  uploadedAt: new Date()
-                });
-              } catch (urlError) {
-                reject(urlError);
-              }
-            }
-          );
-        });
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch(`${API_URL}/api/media/upload`, { method: 'POST', headers: token ? { Authorization: `Bearer ${token}` } : undefined as any, body: form });
+        if (!res.ok) throw new Error('Upload failed');
+        const data = await res.json();
+        const progress = ((index + 1) / validFiles.length) * 100;
+        setUploadProgress(progress);
+        return { url: data.url, path: data.name, name: data.name, uploadedAt: new Date() } as ImageItem;
       });
 
       const results = await Promise.allSettled(uploadPromises);
@@ -321,12 +241,11 @@ export default function ShopifyImageLibrary({
 
     } catch (error: any) {
       console.error('Upload failed:', error);
-      // Handle specific Firebase Storage errors
-      if (error?.code === 'storage/retry-limit-exceeded') {
+      if (error?.message?.includes('retry')) {
         console.error('Upload retry limit exceeded. Please try again later.');
-      } else if (error?.code === 'storage/unauthorized') {
+      } else if (error?.code === 'unauthorized') {
         console.error('Upload unauthorized. Please check Firebase Storage rules.');
-      } else if (error?.code === 'storage/canceled') {
+      } else if (error?.code === 'canceled') {
         console.error('Upload was canceled.');
       } else {
         console.error('Upload error:', error?.message || error);
